@@ -1,0 +1,8 @@
+# virtual env files
+venv
+
+# cache files
+*.pyc
+.idea
+
+db.sqlite3

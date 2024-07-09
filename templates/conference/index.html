@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-12">
+            Upcoming LUD Conferences
+        </div>
+
+        <div class="col-12 py-3">
+
+            {# loop the following for various conferences #}
+            <div class="card mb-3">
+                <div class="row p-1">
+                    <div class="col-md-3 d-flex justify-content-center">
+                        <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card-body">
+                            <div class="float-end mb-3">
+                                <a class="btn btn-sm btn-warning">
+                                    <i class="fa-regular fa-circle-check"></i>
+                                    Participate
+                                </a>
+                            </div>
+                            <h5 class="card-title">LUD Community Conference - Bangalore</h5>
+                            <hr/>
+                            <p class="card-text">
+                                This is a wider card with supporting text below as a natural lead-in to
+                                additional content. This content is a little bit longer.
+                            </p>
+                            <p class="card-text">
+                                This is a wider card with supporting text below as a natural lead-in to
+                                additional content. This content is a little bit longer.
+                            </p>
+                            <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock content %}
