@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="d-flex justify-content-center py-5">
+        <form method="POST" class="col-sm-12 col-md-6 border p-3 py-4">
+            {% csrf_token %}
+            <div class="text-center mb-4 fs-5">
+                 <i class="fa-solid fa-right-to-bracket fs-1 fw-bolder"></i>
+                <br/>
+                Login to LUD-CMT
+            </div>
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com">
+                <label for="email">Email address</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                <label for="password">Password</label>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-sm btn-secondary" type="submit">
+                    Login
+                </button>
+            </div>
+        </form>
+    
+    </div>
+
+{% endblock content %}

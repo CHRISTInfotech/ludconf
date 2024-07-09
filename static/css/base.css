@@ -1,0 +1,9 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure the body takes up the full viewport height */
+}
+
+.main-container {
+  flex: 1; /* Allow the main content to grow and push the footer down */
+}

@@ -12,16 +12,21 @@
           integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <link rel="icon" type="image/x-icon" href="{% static 'img/logo.png' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 
 <body>
 
 {% include 'partials/header.html' %}
 
-<div class="container m-auto my-3">
+<div class="container main-container m-auto my-3">
     {% block content %}
 
     {% endblock content %}
+</div>
+
+<div class="container">
+    {% include 'partials/messages.html' %}
 </div>
 
 {% include 'partials/footer.html' %}
