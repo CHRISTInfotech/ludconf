@@ -5,8 +5,56 @@
 
     {% include 'partials/nav.html' %}
 
-    <div class="py-3">
-        Conference Admin Dashboard
+    <div class="row m-auto py-3">
+        <div class="col-12 fs-6 fw-bold text-center mb-3">
+            Conference Admin Dashboard <br/>
+            <hr/>
+        </div>
+        <div class="col-sm-12 col-md-6 mb-3">
+            <div class="text-center">
+                Active Conferences
+            </div>
+            <div class="text-center fw-bolder fs-1">
+                {{ active_conferences }}
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6 mb-3">
+            <div class="text-center">
+                Conferences Managed
+            </div>
+            <div class="text-center fw-bolder fs-1">
+                {{ all_conferences }}
+            </div>
+        </div>
+        <div class="col-12 mb-3">
+            <div class="text-center">
+                # for active conferences
+            </div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">Handle</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+                    <td>@fat</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
 {% endblock content %}

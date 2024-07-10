@@ -16,10 +16,17 @@
                     Login
                 </a>
             {% else %}
-                <a class="btn btn-sm btn-outline-success " href="{% url 'ludlogout' %}">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Logout
-                </a>
+                <div class="p-2">
+                    <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                        {{ request.user.username }}
+                    </a>
+                </div>
+                <div class="p-1">
+                    <a class="btn btn-sm btn-outline-success " href="{% url 'ludlogout' %}">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+                    </a>
+                </div>
             {% endif %}
         </form>
     </div>
