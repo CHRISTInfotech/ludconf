@@ -76,3 +76,11 @@ def adminlistactiveconference(request):
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
+
+
+def manageconference(request,conference_id):
+    if request.user.is_authenticated and request.user.is_superuser:
+        conference = Conference.objects.get(pk=conference_id)
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')

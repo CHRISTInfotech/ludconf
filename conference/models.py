@@ -1,8 +1,11 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
 class Conference(models.Model):
+    conference_id = uuid.uuid4()
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     venue = models.CharField(max_length=255)
