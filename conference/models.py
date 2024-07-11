@@ -1,11 +1,11 @@
 import uuid
-
 from django.contrib.auth.models import User
 from django.db import models
 
+
 # Create your models here.
 class Conference(models.Model):
-    conference_id = uuid.uuid4()
+    conference_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     venue = models.CharField(max_length=255)
@@ -20,3 +20,44 @@ class Conference(models.Model):
 
     def __str__(self):
         return self.title + "\t" + self.location + "\t" + self.venue
+
+
+class OTPRequest(models.Model):
+    email = models.EmailField(max_length=255)
+    otp = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.email + "\t" + self.otp.__str__()
+
+
+class UserDetails(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    gender = models.CharField(max_length=10)
+    dob = models.DateField()
+    designation = models.CharField(max_length=255)
+    organization = models.CharField(max_length=255)
+    mobile = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.user.username
+
+
+class ConferenceRegistration(models.Model):
+    conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    interest = models.CharField(max_length=255)
+    registration_date = models.DateField()
+
+    def __str__(self):
+        return self.conference.title + "\t" + self.user.username
+
+
+class ConferenceDetails(models.Model):
+    conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
+    conference_banner = models.ImageField(upload_to="banners/")
+    conference_theme = models.CharField(max_length=255)
+    conference_description = models.TextField()
+    conference_feedback_link = models.TextField()
+
+    def __str__(self):
+        return self.conference.title + "\t" + self.conference.start_date.__str__()

@@ -1,6 +1,9 @@
 <nav class="navbar navbar-expand bg-body-tertiary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'dashboard' %}">Dashboard</a>
+        <a class="navbar-brand" href="{% url 'dashboard' %}">
+            <i class="fa-solid fa-house-user"></i>
+            Home
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -19,6 +22,12 @@
                     </a>
                 {% elif request.user.is_staff %}
                 {% else %}
+                    <a class="nav-link" href="{% url 'registred_conference' %}">
+                        Registered Conferences
+                    </a>
+                    <a class="nav-link" href="{% url 'participated_conference' %}">
+                        Participated Conferences
+                    </a>
                 {% endif %}
             </div>
         </div>

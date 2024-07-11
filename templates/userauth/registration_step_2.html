@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="d-flex justify-content-center py-5">
+        <form method="POST" class="col-sm-12 col-md-6 border p-3 py-4">
+            {% csrf_token %}
+            <div class="text-center mb-4 fs-5 mt-4">
+                 <i class="fa-solid fa-right-to-bracket fs-1 fw-bolder"></i>
+                <br/>
+                Register to LUD-CMT
+            </div>
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="email" name="email" value="{{ email }}" disabled required>
+                <label for="email">Email address</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control" id="otp" name="otp" required>
+                <label for="otp">OTP</label>
+            </div>
+            <div class="mb-3">
+                <small class="text-muted">
+                    Unable to see the otp? Check your SPAM folder in case if your mail is correct.
+                </small>
+            </div>
+            <div class="d-flex justify-content-center mb-3">
+                <button class="btn btn btn-secondary" type="submit">
+                    <i class="fa-solid fa-forward"></i>
+                    Confirm OTP
+                </button>
+            </div>
+        </form>
+    
+    </div>
+
+{% endblock content %}

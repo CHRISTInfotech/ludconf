@@ -1,8 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
-from conference.models import Conference
+from conference.functions import generate_otp
+from conference.mails import send_otp_email
+from conference.models import Conference, OTPRequest, UserDetails
 
 
 # Create your views here.
@@ -11,6 +14,8 @@ def home(request):
 
 
 def ludlogin(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     if request.method.lower() == 'post':
         username = request.POST.get('email')
         password = request.POST.get('password')
@@ -32,15 +37,81 @@ def ludlogout(request):
     return redirect('home')
 
 
+def ludregister(request):
+    if request.method.lower() == 'post':
+        email = request.POST.get('email')
+        otp = generate_otp()
+        ret = send_otp_email(email, otp)
+        if ret:
+            messages.success(request, 'Your OTP has been sent to you')
+            if OTPRequest.objects.filter(email=email).exists():
+                new_otp = OTPRequest.objects.get(email=email)
+                new_otp.otp = otp
+                new_otp.save()
+            else:
+                newotp = OTPRequest.objects.create(email=email, otp=otp)
+                newotp.save()
+            return redirect('ludregister_step_2', email)
+        else:
+            messages.error(request, 'unable to process your request now,\
+                            please try after some time or contacting LUD Admin')
+            return redirect('ludregister')
+    return render(request, 'userauth/registration.html')
+
+
+def ludregister_step_2(request, email):
+    if OTPRequest.objects.filter(email=email).exists():
+        otpRequest = OTPRequest.objects.get(email=email)
+        if request.method == 'POST':
+            otp = request.POST.get('otp')
+            if otp == otpRequest.otp:
+                messages.success(request, 'Your OTP has been been validated, please create an account')
+                return redirect('ludregister_step_3', email)
+            else:
+                messages.error(request, 'Invalid OTP')
+                return redirect('ludregister_step_3', email)
+        return render(request, 'userauth/registration_step_2.html', context={'email': email, 'otpRequest': otpRequest})
+    else:
+        messages.error(request, 'OTP Request does not exist, please try again')
+        return redirect('ludregister')
+
+
+def ludregister_step_3(request, email):
+    if OTPRequest.objects.filter(email=email).exists():
+        if request.method == 'POST':
+            first_name = request.POST.get('firstname')
+            last_name = request.POST.get('lastname')
+            gender = request.POST.get('gender')
+            dob = request.POST.get('dob')
+            designation = request.POST.get('designation')
+            organization = request.POST.get('organization')
+            mobile = request.POST.get('mobile')
+            password = request.POST.get('password')
+            user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name,
+                                            username=email)
+            user.save()
+            userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
+                                      organization=organization, mobile=mobile)
+            userdetails.save()
+            messages.success(request, 'Your Account has been created')
+            return redirect('ludlogin')
+
+        return render(request, 'userauth/registration_step_3.html', context={'email': email})
+    else:
+        messages.error(request, 'OTP Request does not exist, please try again')
+        return redirect('ludregister')
+
+
 def dashboard(request):
     if request.user.is_authenticated and request.user.is_superuser:
         active_conferences = Conference.objects.filter(is_published=True).count()
         all_conferences = Conference.objects.all().count()
-        return render(request, 'siteadmin/dashboard.html',context={'active_conferences': active_conferences, 'all_conferences': all_conferences})
+        return render(request, 'siteadmin/dashboard.html',
+                      context={'active_conferences': active_conferences, 'all_conferences': all_conferences})
     if request.user.is_authenticated and request.user.is_staff:
         pass
     if request.user.is_authenticated:
-        pass
+        return render(request, 'participant/dashboard.html')
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
@@ -77,15 +148,38 @@ def adminlistactiveconference(request):
         messages.error(request, 'You are not logged in')
         return redirect('home')
 
+
 def adminlistcompletedconference(request):
     if request.user.is_authenticated and request.user.is_superuser:
         conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
-        return render(request,'siteadmin/listconferences.html',context={'conferences': conferences})
+        return render(request, 'siteadmin/listconferences.html', context={'conferences': conferences})
 
 
-def manageconference(request,conference_id):
+def manageconference(request, conference_id):
     if request.user.is_authenticated and request.user.is_superuser:
         conference = Conference.objects.get(pk=conference_id)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
+
+
+def participatedconference(request):
+    if request.user.is_authenticated:
+        conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
+        return render(request, 'participant/listconferences.html', context={'conferences': conferences})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+def registeredconference(request):
+    if request.user.is_authenticated:
+        conferences = Conference.objects.filter(is_published=True).order_by('-created_at')
+        return render(request, 'participant/regconferences.html', context={'conferences': conferences})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+def participateconference(request, conference_id):
+    if request.user.is_authenticated:
+        conference = Conference.objects.get(pk=conference_id)
+        return redirect('')
