@@ -14,7 +14,7 @@
                     <a class="nav-link" href="{% url 'admin_list_active_conference' %}">
                         Active Conferences
                     </a>
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'admin_list_completed' %}">
                         Completed Conferences
                     </a>
                 {% elif request.user.is_staff %}

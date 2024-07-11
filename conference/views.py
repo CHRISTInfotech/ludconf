@@ -77,6 +77,11 @@ def adminlistactiveconference(request):
         messages.error(request, 'You are not logged in')
         return redirect('home')
 
+def adminlistcompletedconference(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
+        return render(request,'siteadmin/listconferences.html',context={'conferences': conferences})
+
 
 def manageconference(request,conference_id):
     if request.user.is_authenticated and request.user.is_superuser:
