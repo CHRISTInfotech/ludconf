@@ -8,3 +8,6 @@ venv
 db.sqlite3
 
 conference/migrations/
+
+#env variables
+ludconf/env.py
