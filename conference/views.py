@@ -93,6 +93,16 @@ def ludregister_step_3(request, email):
             userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
                                       organization=organization, mobile=mobile)
             userdetails.save()
+
+            try:
+                conferences = ConferenceOrganisers.objects.filter(mails=user.email)
+                if conferences.exists():
+                    user.is_staff = True
+                    user.save()
+                    messages.success(request, 'You are a conference organiser, your conferences are now linked')
+            except:
+                pass
+
             messages.success(request, 'Your Account has been created')
             return redirect('ludlogin')
 
@@ -109,7 +119,7 @@ def dashboard(request):
         return render(request, 'siteadmin/dashboard.html',
                       context={'active_conferences': active_conferences, 'all_conferences': all_conferences})
     if request.user.is_authenticated and request.user.is_staff:
-        pass
+        return render(request, 'organiser/dashboard.html')
     if request.user.is_authenticated:
         return render(request, 'participant/dashboard.html')
     else:
@@ -142,6 +152,21 @@ def adminconferencecreate(request):
             if not ConferenceOrganisers.objects.filter(mails=organizer3, conference=newconference).exists():
                 cof_org_3 = ConferenceOrganisers(mails=organizer3, conference=newconference, created_by=request.user)
                 cof_org_3.save()
+
+            if User.objects.filter(username=organizer1).exists():
+                user = User.objects.get(username=organizer1)
+                user.is_staff = True
+                user.save()
+
+            if User.objects.filter(username=organizer2).exists():
+                user = User.objects.get(username=organizer2)
+                user.is_staff = True
+                user.save()
+
+            if User.objects.filter(username=organizer3).exists():
+                user = User.objects.get(username=organizer3)
+                user.is_staff = True
+                user.save()
 
             messages.success(request, 'Your conference has been created!')
             return redirect('admin_list_active_conference')
@@ -214,6 +239,24 @@ def participateconference(request, conference_id):
     if request.user.is_authenticated:
         conference = Conference.objects.get(pk=conference_id)
         return render(request, 'participant/conference_participation.html', context={'conference': conference})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def stafforganisingconferenes(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        conferences = Conference.objects.filter(is_published=True).order_by('-created_at')
+        return render(request, 'organiser/newconference.html', context={'conferences': conferences})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def stafforganisedconferene(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
+        return render(request, 'organiser/listconferences.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')

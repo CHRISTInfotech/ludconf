@@ -21,14 +21,20 @@
                         Completed Conferences
                     </a>
                 {% elif request.user.is_staff %}
-                    <a class="nav-link">
+                    <a class="nav-link" href="{% url 'staff_organizing_conference' %}">
                         Organising Conferences
                     </a>
-                    <a class="nav-link">
+                    <a class="nav-link" href="{% url 'staff_organized_conference' %}">
                         Organised Conferences
                     </a>
+                    <a class="nav-link" href="{% url 'registered_conference' %}">
+                        Registered Conferences
+                    </a>
+                    <a class="nav-link" href="{% url 'participated_conference' %}">
+                        Participated Conferences
+                    </a>
                 {% else %}
-                    <a class="nav-link" href="{% url 'registred_conference' %}">
+                    <a class="nav-link" href="{% url 'registered_conference' %}">
                         Registered Conferences
                     </a>
                     <a class="nav-link" href="{% url 'participated_conference' %}">

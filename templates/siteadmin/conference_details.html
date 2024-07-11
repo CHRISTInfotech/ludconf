@@ -80,6 +80,18 @@
                     <th scope="row">Feedback Link</th>
                     <td>{{ conference_details.conference_feedback_link }}</td>
                 </tr>
+                <tr>
+                    <th scope="row">Conference Registration Count</th>
+                    <td>00</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference created on</th>
+                    <td>{{ conference.created_at }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference created By</th>
+                    <td>{{ conference.created_by }}</td>
+                </tr>
                 </tbody>
             </table>
             <div class="col-12 d-flex justify-content-around mt-4">
