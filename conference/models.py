@@ -61,3 +61,10 @@ class ConferenceDetails(models.Model):
 
     def __str__(self):
         return self.conference.title + "\t" + self.conference.start_date.__str__()
+
+
+class ConferenceOrganisers(models.Model):
+    mails = models.EmailField(max_length=255)
+    conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)

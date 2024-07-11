@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    {% include 'partials/nav.html' %}
+
+    <div class="row m-auto py-3">
+        <div class="col-12 fs-6 fw-bold text-center mb-3">
+            Manage Conference #{{ conference.pk }} <br/>
+            <hr/>
+        </div>
+        <div class="col-12">
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th scope="row">Conference</th>
+                    <td>{{ conference.pk }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Title</th>
+                    <td>{{ conference.title }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Location</th>
+                    <td>{{ conference.location }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Venue</th>
+                    <td>{{ conference.venue }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Start Date</th>
+                    <td>{{ conference.start_date }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference End Date</th>
+                    <td>{{ conference.end_date }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Organisers</th>
+                    <td>
+                        Contact People: <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Status</th>
+                    <td>
+                        {% if conference.is_published %}
+                            Active
+                        {% else %}
+                            In-Active
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Created At</th>
+                    <td>{{ conference.created_at }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Created By</th>
+                    <td>{{ conference.created_by }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Banner</th>
+                    <td>{{ conference_details.conference_banner }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Theme</th>
+                    <td>{{ conference_details.conference_theme }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Description</th>
+                    <td>{{ conference_details.conference_description }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Feedback Link</th>
+                    <td>{{ conference_details.conference_feedback_link }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="col-12 d-flex justify-content-around mt-4">
+                <a class="btn btn-warning text-decoration-none"
+                   href="{% url 'admin_conference_status' conference.conference_id %}">
+                    Toggle Conference Status
+                </a>
+                <button class="btn btn-success">
+                    Download Participants List
+                </button>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

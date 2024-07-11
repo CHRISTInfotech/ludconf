@@ -21,7 +21,8 @@
                             </div>
                             <div class="col-12">
                                 <h5 class="card-title text-wrap">{{ conf.title }}</h5>
-                                <a class="btn btn-sm btn-warning float-end">
+                                <a class="btn btn-sm btn-warning float-end"
+                                   href="{% url 'admin_manage_conference' conf.pk %}">
                                     <i class="fa-regular fa-circle-check"></i>
                                     Manage
                                 </a>

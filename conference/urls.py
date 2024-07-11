@@ -1,7 +1,8 @@
 from django.urls import path
 
 from conference.views import home, ludlogin, dashboard, adminconferencecreate, ludlogout, adminlistactiveconference, \
-    adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference, participateconference, participatedconference
+    adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference, \
+    participateconference, participatedconference, adminmanageconference, adminconferencestatuschange
 
 urlpatterns = [
     path('', home, name='home'),
@@ -14,6 +15,8 @@ urlpatterns = [
     path('admin_conference_create', adminconferencecreate, name='admin_conference_create'),
     path('admin_list_active_conference', adminlistactiveconference, name='admin_list_active_conference'),
     path('admin_list_completed', adminlistcompletedconference, name='admin_list_completed'),
+    path('admin_manage_conference/<str:conference_id>', adminmanageconference, name='admin_manage_conference'),
+    path('admin_conference_status/<str:conference_id>', adminconferencestatuschange, name='admin_conference_status'),
     path('registred_conference', registeredconference, name='registred_conference'),
     path('participated_conference', participatedconference, name='participated_conference'),
 

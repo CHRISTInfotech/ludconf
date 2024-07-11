@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 
 from conference.functions import generate_otp
 from conference.mails import send_otp_email
-from conference.models import Conference, OTPRequest, UserDetails
+from conference.models import Conference, OTPRequest, UserDetails, ConferenceOrganisers, ConferenceDetails
 
 
 # Create your views here.
@@ -132,6 +132,17 @@ def adminconferencecreate(request):
                                        end_date=endDate, organizer1=organizer1, organizer2=organizer2,
                                        organizer3=organizer3, created_by=request.user)
             newconference.save()
+
+            if not ConferenceOrganisers.objects.filter(mails=organizer1, conference=newconference).exists():
+                cof_org_1 = ConferenceOrganisers(mails=organizer1, conference=newconference, created_by=request.user)
+                cof_org_1.save()
+            if not ConferenceOrganisers.objects.filter(mails=organizer2, conference=newconference).exists():
+                cof_org_2 = ConferenceOrganisers(mails=organizer2, conference=newconference, created_by=request.user)
+                cof_org_2.save()
+            if not ConferenceOrganisers.objects.filter(mails=organizer3, conference=newconference).exists():
+                cof_org_3 = ConferenceOrganisers(mails=organizer3, conference=newconference, created_by=request.user)
+                cof_org_3.save()
+
             messages.success(request, 'Your conference has been created!')
             return redirect('admin_list_active_conference')
         return render(request, 'siteadmin/newconference.html')
@@ -155,9 +166,27 @@ def adminlistcompletedconference(request):
         return render(request, 'siteadmin/listconferences.html', context={'conferences': conferences})
 
 
-def manageconference(request, conference_id):
+def adminmanageconference(request, conference_id):
     if request.user.is_authenticated and request.user.is_superuser:
         conference = Conference.objects.get(pk=conference_id)
+        try:
+            conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
+        except:
+            conference_details = None
+        return render(request, 'siteadmin/conference_details.html',
+                      context={'conference': conference, 'conference_details': conference_details})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def adminconferencestatuschange(request, conference_id):
+    if request.user.is_authenticated and request.user.is_superuser:
+        conference = Conference.objects.get(pk=conference_id)
+        conference.is_published = not conference.is_published
+        conference.save()
+        messages.success(request, 'Your conference status has been updated')
+        return redirect('admin_manage_conference', conference_id)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
@@ -171,6 +200,7 @@ def participatedconference(request):
         messages.error(request, 'You are not logged in')
         return redirect('home')
 
+
 def registeredconference(request):
     if request.user.is_authenticated:
         conferences = Conference.objects.filter(is_published=True).order_by('-created_at')
@@ -179,7 +209,11 @@ def registeredconference(request):
         messages.error(request, 'You are not logged in')
         return redirect('home')
 
+
 def participateconference(request, conference_id):
     if request.user.is_authenticated:
         conference = Conference.objects.get(pk=conference_id)
-        return redirect('')
+        return render(request, 'participant/conference_participation.html', context={'conference': conference})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')

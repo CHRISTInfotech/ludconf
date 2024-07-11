@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    {% include 'partials/nav.html' %}
+
+    <div class="row m-auto py-3">
+        <div class="col-12 fs-6 fw-bold text-center">
+            New Conference <br/>
+            <hr/>
+        </div>
+        <form method="POST" class="col-12 row m-auto">
+            {% csrf_token %}
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="conferenceHeading" name="conferenceHeading"
+                           placeholder="Conference Heading" required>
+                    <label for="conferenceHeading">Conference Heading</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="location" name="location" placeholder="Location"
+                           required>
+                    <label for="location">Location</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="venue" name="venue" placeholder="Venue" required>
+                    <label for="venue">Venue</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="date" class="form-control" id="fromdate" name="fromdate" placeholder="From Date"
+                           required>
+                    <label for="fromdate">Start Date</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="date" class="form-control" id="enddate" name="enddate" placeholder="End Date" required>
+                    <label for="enddate">End Date</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="org1" name="org1" placeholder="Organiser 1" required>
+                    <label for="org1">Organiser Email 1</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="org2" name="org2" placeholder="Organiser 2" required>
+                    <label for="org2">Organiser Email 2</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="org3" name="org3" placeholder="Organiser 3" required>
+                    <label for="org3">Organiser Email 3</label>
+                </div>
+            </div>
+            <div class="col-12 text-center">
+                <button class="btn btn-sm btn-success mb-3" type="submit">
+                    Create Conference
+                </button>
+            </div>
+        </form>
+    </div>
+
+{% endblock content %}
