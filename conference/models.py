@@ -46,7 +46,7 @@ class ConferenceRegistration(models.Model):
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     interest = models.CharField(max_length=255)
-    registration_date = models.DateField()
+    registration_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.conference.title + "\t" + self.user.username

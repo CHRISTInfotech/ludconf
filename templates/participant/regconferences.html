@@ -13,44 +13,51 @@
         <div class="">
             <table class="table table-hover">
                 <tbody>
-                {% if conferences%}
-                {% for conf in conferences %}
-                    <tr>
-                        <td class="row p-1">
-                            <div class="col-12 mt-3">
-                                <small class="mb-3">Conference #{{ forloop.counter }}</small>
-                            </div>
-                            <div class="col-12">
-                                <h5 class="card-title text-wrap">{{ conf.title }}</h5>
-                                <a class="btn btn-sm btn-warning float-end">
-                                    <i class="fa-regular fa-circle-check"></i>
-                                    Manage
-                                </a>
-                                <hr/>
-                            </div>
-                            <div class="col-sm-12 col-md-6 fs-6 mb-3">
-                                Location: {{ conf.location }}
-                            </div>
-                            <div class="col-sm-12 col-md-6 fs-6 mb-3">
-                                Venue: {{ conf.venue }}
-                            </div>
-                            <div class="col-12 fs-6 fst-italic mb-3">
-                                From {{ conf.start_date }} to {{ conf.end_date }}
-                            </div>
-                            <div class="col-12 fs-6 mb-3">
-                                Contact People: <br/>
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
-                            </div>
-                            <div class="col-12 mb-3">
-                                <small class="text-body-secondary float-end">
-                                    Created {{ conf.created_at|timesince }} ago
-                                </small>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
+                {% if conferences %}
+                    {% for conf in conferences %}
+                        <tr>
+                            <td class="row p-1">
+                                <div class="col-12 mt-3">
+                                    <small class="mb-3">Conference #{{ forloop.counter }}</small>
+                                </div>
+                                <div class="col-12">
+                                    <h5 class="card-title text-wrap">{{ conf.title }}</h5>
+                                    <a class="btn btn-danger float-end"
+                                       href="{% url 'de_register_conference' conf.pk %}">
+                                        <i class="fa-regular fa-circle-check"></i>
+                                        De-register
+                                    </a>
+                                    <div class="float-end p-2"></div>
+                                    <a class="btn btn-success float-end"
+                                       href="{% url 'conference_pass' conf.pk %}">
+                                        <i class="fa-regular fa-circle-check"></i>
+                                        View Pass
+                                    </a>
+                                    <hr/>
+                                </div>
+                                <div class="col-sm-12 col-md-6 fs-6 mb-3">
+                                    Location: {{ conf.location }}
+                                </div>
+                                <div class="col-sm-12 col-md-6 fs-6 mb-3">
+                                    Venue: {{ conf.venue }}
+                                </div>
+                                <div class="col-12 fs-6 fst-italic mb-3">
+                                    From {{ conf.start_date }} to {{ conf.end_date }}
+                                </div>
+                                <div class="col-12 fs-6 mb-3">
+                                    Contact People: <br/>
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <small class="text-body-secondary float-end">
+                                        Created {{ conf.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 {% else %}
                     <tr>
                         <td class="p-2">

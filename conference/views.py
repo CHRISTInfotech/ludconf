@@ -1,16 +1,19 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
 from conference.functions import generate_otp
 from conference.mails import send_otp_email
-from conference.models import Conference, OTPRequest, UserDetails, ConferenceOrganisers, ConferenceDetails
+from conference.models import Conference, OTPRequest, UserDetails, ConferenceOrganisers, ConferenceDetails, \
+    ConferenceRegistration
 
 
 # Create your views here.
 def home(request):
-    return render(request, 'conference/index.html')
+    conferences = Conference.objects.filter(is_published=True)
+    return render(request, 'conference/index.html', context={'conferences': conferences})
 
 
 def ludlogin(request):
@@ -119,9 +122,17 @@ def dashboard(request):
         return render(request, 'siteadmin/dashboard.html',
                       context={'active_conferences': active_conferences, 'all_conferences': all_conferences})
     if request.user.is_authenticated and request.user.is_staff:
-        return render(request, 'organiser/dashboard.html')
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
+        return render(request, 'organiser/dashboard.html', context={'conferences': conferences})
     if request.user.is_authenticated:
-        return render(request, 'participant/dashboard.html')
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
+        context = {
+            'conferences': conferences,
+            'registeredconference': registeredconference
+        }
+        return render(request, 'participant/dashboard.html', context=context)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
@@ -219,7 +230,8 @@ def adminconferencestatuschange(request, conference_id):
 
 def participatedconference(request):
     if request.user.is_authenticated:
-        conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.filter(conference_id__in=registeredconference).exclude(is_published=True)
         return render(request, 'participant/listconferences.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
@@ -228,17 +240,49 @@ def participatedconference(request):
 
 def registeredconference(request):
     if request.user.is_authenticated:
-        conferences = Conference.objects.filter(is_published=True).order_by('-created_at')
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.filter(conference_id__in=registeredconference).exclude(is_published=False)
         return render(request, 'participant/regconferences.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
 
 
+def deregisteredconference(request, conference_id):
+    if request.user.is_authenticated:
+        registeredconference = ConferenceRegistration.objects.get(user=request.user, conference_id=conference_id)
+        registeredconference.delete()
+        messages.success(request, 'Your conference registration has been deleted')
+        return redirect('dashboard')
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+@login_required(login_url='ludlogin')
 def participateconference(request, conference_id):
     if request.user.is_authenticated:
         conference = Conference.objects.get(pk=conference_id)
-        return render(request, 'participant/conference_participation.html', context={'conference': conference})
+        if request.method.lower() == 'post':
+            interest = request.POST.get('participation')
+            conferenceReg = ConferenceRegistration(interest=interest, conference_id=conference.conference_id,
+                                                   user=request.user)
+            conferenceReg.save()
+            messages.success(request, 'You have registered for the conference')
+            return redirect('registered_conference')
+        return render(request, 'conference/conference_participation.html', context={'conference': conference})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def conferencepass(request, conference_id):
+    if request.user.is_authenticated:
+        conference = Conference.objects.get(pk=conference_id)
+        conferenceRegistration = ConferenceRegistration.objects.get(user=request.user,
+                                                                    conference_id=conference.conference_id)
+        return render(request, 'conference/conference_pass.html',
+                      context={'conference': conference, 'conferenceRegistration': conferenceRegistration})
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
@@ -257,6 +301,18 @@ def stafforganisedconferene(request):
     if request.user.is_authenticated and request.user.is_staff:
         conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
         return render(request, 'organiser/listconferences.html', context={'conferences': conferences})
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def staffupdateconference(request,conference_id):
+    if request.user.is_authenticated and request.user.is_staff:
+        conference = Conference.objects.get(pk=conference_id)
+        context={
+            'conference': conference,
+        }
+        return render(request,'organiser/manage_conference.html',context)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')

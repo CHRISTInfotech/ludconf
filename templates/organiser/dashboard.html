@@ -9,36 +9,60 @@
         <div class="text-center p-2 fw-bolder fs-4 mb-3">
             Recent Conferences
         </div>
-    
-        <div class="card mb-3">
-            <div class="row p-1">
-                <div class="col-md-3 d-flex justify-content-center">
-                    <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
-                </div>
-                <div class="col-md-9">
-                    <div class="card-body">
-                        <div class="float-end mb-3">
-                            <a class="btn btn-sm btn-warning" href="{% url 'ludlogin' %}">
-                                <i class="fa-regular fa-circle-check"></i>
-                                Participate
-                            </a>
+
+        {% if conferences %}
+            {% for conf in conferences %}
+
+                <div class="card mb-3">
+                    <div class="row p-1">
+                        <div class="col-md-3 d-flex justify-content-center">
+                            <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
                         </div>
-                        <h5 class="card-title text-wrap">LUD Community Conference - Bangalore</h5>
-                        <hr/>
-                        <p class="card-text">
-                            This is a wider card with supporting text below as a natural lead-in to
-                            additional content. This content is a little bit longer.
-                        </p>
-                        <p class="card-text">
-                            This is a wider card with supporting text below as a natural lead-in to
-                            additional content. This content is a little bit longer.
-                        </p>
-                        <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <div class="float-end mb-3">
+                                    <a class="btn btn-sm btn-warning"
+                                       href="{% url 'participate_conference' conf.pk %}">
+                                        <i class="fa-regular fa-circle-check"></i>
+                                        Participate
+                                    </a>
+                                </div>
+                                <h5 class="card-title text-wrap">
+                                    {{ conf.title }}
+                                </h5>
+                                <hr/>
+                                <p class="card-text">
+                                <span class="fw-bold">
+                                    Conference Theme
+                                </span> <br/>
+                                    Conference Description
+                                </p>
+                                <p class="card-text">
+                                    {{ conf.location }} | {{ conf.venue }} <br/>
+                                    <span class="fst-italic">
+                                    {{ conf.start_date }} | {{ conf.end_date }}
+                                </span>
+                                </p>
+                                <p class="card-text">
+                                    Contact People: <br/>
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
+                                </p>
+                                <p class="card-text"><small class="text-body-secondary">Last updated 3 mins
+                                    ago</small></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+            {% endfor %}
+        {% else %}
+            <div class="text-center p-3 fw-bolder">
+                No conferences participated yet.
             </div>
-        </div>
-    
+        {% endif %}
+
     </div>
 
 {% endblock content %}

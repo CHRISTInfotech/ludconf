@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    {% include 'partials/nav.html' %}
+
+    <div class="row m-auto py-3">
+        <div class="col-12 fs-6 fw-bold text-center mb-3">
+            Conference Pass #{{ conference.pk }}<br/>
+            <hr/>
+        </div>
+        <div class="col-12">
+            <div class="row m-0">
+                <div class="col-sm-12 col-md-4">
+                    <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
+                </div>
+                <div class="col-sm-12 col-md-8">
+                    <div class="fw-bolder fs-2 mb-2">
+                        {{ conference.title }}
+                    </div>
+                    <div class="mb-2">
+                        Conference Theme
+                    </div>
+                    <div class="mb-2">
+                        Conference Description
+                    </div>
+                    <div class="fst-italic mb-2">
+                        {{ conference.location }}; {{ conference.venue }}
+                    </div>
+                    <div class="mb-2">
+                        From {{ conference.start_date }} to {{ conference.end_date }}
+                    </div>
+                    <div class="mb-2">
+                        Contact People: <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }}
+                    </div>
+                    <div class="mb-2">
+                        <small>
+                            Conference live from {{ conference.created_at|timesince }}
+                        </small>
+                    </div>
+                    <div class="mb-2">
+                        <hr/>
+                        <div class="mt-3 fw-bolder fs-5 mb-3">
+                            Participant Details
+                        </div>
+                        <hr/>
+                        <table class="table table-hover">
+                            <tr>
+                                <th>Participant Name</th>
+                                <td>{{ conferenceRegistration.user.first_name }} {{ conferenceRegistration.user.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email</th>
+                                <td>{{ conferenceRegistration.user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>Gender</th>
+                                <td>{{ conferenceRegistration.user.userdetails.gender }}</td>
+                            </tr>
+                            <tr>
+                                <th>DOB</th>
+                                <td>{{ conferenceRegistration.user.userdetails.dob }}</td>
+                            </tr>
+                            <tr>
+                                <th>Designation</th>
+                                <td>{{ conferenceRegistration.user.userdetails.designation }}</td>
+                            </tr>
+                            <tr>
+                                <th>Organization</th>
+                                <td>{{ conferenceRegistration.user.userdetails.organization }}</td>
+                            </tr>
+                            <tr>
+                                <th>Mobile</th>
+                                <td>{{ conferenceRegistration.user.userdetails.mobile }}</td>
+                            </tr>
+                            <tr>
+                                <th>Preference</th>
+                                <td>{{ conferenceRegistration.interest }}</td>
+                            </tr>
+                        </table>
+                        <div class="text-center text-muted fst-italic">
+                            You have registered for the conference on {{ conferenceRegistration.registration_date }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
