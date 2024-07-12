@@ -14,7 +14,9 @@ from conference.utils import export_to_excel
 # Create your views here.
 def home(request):
     conferences = Conference.objects.filter(is_published=True)
-    return render(request, 'conference/index.html', context={'conferences': conferences})
+    conferenceDetails = ConferenceDetails.objects.filter(conference_id__in=conferences)
+    context = {'conferences': conferences, 'conference_details': conferenceDetails}
+    return render(request, 'conference/index.html', context=context)
 
 
 def ludlogin(request):
@@ -131,9 +133,11 @@ def dashboard(request):
     if request.user.is_authenticated:
         registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
         conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
+        conferenceDetails = ConferenceDetails.objects.filter(conference_id__in=conferences)
         context = {
             'conferences': conferences,
-            'registeredconference': registeredconference
+            'registeredconference': registeredconference,
+            'conference_details': conferenceDetails
         }
         return render(request, 'participant/dashboard.html', context=context)
     else:

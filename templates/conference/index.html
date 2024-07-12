@@ -16,7 +16,11 @@
                     <div class="card mb-3">
                         <div class="row p-1">
                             <div class="col-md-3 d-flex justify-content-center">
-                                <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
+                                {% for confdetail in conference_details %}
+                                    {% if conf.pk == confdetail.conference_id %}
+                                        <img src="{{ confdetail.conference_banner.url }}" class="img-fluid" alt="...">
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                             <div class="col-md-9">
                                 <div class="card-body">
@@ -32,10 +36,18 @@
                                     </h5>
                                     <hr/>
                                     <p class="card-text">
-                                <span class="fw-bold">
-                                    Conference Theme
-                                </span> <br/>
-                                        Conference Description
+                                       <span class="fw-bold">
+                                         {% for confdetail in conference_details %}
+                                             {% if conf.pk == confdetail.conference_id %}
+                                                 {{ confdetail.conference_theme }}
+                                             {% endif %}
+                                         {% endfor %}
+                                        </span> <br/>
+                                        {% for confdetail in conference_details %}
+                                            {% if conf.pk == confdetail.conference_id %}
+                                                {{ confdetail.conference_description }}
+                                            {% endif %}
+                                        {% endfor %}
                                     </p>
                                     <p class="card-text">
                                         {{ conf.location }} | {{ conf.venue }} <br/>
@@ -49,13 +61,18 @@
                                         <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
                                         <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
                                     </p>
-                                    <p class="card-text"><small class="text-body-secondary">Last updated 3 mins
-                                        ago</small></p>
+                                    <p class="card-text">
+                                        <small class="text-body-secondary">
+                                            <small class="text-body-secondary">
+                                                Posted {{ conf.created_at|timesince }} ago.
+                                            </small>
+                                        </small>
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                 {% endfor %}
             {% else %}
                 <div class="text-center p-3 fw-bolder">
