@@ -7,27 +7,32 @@
 
     <div class="row m-auto py-3">
         <div class="col-12 fs-6 fw-bold text-center">
-            Update Conference Details <br/>
+            <div class="fw-bolder fs-2">
+                {{ conference.title }}
+            </div>
+            <small class="fw-normal fs-6">
+                #{{ conference.conference_id }}
+            </small>
             <hr/>
         </div>
         <div class="col-sm-12 col-md-6">
-            <div class="fw-bolder fs-2 mb-2">
-                {{ conference.title }}
-            </div>
-            <div class="">
-                <small>
-                    #{{ conference.conference_id }}
-                </small>
-            </div>
             <div class="mb-2">
-                <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
+                {% if conferenceDetails.conference_banner %}
+                    <img src="{{ conferenceDetails.conference_banner.url }}" class="img-fluid" alt="...">
+                {% else %}
+                    <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
+                {% endif %}
             </div>
-            <div class="mb-2">
-                Conference Theme
-            </div>
-            <div class="mb-2">
-                Conference Description
-            </div>
+            {% if conferenceDetails.conference_theme %}
+                <div class="mb-2 fw-bold">
+                    {{ conferenceDetails.conference_theme }}
+                </div>
+            {% endif %}
+            {% if conferenceDetails.conference_description %}
+                <div class="mb-2">
+                    {{ conferenceDetails.conference_description }}
+                </div>
+            {% endif %}
             <div class="fst-italic mb-2">
                 {{ conference.location }} | {{ conference.venue }}
             </div>
@@ -40,6 +45,14 @@
                 <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
                 <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }}
             </div>
+            {% if conferenceDetails.conference_feedback_link %}
+                <div class="mb-2">
+                   Feedback Link:
+                    <a href="{{ conferenceDetails.conference_feedback_link }}" target="_blank">
+                        {{ conferenceDetails.conference_feedback_link }}
+                    </a>
+                </div>
+            {% endif %}
             <hr/>
             <div class="mb-2">
                 <small>
@@ -52,29 +65,40 @@
             <div class="text-center p-2 mb-3 fw-bold">
                 Add/Update the conference details
             </div>
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="confbanner">Upload</label>
-                    <input type="file" class="form-control" id="confbanner" name="confbanner" accept="image/png"
-                           required>
+                    <input type="file" class="form-control" id="confbanner" name="confbanner" accept="image/png">
+                    <small class="mt-2">
+                        The poster dimensions are <a
+                            href="https://www.canva.com/design/DAGKso6XyGg/zDs8XhvbUNOdpQZ8MHRBNQ/edit?utm_content=DAGKso6XyGg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
+                            target="_blank"> 1080*1080 </a>.
+                        Create a copy of the sample link and create your conference poster.
+                    </small>
                 </div>
                 <div class="form-floating mb-3">
-                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
-                                  style="height: 100px" required></textarea>
-                    <label for="floatingTextarea2">Theme</label>
+                    <textarea class="form-control" placeholder="Conference Theme" id="conftheme" name="conftheme"
+                              style="height: 100px" required>{% if conferenceDetails %}{{ conferenceDetails.conference_theme }}{% endif %}</textarea>
+                    <label for="conftheme">Theme</label>
                 </div>
                 <div class="form-floating mb-3">
-                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"
-                                  style="height: 150px" required></textarea>
-                    <label for="floatingTextarea2">Description</label>
+                    <textarea class="form-control" placeholder="Conference Description" id="confdesc" name="confdesc"
+                              style="height: 150px" required>{% if conferenceDetails %}{{ conferenceDetails.conference_description }}{% endif %}</textarea>
+                    <label for="confdesc">Description</label>
                 </div>
-                <div class="form-floating mb-3">
-                        <textarea class="form-control" placeholder="Leave a comment here"
-                                  id="floatingTextarea" required></textarea>
-                    <label for="floatingTextarea">Feedback Link</label>
+                <div class="form-floating mb-2">
+                    <textarea class="form-control" placeholder="Feedback Link"
+                              id="conffeedback" name="conffeedback" required>{% if conferenceDetails %}{{ conferenceDetails.conference_feedback_link }}{% endif %}</textarea>
+                    <label for="conffeedback">Feedback Link</label>
                 </div>
-                <div class="d-flex justify-content-center">
+                <small class="">
+                    Feedback link is expected to be a Google Form that is attached with automatic certificate
+                    dispatch.
+                    The conference feedback link will be enabled once the conference has been over and the admin
+                    makes the conference as in-active and move to the past conferences.
+                </small>
+                <div class="d-flex justify-content-center mt-4">
                     <button class="btn btn-success" type="submit">
                         Save Details
                     </button>

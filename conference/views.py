@@ -8,6 +8,7 @@ from conference.functions import generate_otp
 from conference.mails import send_otp_email
 from conference.models import Conference, OTPRequest, UserDetails, ConferenceOrganisers, ConferenceDetails, \
     ConferenceRegistration
+from conference.utils import export_to_excel
 
 
 # Create your views here.
@@ -124,7 +125,9 @@ def dashboard(request):
     if request.user.is_authenticated and request.user.is_staff:
         registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
         conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
-        return render(request, 'organiser/dashboard.html', context={'conferences': conferences})
+        conferenceDetails = ConferenceDetails.objects.filter(conference_id__in=conferences)
+        context = {'conferences': conferences, 'conference_details': conferenceDetails}
+        return render(request, 'organiser/dashboard.html', context=context)
     if request.user.is_authenticated:
         registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
         conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
@@ -281,8 +284,13 @@ def conferencepass(request, conference_id):
         conference = Conference.objects.get(pk=conference_id)
         conferenceRegistration = ConferenceRegistration.objects.get(user=request.user,
                                                                     conference_id=conference.conference_id)
-        return render(request, 'conference/conference_pass.html',
-                      context={'conference': conference, 'conferenceRegistration': conferenceRegistration})
+        try:
+            conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
+        except:
+            conferenceDetails = None
+        context = {'conference': conference, 'conferenceRegistration': conferenceRegistration,
+                   'conferenceDetails': conferenceDetails}
+        return render(request, 'conference/conference_pass.html', context=context)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
@@ -306,13 +314,63 @@ def stafforganisedconferene(request):
         return redirect('home')
 
 
-def staffupdateconference(request,conference_id):
+def staffupdateconference(request, conference_id):
     if request.user.is_authenticated and request.user.is_staff:
         conference = Conference.objects.get(pk=conference_id)
-        context={
+        if request.method.lower() == "post":
+            banner = request.FILES.get('confbanner')
+            theme = request.POST.get('conftheme')
+            description = request.POST.get('confdesc')
+            feedback = request.POST.get('conffeedback')
+
+            if ConferenceDetails.objects.filter(conference_id=conference.conference_id).exists():
+                conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
+                if banner:
+                    conferenceDetails.conference_banner = banner
+                if theme:
+                    conferenceDetails.conference_theme = theme
+                if description:
+                    conferenceDetails.conference_description = description
+                if feedback:
+                    conferenceDetails.conference_feedback_link = feedback
+                conferenceDetails.save()
+            else:
+                conferenceDetails = ConferenceDetails(conference_id=conference.conference_id, conference_banner=banner,
+                                                      conference_theme=theme, conference_description=description,
+                                                      conference_feedback_link=feedback)
+                conferenceDetails.save()
+
+            messages.success(request, 'Your conference details has been updated')
+            return redirect('staff_update_conference', conference_id)
+        try:
+            conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
+        except:
+            conferenceDetails = None
+        context = {
             'conference': conference,
+            'conferenceDetails': conferenceDetails
         }
-        return render(request,'organiser/manage_conference.html',context)
+        return render(request, 'organiser/manage_conference.html', context)
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def download_registration_details(request, conference_id):
+    if request.user.is_authenticated and request.user.is_staff or request.user.is_superuser:
+        queryset = ConferenceRegistration.objects.filter(conference_id=conference_id).values('registration_date',
+                                                                                             'interest',
+                                                                                             'user__first_name',
+                                                                                             'user__last_name',
+                                                                                             'user__email',
+                                                                                             'user__userdetails__mobile',
+                                                                                             'user__userdetails__gender',
+                                                                                             'user__userdetails__dob',
+                                                                                             'user__userdetails__designation',
+                                                                                             'user__userdetails__organization')
+        print(queryset)
+        response = export_to_excel(queryset)
+        return response
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
