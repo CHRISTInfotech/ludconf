@@ -26,10 +26,12 @@ SECRET_KEY = 'django-insecure-ih_1e!$x1sys6fb13r&p9b95#o)iia6)&ea%zq!o5bha@yaq49
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['https://cmt.letusdream.org/', '10.5.5.31']
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
