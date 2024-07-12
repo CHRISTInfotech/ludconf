@@ -4,7 +4,7 @@ from conference.views import home, ludlogin, dashboard, adminconferencecreate, l
     adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference, \
     participateconference, participatedconference, adminmanageconference, adminconferencestatuschange, \
     stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass, staffupdateconference,\
-    download_registration_details
+    download_registration_details, adminconferenceupdate
 
 urlpatterns = [
     path('', home, name='home'),
@@ -19,6 +19,7 @@ urlpatterns = [
     path('admin_list_completed', adminlistcompletedconference, name='admin_list_completed'),
     path('admin_manage_conference/<str:conference_id>', adminmanageconference, name='admin_manage_conference'),
     path('admin_conference_status/<str:conference_id>', adminconferencestatuschange, name='admin_conference_status'),
+    path('admin_conference_update/<str:conference_id>', adminconferenceupdate, name='admin_conference_update'),
     path('registred_conference', registeredconference, name='registered_conference'),
     path('conference_pass/<str:conference_id>', conferencepass, name='conference_pass'),
     path('participate_conference/<str:conference_id>', participateconference, name='participate_conference'),

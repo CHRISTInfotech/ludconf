@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Count
 from django.shortcuts import render, redirect
 
 from conference.functions import generate_otp
@@ -122,8 +123,13 @@ def dashboard(request):
     if request.user.is_authenticated and request.user.is_superuser:
         active_conferences = Conference.objects.filter(is_published=True).count()
         all_conferences = Conference.objects.all().count()
-        return render(request, 'siteadmin/dashboard.html',
-                      context={'active_conferences': active_conferences, 'all_conferences': all_conferences})
+        registrations = Conference.objects.annotate(registration_count=Count("conferenceregistration")).values("title",
+                                                                                                               "registration_count",
+                                                                                                               "is_published",
+                                                                                                               "conference_id")
+        context = {'active_conferences': active_conferences, 'all_conferences': all_conferences,
+                   'registrations': registrations}
+        return render(request, 'siteadmin/dashboard.html', context=context)
     if request.user.is_authenticated and request.user.is_staff:
         registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
         conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
@@ -216,8 +222,15 @@ def adminmanageconference(request, conference_id):
             conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
         except:
             conference_details = None
-        return render(request, 'siteadmin/conference_details.html',
-                      context={'conference': conference, 'conference_details': conference_details})
+
+        try:
+            participant_count = ConferenceRegistration.objects.filter(conference_id=conference.conference_id).count()
+        except:
+            participant_count = 0
+
+        context = {'conference': conference, 'conference_details': conference_details,
+                   'participant_count': participant_count}
+        return render(request, 'siteadmin/conference_details.html', context=context)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
@@ -230,6 +243,98 @@ def adminconferencestatuschange(request, conference_id):
         conference.save()
         messages.success(request, 'Your conference status has been updated')
         return redirect('admin_manage_conference', conference_id)
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def adminconferenceupdate(request, conference_id):
+    if request.user.is_authenticated and request.user.is_superuser:
+        conference = Conference.objects.get(pk=conference_id)
+
+        if request.method.lower() == 'post':
+            conference_title = request.POST.get('conferenceHeading')
+            location = request.POST.get('location')
+            venue = request.POST.get('venue')
+            startDate = request.POST.get('fromdate')
+            endDate = request.POST.get('enddate')
+            organizer1 = request.POST.get('org1')
+            organizer2 = request.POST.get('org2')
+            organizer3 = request.POST.get('org3')
+            banner = request.FILES.get('confbanner')
+            theme = request.POST.get('conftheme')
+            description = request.POST.get('confdesc')
+            feedback = request.POST.get('conffeedback')
+
+            conference.title = conference_title
+            conference.location = location
+            conference.venue = venue
+            conference.startDate = startDate
+            conference.endDate = endDate
+            conference.organizer1 = organizer1
+            conference.organizer2 = organizer2
+            conference.organizer3 = organizer3
+            conference.save()
+
+            if not ConferenceOrganisers.objects.filter(mails=organizer1, conference=conference).exists():
+                cof_org_1 = ConferenceOrganisers(mails=organizer1, conference=conference, created_by=request.user)
+                cof_org_1.save()
+            if not ConferenceOrganisers.objects.filter(mails=organizer2, conference=conference).exists():
+                cof_org_2 = ConferenceOrganisers(mails=organizer2, conference=conference, created_by=request.user)
+                cof_org_2.save()
+            if not ConferenceOrganisers.objects.filter(mails=organizer3, conference=conference).exists():
+                cof_org_3 = ConferenceOrganisers(mails=organizer3, conference=conference, created_by=request.user)
+                cof_org_3.save()
+
+            if User.objects.filter(username=organizer1).exists():
+                user = User.objects.get(username=organizer1)
+                user.is_staff = True
+                user.save()
+
+            if User.objects.filter(username=organizer2).exists():
+                user = User.objects.get(username=organizer2)
+                user.is_staff = True
+                user.save()
+
+            if User.objects.filter(username=organizer3).exists():
+                user = User.objects.get(username=organizer3)
+                user.is_staff = True
+                user.save()
+
+            if ConferenceDetails.objects.filter(conference_id=conference.conference_id).exists():
+                conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
+                if banner:
+                    conferenceDetails.conference_banner = banner
+                if theme:
+                    conferenceDetails.conference_theme = theme
+                if description:
+                    conferenceDetails.conference_description = description
+                if feedback:
+                    conferenceDetails.conference_feedback_link = feedback
+                conferenceDetails.save()
+            else:
+                conferenceDetails = ConferenceDetails(conference_id=conference.conference_id, conference_banner=banner,
+                                                      conference_theme=theme, conference_description=description,
+                                                      conference_feedback_link=feedback)
+                conferenceDetails.save()
+
+            messages.success(request, 'Your conference has been updated')
+            return redirect('admin_conference_update',conference_id)
+
+        try:
+            conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
+        except:
+            conference_details = None
+
+        try:
+            participant_count = ConferenceRegistration.objects.filter(conference_id=conference.conference_id).count()
+        except:
+            participant_count = 0
+
+        context = {'conference': conference, 'conference_details': conference_details,
+                   'participant_count': participant_count}
+
+        return render(request, 'siteadmin/updateconference.html', context=context)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')

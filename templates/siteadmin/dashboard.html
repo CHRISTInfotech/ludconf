@@ -27,31 +27,49 @@
             </div>
         </div>
         <div class="col-12 mb-3">
-            <div class="text-center">
+            <div class="text-center mb-3">
                 # for active conferences
             </div>
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th>#</th>
+                    <th>Conference Title</th>
+                    <th>Registration #</th>
+                    <th>Status</th>
+                    <th>Manage</th>
+                    <th>Participants</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                </tr>
+                {% for registration in registrations %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <th scope="row">{{ registration.title }}</th>
+                        <td>{{ registration.registration_count }}</td>
+                        <td>
+                            {% if conference.is_published %}
+                                Active
+                            {% else %}
+                                In-Active
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-warning"
+                                   href="{% url 'admin_manage_conference' registration.conference_id %}">
+                                    <i class="fa-regular fa-circle-check"></i>
+                                    Manage
+                                </a>
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-warning "
+                               href="{% url 'download_registration_details' registration.conference_id %}">
+                                <i class="fa-regular fa-circle-check"></i>
+                                Download Registration
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>

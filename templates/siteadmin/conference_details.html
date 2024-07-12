@@ -66,7 +66,10 @@
                 </tr>
                 <tr>
                     <th scope="row">Conference Banner</th>
-                    <td>{{ conference_details.conference_banner }}</td>
+                    <td>
+                        <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" height="200px"
+                             width="200px" alt="...">
+                    </td>
                 </tr>
                 <tr>
                     <th scope="row">Conference Theme</th>
@@ -78,11 +81,15 @@
                 </tr>
                 <tr>
                     <th scope="row">Feedback Link</th>
-                    <td>{{ conference_details.conference_feedback_link }}</td>
+                    <td>
+                        <a href="{{ conference_details.conference_feedback_link }}" target="_blank">
+                            {{ conference_details.conference_feedback_link }}
+                        </a>
+                    </td>
                 </tr>
                 <tr>
                     <th scope="row">Conference Registration Count</th>
-                    <td>00</td>
+                    <td>{{ participant_count }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Conference created on</th>
@@ -99,9 +106,10 @@
                    href="{% url 'admin_conference_status' conference.conference_id %}">
                     Toggle Conference Status
                 </a>
-                <button class="btn btn-success">
-                    Download Participants List
-                </button>
+                <a class="btn btn-success text-decoration-none"
+                   href="{% url 'admin_conference_update' conference.conference_id %}">
+                    Update Conference Details
+                </a>
             </div>
         </div>
     </div>

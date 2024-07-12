@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    {% include 'partials/nav.html' %}
+
+    <div class="row m-auto py-3">
+        <div class="col-12 fs-6 fw-bold text-center mb-3">
+            Manage Conference #{{ conference.pk }} <br/>
+            <hr/>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th scope="row">Conference</th>
+                    <td>{{ conference.pk }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Title</th>
+                    <td>{{ conference.title }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Location</th>
+                    <td>{{ conference.location }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Venue</th>
+                    <td>{{ conference.venue }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Start Date</th>
+                    <td>{{ conference.start_date }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference End Date</th>
+                    <td>{{ conference.end_date }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Organisers</th>
+                    <td>
+                        Contact People: <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
+                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Status</th>
+                    <td>
+                        {% if conference.is_published %}
+                            Active
+                        {% else %}
+                            In-Active
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Banner</th>
+                    <td>
+                        <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" height="200px"
+                             width="200px" alt="...">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Theme</th>
+                    <td>{{ conference_details.conference_theme }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Description</th>
+                    <td>{{ conference_details.conference_description }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Feedback Link</th>
+                    <td>
+                        <a href="{{ conference_details.conference_feedback_link }}" target="_blank">
+                            {{ conference_details.conference_feedback_link }}
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Registration Count</th>
+                    <td>{{ participant_count }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference created on</th>
+                    <td>{{ conference.created_at }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference created By</th>
+                    <td>{{ conference.created_by }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="conferenceHeading" name="conferenceHeading"
+                           value="{{ conference.title }}" required>
+                    <label for="conferenceHeading">Conference Title</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="location" name="location"
+                           value="{{ conference.location }}"
+                           required>
+                    <label for="location">Location</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="venue" name="venue" value="{{ conference.venue }}"
+                           required>
+                    <label for="venue">Venue</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="date" class="form-control" id="fromdate" name="fromdate"
+                           value="{{ conference.start_date|date:'Y-m-d' }}"
+                           required>
+                    <label for="fromdate">Start Date</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="date" class="form-control" id="enddate" name="enddate"
+                           value="{{ conference.end_date|date:'Y-m-d' }}" required>
+                    <label for="enddate">End Date</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="org1" name="org1" value="{{ conference.organizer1 }}"
+                           required>
+                    <label for="org1">Organiser Email 1</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="org2" name="org2" value="{{ conference.organizer2 }}"
+                           required>
+                    <label for="org2">Organiser Email 2</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="org3" name="org3" value="{{ conference.organizer3 }}"
+                           required>
+                    <label for="org3">Organiser Email 3</label>
+                </div>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="confbanner">Upload</label>
+                    <input type="file" class="form-control" id="confbanner" name="confbanner" accept="image/png">
+                    <small class="mt-2">
+                        The poster dimensions are <a
+                            href="https://www.canva.com/design/DAGKso6XyGg/zDs8XhvbUNOdpQZ8MHRBNQ/edit?utm_content=DAGKso6XyGg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
+                            target="_blank"> 1080*1080 </a>.
+                        Create a copy of the sample link and create your conference poster.
+                    </small>
+                </div>
+                <div class="form-floating mb-3">
+                    <textarea class="form-control" placeholder="Conference Theme" id="conftheme" name="conftheme"
+                              style="height: 100px" required>{% if conference_details %}{{ conference_details.conference_theme }}{% endif %}</textarea>
+                    <label for="conftheme">Theme</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <textarea class="form-control" placeholder="Conference Description" id="confdesc" name="confdesc"
+                              style="height: 150px" required>{% if conference_details %}{{ conference_details.conference_description }}{% endif %}</textarea>
+                    <label for="confdesc">Description</label>
+                </div>
+                <div class="form-floating mb-2">
+                    <textarea class="form-control" placeholder="Feedback Link"
+                              id="conffeedback" name="conffeedback" required>{% if conference_details %}{{ conference_details.conference_feedback_link }}{% endif %}</textarea>
+                    <label for="conffeedback">Feedback Link</label>
+                </div>
+                <small class="">
+                    Feedback link is expected to be a Google Form that is attached with automatic certificate
+                    dispatch.
+                    The conference feedback link will be enabled once the conference has been over and the admin
+                    makes the conference as in-active and move to the past conferences.
+                </small>
+                <div class="text-center mt-4">
+                    <button class="btn btn-success">
+                        Update Conference Details
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+{% endblock content %}
