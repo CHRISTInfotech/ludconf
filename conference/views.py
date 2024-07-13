@@ -319,7 +319,7 @@ def adminconferenceupdate(request, conference_id):
                 conferenceDetails.save()
 
             messages.success(request, 'Your conference has been updated')
-            return redirect('admin_conference_update',conference_id)
+            return redirect('admin_conference_update', conference_id)
 
         try:
             conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
@@ -407,7 +407,9 @@ def conferencepass(request, conference_id):
 
 def stafforganisingconferenes(request):
     if request.user.is_authenticated and request.user.is_staff:
-        conferences = Conference.objects.filter(is_published=True).order_by('-created_at')
+        organisingConference = ConferenceOrganisers.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.filter(is_published=True, conference_id__in=organisingConference).order_by(
+            '-created_at')
         return render(request, 'organiser/newconference.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
@@ -416,7 +418,9 @@ def stafforganisingconferenes(request):
 
 def stafforganisedconferene(request):
     if request.user.is_authenticated and request.user.is_staff:
-        conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
+        organisingConference = ConferenceOrganisers.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.filter(is_published=False, conference_id__in=organisingConference).order_by(
+            '-created_at')
         return render(request, 'organiser/listconferences.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
