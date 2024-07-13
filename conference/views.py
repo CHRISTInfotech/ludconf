@@ -14,6 +14,8 @@ from conference.utils import export_to_excel
 
 # Create your views here.
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     conferences = Conference.objects.filter(is_published=True)
     conferenceDetails = ConferenceDetails.objects.filter(conference_id__in=conferences)
     context = {'conferences': conferences, 'conference_details': conferenceDetails}
@@ -377,9 +379,14 @@ def participateconference(request, conference_id):
         conference = Conference.objects.get(pk=conference_id)
         if request.method.lower() == 'post':
             interest = request.POST.get('participation')
-            conferenceReg = ConferenceRegistration(interest=interest, conference_id=conference.conference_id,
-                                                   user=request.user)
-            conferenceReg.save()
+            if ConferenceRegistration.objects.filter(conference_id=conference_id, user=request.user).exists():
+                conference_reg = ConferenceRegistration.objects.get(user=request.user, conference_id=conference_id)
+                conference_reg.interest = interest
+                conference_reg.save()
+            else:
+                conferenceReg = ConferenceRegistration(interest=interest, conference_id=conference.conference_id,
+                                                       user=request.user)
+                conferenceReg.save()
             messages.success(request, 'You have registered for the conference')
             return redirect('registered_conference')
         return render(request, 'conference/conference_participation.html', context={'conference': conference})
