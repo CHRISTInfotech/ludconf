@@ -407,7 +407,7 @@ def conferencepass(request, conference_id):
 
 def stafforganisingconferenes(request):
     if request.user.is_authenticated and request.user.is_staff:
-        organisingConference = ConferenceOrganisers.objects.filter(user=request.user).values('conference_id')
+        organisingConference = ConferenceOrganisers.objects.filter(mails=request.user.email).values('conference_id')
         conferences = Conference.objects.filter(is_published=True, conference_id__in=organisingConference).order_by(
             '-created_at')
         return render(request, 'organiser/newconference.html', context={'conferences': conferences})
@@ -418,7 +418,7 @@ def stafforganisingconferenes(request):
 
 def stafforganisedconferene(request):
     if request.user.is_authenticated and request.user.is_staff:
-        organisingConference = ConferenceOrganisers.objects.filter(user=request.user).values('conference_id')
+        organisingConference = ConferenceOrganisers.objects.filter(mails=request.user.email).values('conference_id')
         conferences = Conference.objects.filter(is_published=False, conference_id__in=organisingConference).order_by(
             '-created_at')
         return render(request, 'organiser/listconferences.html', context={'conferences': conferences})
