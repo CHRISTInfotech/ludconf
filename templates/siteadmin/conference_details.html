@@ -40,10 +40,21 @@
                 <tr>
                     <th scope="row">Conference Organisers</th>
                     <td>
-                        Contact People: <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }}
+                        <i class="fa-solid fa-user-large"></i> Contact People: <br/>
+                        <div class="row mt-2">
+                            <div class="col-sm-12 col-md-4">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile1 }}
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile2 }}
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile3 }}
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -65,10 +76,71 @@
                     <td>{{ conference.created_by }}</td>
                 </tr>
                 <tr>
+                    <th scope="row">Conference Social</th>
+                    <td>
+                        <div class="row m-0">
+                            {% if conference_details.social_facebook %}
+                                <div class="col">
+                                    <a href="{{ conference_details.social_facebook }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-facebook"></i> Facebook
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_insta %}
+                                <div class="col">
+                                    <a href="{{ conference_details.social_insta }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-instagram"></i> Instagram
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_linkedin %}
+                                <div class="col">
+                                    <a href="{{ conference_details.social_linkedin }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-linkedin"></i> LinkedIn
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_twitter %}
+                                <div class="col">
+                                    <a href="{{ conference_details.social_twitter }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-twitter"></i> Twitter
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_youtube %}
+                                <div class="col">
+                                    <a href="{{ conference_details.social_youtube }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-youtube"></i> YouTube
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row">Conference Banner</th>
                     <td>
-                        <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" height="200px"
-                             width="200px" alt="...">
+                        {% if conference_details.conference_banner %}
+                            <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" height="200px"
+                                 width="200px" alt="...">
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Brochure</th>
+                    <td>
+                        {% if conference_details.conference_brochure %}
+                            <a href="{{ conference_details.conference_brochure.url }}" target="_blank"
+                               class="text-decoration-none">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                Conference Brochure
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -77,7 +149,7 @@
                 </tr>
                 <tr>
                     <th scope="row">Conference Description</th>
-                    <td>{{ conference_details.conference_description }}</td>
+                    <td style="max-width: 500px">{{ conference_details.conference_description }}</td>
                 </tr>
                 <tr>
                     <th scope="row">Feedback Link</th>
@@ -104,10 +176,12 @@
             <div class="col-12 d-flex justify-content-around mt-4">
                 <a class="btn btn-warning text-decoration-none"
                    href="{% url 'admin_conference_status' conference.conference_id %}">
+                    <i class="fa-solid fa-toggle-on"></i>
                     Toggle Conference Status
                 </a>
                 <a class="btn btn-success text-decoration-none"
                    href="{% url 'admin_conference_update' conference.conference_id %}">
+                    <i class="fa-solid fa-pen-to-square"></i>
                     Update Conference Details
                 </a>
             </div>

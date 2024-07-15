@@ -30,6 +30,11 @@
                                             <i class="fa-regular fa-circle-check"></i>
                                             Participate
                                         </a>
+                                        <a class="btn btn-sm btn-success"
+                                           href="{% url 'conference_details' conf.pk %}">
+                                            <i class="fa-solid fa-eye"></i>
+                                            View More
+                                        </a>
                                     </div>
                                     <h5 class="card-title text-wrap">
                                         {{ conf.title }}

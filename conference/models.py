@@ -12,8 +12,11 @@ class Conference(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     organizer1 = models.EmailField(max_length=255)
+    mobile1 = models.CharField(max_length=255, blank=True, null=True)
     organizer2 = models.EmailField(max_length=255)
+    mobile2 = models.CharField(max_length=255, blank=True, null=True)
     organizer3 = models.EmailField(max_length=255)
+    mobile3 = models.CharField(max_length=255, blank=True, null=True)
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)
@@ -37,6 +40,7 @@ class UserDetails(models.Model):
     designation = models.CharField(max_length=255)
     organization = models.CharField(max_length=255)
     mobile = models.CharField(max_length=255)
+    opt_newsletter = models.BooleanField(default=True)
 
     def __str__(self):
         return self.user.username
@@ -58,6 +62,12 @@ class ConferenceDetails(models.Model):
     conference_theme = models.CharField(max_length=255)
     conference_description = models.TextField()
     conference_feedback_link = models.TextField()
+    conference_brochure = models.FileField(upload_to="brochure/", null=True, blank=True)
+    social_insta = models.CharField(max_length=255, null=True, blank=True)
+    social_twitter = models.CharField(max_length=255, null=True, blank=True)
+    social_youtube = models.CharField(max_length=255, null=True, blank=True)
+    social_facebook = models.CharField(max_length=255, null=True, blank=True)
+    social_linkedin = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.conference.title + "\t" + self.conference.start_date.__str__()

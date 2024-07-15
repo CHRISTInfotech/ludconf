@@ -42,3 +42,31 @@ def export_to_excel(queryset):
 
     workbook.save(response)
     return response
+
+
+def export_emails_for_newsletters(queryset):
+    """Creates an Excel file from the given queryset and returns an HTTP response."""
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=newsletter_registration_details.xlsx'
+
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    columns = ['user__first_name', 'user__last_name', 'user__email']
+
+    columns_to_excel = ['First Name', 'Last Name', 'Email']
+
+    # Header row (optional styling for bold)
+    for col_num, column in enumerate(columns_to_excel, 1):
+        cell = worksheet.cell(row=1, column=col_num, value=column)
+        cell.font = Font(bold=True)
+
+    # Data rows
+    for row_num, obj in enumerate(queryset, 2):
+        for col_num, column in enumerate(columns, 1):
+            value = obj[column]
+            if isinstance(value, (timezone.datetime, time)):
+                value = value.replace(tzinfo=None)
+            worksheet.cell(row=row_num, column=col_num).value = value
+
+    workbook.save(response)
+    return response

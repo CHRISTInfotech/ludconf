@@ -9,7 +9,7 @@ from conference.functions import generate_otp
 from conference.mails import send_otp_email
 from conference.models import Conference, OTPRequest, UserDetails, ConferenceOrganisers, ConferenceDetails, \
     ConferenceRegistration
-from conference.utils import export_to_excel
+from conference.utils import export_to_excel, export_emails_for_newsletters
 
 
 # Create your views here.
@@ -96,11 +96,16 @@ def ludregister_step_3(request, email):
             organization = request.POST.get('organization')
             mobile = request.POST.get('mobile')
             password = request.POST.get('password')
+            newsletter = request.POST.get('opt_newsletter')
+            if not newsletter:
+                newsletter = False
+            else:
+                newsletter = True
             user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name,
                                             username=email)
             user.save()
             userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
-                                      organization=organization, mobile=mobile)
+                                      organization=organization, mobile=mobile, opt_newsletter=newsletter)
             userdetails.save()
 
             try:
@@ -164,9 +169,13 @@ def adminconferencecreate(request):
             organizer1 = request.POST.get('org1')
             organizer2 = request.POST.get('org2')
             organizer3 = request.POST.get('org3')
+            org_mob_1 = request.POST.get('org_mob_1')
+            org_mob_2 = request.POST.get('org_mob_2')
+            org_mob_3 = request.POST.get('org_mob_3')
             newconference = Conference(title=conference_title, location=location, venue=venue, start_date=startDate,
                                        end_date=endDate, organizer1=organizer1, organizer2=organizer2,
-                                       organizer3=organizer3, created_by=request.user)
+                                       organizer3=organizer3, mobile1=org_mob_1, mobile2=org_mob_2, mobile3=org_mob_3,
+                                       created_by=request.user)
             newconference.save()
 
             if not ConferenceOrganisers.objects.filter(mails=organizer1, conference=newconference).exists():
@@ -263,7 +272,11 @@ def adminconferenceupdate(request, conference_id):
             organizer1 = request.POST.get('org1')
             organizer2 = request.POST.get('org2')
             organizer3 = request.POST.get('org3')
+            org_mob_1 = request.POST.get('org_mob_1')
+            org_mob_2 = request.POST.get('org_mob_2')
+            org_mob_3 = request.POST.get('org_mob_3')
             banner = request.FILES.get('confbanner')
+            brochure = request.FILES.get('confbrochure')
             theme = request.POST.get('conftheme')
             description = request.POST.get('confdesc')
             feedback = request.POST.get('conffeedback')
@@ -276,6 +289,9 @@ def adminconferenceupdate(request, conference_id):
             conference.organizer1 = organizer1
             conference.organizer2 = organizer2
             conference.organizer3 = organizer3
+            conference.mobile1 = org_mob_1
+            conference.mobile2 = org_mob_2
+            conference.mobile3 = org_mob_3
             conference.save()
 
             if not ConferenceOrganisers.objects.filter(mails=organizer1, conference=conference).exists():
@@ -307,6 +323,8 @@ def adminconferenceupdate(request, conference_id):
                 conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
                 if banner:
                     conferenceDetails.conference_banner = banner
+                if brochure:
+                    conferenceDetails.conference_brochure = brochure
                 if theme:
                     conferenceDetails.conference_theme = theme
                 if description:
@@ -316,7 +334,8 @@ def adminconferenceupdate(request, conference_id):
                 conferenceDetails.save()
             else:
                 conferenceDetails = ConferenceDetails(conference_id=conference.conference_id, conference_banner=banner,
-                                                      conference_theme=theme, conference_description=description,
+                                                      conference_brochure=brochure, conference_theme=theme,
+                                                      conference_description=description,
                                                       conference_feedback_link=feedback)
                 conferenceDetails.save()
 
@@ -389,11 +408,22 @@ def participateconference(request, conference_id):
                 conferenceReg.save()
             messages.success(request, 'You have registered for the conference')
             return redirect('registered_conference')
-        return render(request, 'conference/conference_participation.html', context={'conference': conference})
+        conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
+        context = {'conference': conference, 'conferenceDetails': conferenceDetails}
+        return render(request, 'conference/conference_participation.html', context=context)
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
 
+def conference_details(request,conference_id):
+    conference = Conference.objects.get(pk=conference_id)
+    try:
+        conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
+    except:
+        conference_details = None
+
+    context = {'conference': conference, 'conference_details': conference_details}
+    return render(request, 'conference/conference_details.html', context=context)
 
 def conferencepass(request, conference_id):
     if request.user.is_authenticated:
@@ -439,6 +469,7 @@ def staffupdateconference(request, conference_id):
         conference = Conference.objects.get(pk=conference_id)
         if request.method.lower() == "post":
             banner = request.FILES.get('confbanner')
+            brochure = request.FILES.get('confbrochure')
             theme = request.POST.get('conftheme')
             description = request.POST.get('confdesc')
             feedback = request.POST.get('conffeedback')
@@ -447,6 +478,8 @@ def staffupdateconference(request, conference_id):
                 conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
                 if banner:
                     conferenceDetails.conference_banner = banner
+                if brochure:
+                    conferenceDetails.conference_brochure = brochure
                 if theme:
                     conferenceDetails.conference_theme = theme
                 if description:
@@ -456,7 +489,8 @@ def staffupdateconference(request, conference_id):
                 conferenceDetails.save()
             else:
                 conferenceDetails = ConferenceDetails(conference_id=conference.conference_id, conference_banner=banner,
-                                                      conference_theme=theme, conference_description=description,
+                                                      conference_brochure=brochure, conference_theme=theme,
+                                                      conference_description=description,
                                                       conference_feedback_link=feedback)
                 conferenceDetails.save()
 
@@ -488,8 +522,19 @@ def download_registration_details(request, conference_id):
                                                                                              'user__userdetails__dob',
                                                                                              'user__userdetails__designation',
                                                                                              'user__userdetails__organization')
-        print(queryset)
+        # print(queryset)
         response = export_to_excel(queryset)
+        return response
+    else:
+        messages.error(request, 'You are not logged in')
+        return redirect('home')
+
+
+def download_emails_for_newsletter(request):
+    if request.user.is_authenticated and request.user.is_staff or request.user.is_superuser:
+        queryset = UserDetails.objects.filter(opt_newsletter=True).values('user__first_name',
+                                                                          'user__last_name', 'user__email')
+        response = export_emails_for_newsletters(queryset)
         return response
     else:
         messages.error(request, 'You are not logged in')

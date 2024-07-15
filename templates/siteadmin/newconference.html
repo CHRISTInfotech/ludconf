@@ -7,12 +7,15 @@
 
     <div class="row m-auto py-3">
         <div class="col-12 fs-6 fw-bold text-center">
-            New Conference <br/>
+            <i class="fa-solid fa-plus"></i> New Conference <br/>
             <hr/>
         </div>
         <form method="POST" class="col-12 row m-auto">
             {% csrf_token %}
-            <div class=" col-sm-12 col-md-6">
+            <div class="col-12 mb-3 fst-italic">
+                Conference Details
+            </div>
+            <div class=" col-sm-12 col-md-12">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="conferenceHeading" name="conferenceHeading"
                            placeholder="Conference Heading" required>
@@ -45,10 +48,20 @@
                     <label for="enddate">End Date</label>
                 </div>
             </div>
+            <div class="col-12 mb-3 mt-4 fst-italic">
+                Organiser Details
+            </div>
             <div class=" col-sm-12 col-md-6">
                 <div class="form-floating mb-3">
                     <input type="email" class="form-control" id="org1" name="org1" placeholder="Organiser 1" required>
                     <label for="org1">Organiser Email 1</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="org_mob_1" name="org_mob_1"
+                           placeholder="Mobile Number 1">
+                    <label for="org_mob_1">Organiser Phone Number 1</label>
                 </div>
             </div>
             <div class=" col-sm-12 col-md-6">
@@ -59,12 +72,27 @@
             </div>
             <div class=" col-sm-12 col-md-6">
                 <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="org_mob_2" name="org_mob_2"
+                           placeholder="Mobile Number 2">
+                    <label for="org_mob_2">Organiser Phone Number 2</label>
+                </div>
+            </div>
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
                     <input type="email" class="form-control" id="org3" name="org3" placeholder="Organiser 3" required>
                     <label for="org3">Organiser Email 3</label>
                 </div>
             </div>
-            <div class="col-12 text-center">
-                <button class="btn btn-sm btn-success mb-3" type="submit">
+            <div class=" col-sm-12 col-md-6">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="org_mob_3" name="org_mob_3"
+                           placeholder="Mobile Number 3">
+                    <label for="org_mob_3">Organiser Phone Number 3</label>
+                </div>
+            </div>
+            <div class="col-12 mt-4 text-center">
+                <button class="btn btn-success mb-3" type="submit">
+                    <i class="fa-regular fa-floppy-disk"></i>
                     Create Conference
                 </button>
             </div>

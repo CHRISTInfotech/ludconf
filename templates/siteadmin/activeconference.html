@@ -28,20 +28,31 @@
                                 </a>
                                 <hr/>
                             </div>
-                            <div class="col-sm-12 col-md-6 fs-6 mb-3">
+                            <div class="col-sm-12 col-md-4 fs-6 mb-3">
                                 Location: {{ conf.location }}
                             </div>
-                            <div class="col-sm-12 col-md-6 fs-6 mb-3">
+                            <div class="col-sm-12 col-md-4 fs-6 mb-3">
                                 Venue: {{ conf.venue }}
                             </div>
-                            <div class="col-12 fs-6 fst-italic mb-3">
+                            <div class="col-sm-12 col-md-4 fs-6 fst-italic mb-3">
                                 From {{ conf.start_date }} to {{ conf.end_date }}
                             </div>
                             <div class="col-12 fs-6 mb-3">
-                                Contact People: <br/>
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
+                                <i class="fa-solid fa-user-large"></i> Contact People: <br/>
+                                <div class="row mt-2">
+                                    <div class="col-sm-12 col-md-4">
+                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} <br/>
+                                        <i class="fa-solid fa-phone"></i> {{ conf.mobile1 }}
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} <br/>
+                                        <i class="fa-solid fa-phone"></i> {{ conf.mobile2 }}
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }} <br/>
+                                        <i class="fa-solid fa-phone"></i> {{ conf.mobile3 }}
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-12 mb-3">
                                 <small class="text-body-secondary float-end">

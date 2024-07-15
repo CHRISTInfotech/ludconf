@@ -13,18 +13,32 @@
         <div class="col-12">
             <div class="row m-0">
                 <div class="col-sm-12 col-md-4">
-                    <img src="{% static 'img/conference.png' %}" class="img-fluid " alt="...">
+                    <img src="{{ conferenceDetails.conference_banner.url }}" class="img-fluid " alt="...">
                 </div>
                 <div class="col-sm-12 col-md-8">
                     <div class="fw-bolder fs-2 mb-2">
                         {{ conference.title }}
                     </div>
                     <div class="mb-2">
-                        Conference Theme
+                        {{ conferenceDetails.conference_theme }}
                     </div>
                     <div class="mb-2">
-                        Conference Description
+                        {{ conferenceDetails.conference_description }}
                     </div>
+                    {% if conferenceDetails.conference_brochure %}
+                        <div class="mb-2">
+                            <a class="btn btn-sm btn-success" href="{{ conferenceDetails.conference_brochure.url }}"
+                               target="_blank">
+                                <i class="fa-solid fa-download"></i>
+                                Download Brochure
+                            </a>
+                            <a class="btn btn-sm btn-success" href="{{ conferenceDetails.conference_banner.url }}"
+                               target="_blank">
+                                <i class="fa-solid fa-download"></i>
+                                Download Banner
+                            </a>
+                        </div>
+                    {% endif %}
                     <div class="fst-italic mb-2">
                         {{ conference.location }}; {{ conference.venue }}
                     </div>

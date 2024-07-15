@@ -27,6 +27,7 @@
             </div>
         </div>
         <div class="col-12 mb-3">
+            <hr/>
             <div class="text-center mb-3">
                 # for active conferences
             </div>
@@ -48,7 +49,7 @@
                         <th scope="row">{{ registration.title }}</th>
                         <td>{{ registration.registration_count }}</td>
                         <td>
-                            {% if conference.is_published %}
+                            {% if registration.is_published %}
                                 Active
                             {% else %}
                                 In-Active
@@ -56,10 +57,10 @@
                         </td>
                         <td>
                             <a class="btn btn-sm btn-warning"
-                                   href="{% url 'admin_manage_conference' registration.conference_id %}">
-                                    <i class="fa-regular fa-circle-check"></i>
-                                    Manage
-                                </a>
+                               href="{% url 'admin_manage_conference' registration.conference_id %}">
+                                <i class="fa-regular fa-circle-check"></i>
+                                Manage
+                            </a>
                         </td>
                         <td>
                             <a class="btn btn-sm btn-warning "
@@ -72,6 +73,12 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <hr/>
+        </div>
+        <div class="col-12">
+            <a class="float-end btn btn-sm btn-warning" href="{% url 'download_emails_for_newsletter' %}">
+                Download emails for NewsLetter
+            </a>
         </div>
     </div>
 

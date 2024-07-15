@@ -3,8 +3,8 @@ from django.urls import path
 from conference.views import home, ludlogin, dashboard, adminconferencecreate, ludlogout, adminlistactiveconference, \
     adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference, \
     participateconference, participatedconference, adminmanageconference, adminconferencestatuschange, \
-    stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass, staffupdateconference,\
-    download_registration_details, adminconferenceupdate
+    stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass, staffupdateconference, \
+    download_registration_details, adminconferenceupdate, download_emails_for_newsletter, conference_details
 
 urlpatterns = [
     path('', home, name='home'),
@@ -22,11 +22,14 @@ urlpatterns = [
     path('admin_conference_update/<str:conference_id>', adminconferenceupdate, name='admin_conference_update'),
     path('registred_conference', registeredconference, name='registered_conference'),
     path('conference_pass/<str:conference_id>', conferencepass, name='conference_pass'),
+    path('conference_details/<str:conference_id>', conference_details, name='conference_details'),
     path('participate_conference/<str:conference_id>', participateconference, name='participate_conference'),
     path('participated_conference', participatedconference, name='participated_conference'),
     path('de_register_conference/<str:conference_id>', deregisteredconference, name='de_register_conference'),
     path('staff_organizing_conference', stafforganisingconferenes, name='staff_organizing_conference'),
     path('staff_organized_conference', stafforganisedconferene, name='staff_organized_conference'),
     path('staff_update_conference/<str:conference_id>', staffupdateconference, name='staff_update_conference'),
-    path('download_registration_details/<str:conference_id>', download_registration_details, name='download_registration_details'),
+    path('download_registration_details/<str:conference_id>', download_registration_details,
+         name='download_registration_details'),
+    path('download_emails_for_newsletter', download_emails_for_newsletter, name='download_emails_for_newsletter'),
 ]

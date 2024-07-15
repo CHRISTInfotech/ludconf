@@ -40,10 +40,21 @@
                 <tr>
                     <th scope="row">Conference Organisers</th>
                     <td>
-                        Contact People: <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }}
+                        <i class="fa-solid fa-user-large"></i> Contact People: <br/>
+                        <div class="row mt-2">
+                            <div class="col-sm-12">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile1 }}
+                            </div>
+                            <div class="col-sm-12">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile2 }}
+                            </div>
+                            <div class="col-sm-12">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile3 }}
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -59,8 +70,69 @@
                 <tr>
                     <th scope="row">Conference Banner</th>
                     <td>
-                        <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" height="200px"
-                             width="200px" alt="...">
+                        {% if conference_details.conference_banner %}
+                            <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" height="200px"
+                                 width="200px" alt="...">
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Social</th>
+                    <td>
+                        <div class="row m-0">
+                            {% if conference_details.social_facebook %}
+                                <div class="col-12">
+                                    <a href="{{ conference_details.social_facebook }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-facebook"></i> Facebook
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_insta %}
+                                <div class="col-12">
+                                    <a href="{{ conference_details.social_insta }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-instagram"></i> Instagram
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_linkedin %}
+                                <div class="col-12">
+                                    <a href="{{ conference_details.social_linkedin }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-linkedin"></i> LinkedIn
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_twitter %}
+                                <div class="col-12">
+                                    <a href="{{ conference_details.social_twitter }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-twitter"></i> Twitter
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conference_details.social_youtube %}
+                                <div class="col-12">
+                                    <a href="{{ conference_details.social_youtube }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-youtube"></i> YouTube
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Conference Brochure</th>
+                    <td>
+                        {% if conference_details.conference_brochure %}
+                            <a href="{{ conference_details.conference_brochure.url }}" target="_blank"
+                               class="text-decoration-none">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                Conference Brochure
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -130,12 +202,27 @@
                     <label for="org1">Organiser Email 1</label>
                 </div>
                 <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="org_mob_1" name="org_mob_1"
+                           value="{{ conference.mobile1 }}">
+                    <label for="org_mob_1">Organiser Phone Number 1</label>
+                </div>
+                <div class="form-floating mb-3">
                     <input type="email" class="form-control" id="org2" name="org2" value="{{ conference.organizer2 }}"
                            required>
                     <label for="org2">Organiser Email 2</label>
                 </div>
                 <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="org_mob_2" name="org_mob_2"
+                           value="{{ conference.mobile2 }}">
+                    <label for="org_mob_2">Organiser Phone Number 2</label>
+                </div>
+                <div class="form-floating mb-3">
                     <input type="email" class="form-control" id="org3" name="org3" value="{{ conference.organizer3 }}"
+                           required>
+                    <label for="org3">Organiser Email 3</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="org3" name="org3" value="{{ conference.mobile3 }}"
                            required>
                     <label for="org3">Organiser Email 3</label>
                 </div>
@@ -149,9 +236,39 @@
                         Create a copy of the sample link and create your conference poster.
                     </small>
                 </div>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="confbrochure">Upload Brochure</label>
+                    <input type="file" class="form-control" id="confbrochure" name="confbrochure"
+                           accept="application/pdf">
+                </div>
+                <div class="form-floating mb-2">
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_facebook" 
+                              name="social_facebook" required>{% if conference_details %}{{ conference_details.social_facebook }}{% endif %}</textarea>
+                    <label for="social_facebook">Facebook Link</label>
+                </div>
+                <div class="form-floating mb-2">
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_insta" 
+                              name="social_insta" required>{% if conference_details %}{{ conference_details.social_insta }}{% endif %}</textarea>
+                    <label for="social_insta">Instagram Link</label>
+                </div>
+                <div class="form-floating mb-2">
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_linkedin" 
+                              name="social_linkedin" required>{% if conference_details %}{{ conference_details.social_linkedin }}{% endif %}</textarea>
+                    <label for="social_linkedin">LinkedIn Link</label>
+                </div>
+                <div class="form-floating mb-2">
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_twitter" 
+                              name="social_twitter" required>{% if conference_details %}{{ conference_details.social_twitter }}{% endif %}</textarea>
+                    <label for="social_twitter">Twitter Link</label>
+                </div>
+                <div class="form-floating mb-2">
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_youtube" 
+                              name="social_youtube" required>{% if conference_details %}{{ conference_details.social_youtube }}{% endif %}</textarea>
+                    <label for="social_youtube">YouTube Link</label>
+                </div>
                 <div class="form-floating mb-3">
                     <textarea class="form-control" placeholder="Conference Theme" id="conftheme" name="conftheme"
-                              style="height: 100px" required>{% if conference_details %}{{ conference_details.conference_theme }}{% endif %}</textarea>
+                              style="height: 100px" required>{% if conference_details %} {{ conference_details.conference_theme }}{% endif %}</textarea>
                     <label for="conftheme">Theme</label>
                 </div>
                 <div class="form-floating mb-3">
@@ -166,12 +283,12 @@
                 </div>
                 <small class="">
                     Feedback link is expected to be a Google Form that is attached with automatic certificate
-                    dispatch.
-                    The conference feedback link will be enabled once the conference has been over and the admin
-                    makes the conference as in-active and move to the past conferences.
+                    dispatch. The conference feedback link will be enabled once the conference has been over and the
+                    admin makes the conference as in-active and move to the past conferences.
                 </small>
                 <div class="text-center mt-4">
                     <button class="btn btn-success">
+                        <i class="fa-solid fa-wrench"></i>
                         Update Conference Details
                     </button>
                 </div>
