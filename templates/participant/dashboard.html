@@ -7,67 +7,72 @@
 
     <div class="py-3">
 
-        {% for conf in conferences %}
-            <div class="card mb-3">
-                <div class="row p-1">
-                    <div class="col-md-3 d-flex justify-content-center">
-                        {% for confdetail in conference_details %}
-                            {% if conf.pk == confdetail.conference_id %}
-                                <img src="{{ confdetail.conference_banner.url }}" class="img-fluid" alt="...">
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                    <div class="col-md-9">
-                        <div class="card-body">
-                            <div class="float-end mb-3">
-                                <a class="btn btn-sm btn-warning" href="{% url 'participate_conference' conf.pk %}">
-                                    <i class="fa-regular fa-circle-check"></i>
-                                    Participate
-                                </a>
-                            </div>
-                            <h5 class="card-title text-wrap">
-                                {{ conf.title }}
-                            </h5>
-                            <hr/>
-                            <p class="card-text">
+        {% if conferences %}
+            {% for conf in conferences %}
+                <div class="card mb-3">
+                    <div class="row p-1">
+                        <div class="col-md-3 d-flex justify-content-center">
+                            {% for confdetail in conference_details %}
+                                {% if conf.pk == confdetail.conference_id %}
+                                    <img src="{{ confdetail.conference_banner.url }}" class="img-fluid" alt="...">
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-9">
+                            <div class="card-body">
+                                <div class="float-end mb-3">
+                                    <a class="btn btn-sm btn-warning" href="{% url 'participate_conference' conf.pk %}">
+                                        <i class="fa-regular fa-circle-check"></i>
+                                        Participate
+                                    </a>
+                                </div>
+                                <h5 class="card-title text-wrap">
+                                    {{ conf.title }}
+                                </h5>
+                                <hr/>
+                                <p class="card-text">
                                <span class="fw-bold">
                                    {% for confdetail in conference_details %}
                                        {% if conf.pk == confdetail.conference_id %}
-                                           {{confdetail.conference_theme}}
+                                           {{ confdetail.conference_theme }}
                                        {% endif %}
                                    {% endfor %}
                                </span> <br/>
-                                {% for confdetail in conference_details %}
-                                    {% if conf.pk == confdetail.conference_id %}
-                                        {{confdetail.conference_description}}
-                                    {% endif %}
-                                {% endfor %}
-                            </p>
-                            <p class="card-text">
-                                {{ conf.location }} | {{ conf.venue }} <br/>
-                                <span class="fst-italic">
+                                    {% for confdetail in conference_details %}
+                                        {% if conf.pk == confdetail.conference_id %}
+                                            {{ confdetail.conference_description }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <p class="card-text">
+                                    {{ conf.location }} | {{ conf.venue }} <br/>
+                                    <span class="fst-italic">
                                     {{ conf.start_date }} | {{ conf.end_date }}
                                 </span>
-                            </p>
-                            <p class="card-text">
-                                Contact People: <br/>
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
-                            </p>
-                            <p class="card-text">
-                                <small class="text-body-secondary">
+                                </p>
+                                <p class="card-text">
+                                    Contact People: <br/>
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
+                                </p>
+                                <p class="card-text">
                                     <small class="text-body-secondary">
-                                        Posted {{ conf.created_at|timesince }} ago.
+                                        <small class="text-body-secondary">
+                                            Posted {{ conf.created_at|timesince }} ago.
+                                        </small>
                                     </small>
-                                </small>
-                            </p>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
+            {% endfor %}
+        {% else %}
+            <div class="p-3 text-center fw-bold">
+                No New Conferences !
             </div>
-        {% endfor %}
-
+        {% endif %}
     </div>
 
 {% endblock content %}

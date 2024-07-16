@@ -280,6 +280,11 @@ def adminconferenceupdate(request, conference_id):
             theme = request.POST.get('conftheme')
             description = request.POST.get('confdesc')
             feedback = request.POST.get('conffeedback')
+            social_facebook = request.POST.get('social_facebook')
+            social_insta = request.POST.get('social_insta')
+            social_linkedin = request.POST.get('social_linkedin')
+            social_twitter = request.POST.get('social_twitter')
+            social_youtube = request.POST.get('social_youtube')
 
             conference.title = conference_title
             conference.location = location
@@ -331,12 +336,25 @@ def adminconferenceupdate(request, conference_id):
                     conferenceDetails.conference_description = description
                 if feedback:
                     conferenceDetails.conference_feedback_link = feedback
+                if social_facebook != "None":
+                    conferenceDetails.social_facebook = social_facebook
+                if social_insta != "None":
+                    conferenceDetails.social_insta = social_insta
+                if social_linkedin != "None":
+                    conferenceDetails.social_linkedin = social_linkedin
+                if social_twitter != "None":
+                    conferenceDetails.social_twitter = social_twitter
+                if social_youtube != "None":
+                    conferenceDetails.social_youtube = social_youtube
                 conferenceDetails.save()
             else:
                 conferenceDetails = ConferenceDetails(conference_id=conference.conference_id, conference_banner=banner,
                                                       conference_brochure=brochure, conference_theme=theme,
                                                       conference_description=description,
-                                                      conference_feedback_link=feedback)
+                                                      conference_feedback_link=feedback,
+                                                      social_facebook=social_facebook,
+                                                      social_insta=social_insta, social_linkedin=social_linkedin,
+                                                      social_twitter=social_twitter, social_youtube=social_youtube)
                 conferenceDetails.save()
 
             messages.success(request, 'Your conference has been updated')
@@ -415,7 +433,8 @@ def participateconference(request, conference_id):
         messages.error(request, 'You are not logged in')
         return redirect('home')
 
-def conference_details(request,conference_id):
+
+def conference_details(request, conference_id):
     conference = Conference.objects.get(pk=conference_id)
     try:
         conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
@@ -424,6 +443,7 @@ def conference_details(request,conference_id):
 
     context = {'conference': conference, 'conference_details': conference_details}
     return render(request, 'conference/conference_details.html', context=context)
+
 
 def conferencepass(request, conference_id):
     if request.user.is_authenticated:
@@ -473,6 +493,12 @@ def staffupdateconference(request, conference_id):
             theme = request.POST.get('conftheme')
             description = request.POST.get('confdesc')
             feedback = request.POST.get('conffeedback')
+            social_facebook = request.POST.get('social_facebook')
+            social_insta = request.POST.get('social_insta')
+            social_linkedin = request.POST.get('social_linkedin')
+            social_twitter = request.POST.get('social_twitter')
+            social_youtube = request.POST.get('social_youtube')
+
 
             if ConferenceDetails.objects.filter(conference_id=conference.conference_id).exists():
                 conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
@@ -486,12 +512,25 @@ def staffupdateconference(request, conference_id):
                     conferenceDetails.conference_description = description
                 if feedback:
                     conferenceDetails.conference_feedback_link = feedback
+                if social_facebook != "None":
+                    conferenceDetails.social_facebook = social_facebook
+                if social_insta != "None":
+                    conferenceDetails.social_insta = social_insta
+                if social_linkedin != "None":
+                    conferenceDetails.social_linkedin = social_linkedin
+                if social_twitter != "None":
+                    conferenceDetails.social_twitter = social_twitter
+                if social_youtube != "None":
+                    conferenceDetails.social_youtube = social_youtube
                 conferenceDetails.save()
             else:
                 conferenceDetails = ConferenceDetails(conference_id=conference.conference_id, conference_banner=banner,
                                                       conference_brochure=brochure, conference_theme=theme,
                                                       conference_description=description,
-                                                      conference_feedback_link=feedback)
+                                                      conference_feedback_link=feedback,
+                                                      social_facebook=social_facebook,
+                                                      social_insta=social_insta, social_linkedin=social_linkedin,
+                                                      social_twitter=social_twitter, social_youtube=social_youtube)
                 conferenceDetails.save()
 
             messages.success(request, 'Your conference details has been updated')

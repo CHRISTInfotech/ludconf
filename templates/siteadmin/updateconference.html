@@ -222,9 +222,9 @@
                     <label for="org3">Organiser Email 3</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="org3" name="org3" value="{{ conference.mobile3 }}"
+                    <input type="text" class="form-control" id="org_mob_3" name="org_mob_3" value="{{ conference.mobile3 }}"
                            required>
-                    <label for="org3">Organiser Email 3</label>
+                    <label for="org_mob_3">Organiser Phone Number 3</label>
                 </div>
                 <div class="input-group mb-3">
                     <label class="input-group-text" for="confbanner">Upload</label>
@@ -242,28 +242,28 @@
                            accept="application/pdf">
                 </div>
                 <div class="form-floating mb-2">
-                    <textarea class="form-control" placeholder="Feedback Link" id="social_facebook" 
-                              name="social_facebook" required>{% if conference_details %}{{ conference_details.social_facebook }}{% endif %}</textarea>
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_facebook"
+                              name="social_facebook">{% if conference_details %}{{ conference_details.social_facebook }}{% endif %}</textarea>
                     <label for="social_facebook">Facebook Link</label>
                 </div>
                 <div class="form-floating mb-2">
-                    <textarea class="form-control" placeholder="Feedback Link" id="social_insta" 
-                              name="social_insta" required>{% if conference_details %}{{ conference_details.social_insta }}{% endif %}</textarea>
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_insta"
+                              name="social_insta">{% if conference_details %}{{ conference_details.social_insta }}{% endif %}</textarea>
                     <label for="social_insta">Instagram Link</label>
                 </div>
                 <div class="form-floating mb-2">
-                    <textarea class="form-control" placeholder="Feedback Link" id="social_linkedin" 
-                              name="social_linkedin" required>{% if conference_details %}{{ conference_details.social_linkedin }}{% endif %}</textarea>
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_linkedin"
+                              name="social_linkedin">{% if conference_details %}{{ conference_details.social_linkedin }}{% endif %}</textarea>
                     <label for="social_linkedin">LinkedIn Link</label>
                 </div>
                 <div class="form-floating mb-2">
-                    <textarea class="form-control" placeholder="Feedback Link" id="social_twitter" 
-                              name="social_twitter" required>{% if conference_details %}{{ conference_details.social_twitter }}{% endif %}</textarea>
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_twitter"
+                              name="social_twitter">{% if conference_details %}{{ conference_details.social_twitter }}{% endif %}</textarea>
                     <label for="social_twitter">Twitter Link</label>
                 </div>
                 <div class="form-floating mb-2">
-                    <textarea class="form-control" placeholder="Feedback Link" id="social_youtube" 
-                              name="social_youtube" required>{% if conference_details %}{{ conference_details.social_youtube }}{% endif %}</textarea>
+                    <textarea class="form-control" placeholder="Feedback Link" id="social_youtube"
+                              name="social_youtube">{% if conference_details %}{{ conference_details.social_youtube }}{% endif %}</textarea>
                     <label for="social_youtube">YouTube Link</label>
                 </div>
                 <div class="form-floating mb-3">

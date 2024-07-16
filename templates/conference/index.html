@@ -57,16 +57,27 @@
                                     <p class="card-text">
                                         {{ conf.location }} | {{ conf.venue }} <br/>
                                         <span class="fst-italic">
-                                    {{ conf.start_date }} | {{ conf.end_date }}
-                                </span>
+                                            {{ conf.start_date }} | {{ conf.end_date }}
+                                        </span>
                                     </p>
-                                    <p class="card-text">
-                                        Contact People: <br/>
-                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }}
-                                    </p>
-                                    <p class="card-text">
+                                    <div class="card-text">
+                                        <i class="fa-solid fa-user-large"></i> Contact People: <br/>
+                                        <div class="row mt-2">
+                                            <div class="col-sm-12 col-md-4">
+                                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} <br/>
+                                                <i class="fa-solid fa-phone"></i> {{ conf.mobile1 }}
+                                            </div>
+                                            <div class="col-sm-12 col-md-4">
+                                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} <br/>
+                                                <i class="fa-solid fa-phone"></i> {{ conf.mobile2 }}
+                                            </div>
+                                            <div class="col-sm-12 col-md-4">
+                                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }} <br/>
+                                                <i class="fa-solid fa-phone"></i> {{ conf.mobile3 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="card-text mt-3">
                                         <small class="text-body-secondary">
                                             <small class="text-body-secondary">
                                                 Posted {{ conf.created_at|timesince }} ago.
@@ -81,7 +92,7 @@
                 {% endfor %}
             {% else %}
                 <div class="text-center p-3 fw-bolder">
-                    No conferences participated yet.
+                    No conferences added yet.
                 </div>
             {% endif %}
 

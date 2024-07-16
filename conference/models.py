@@ -47,6 +47,7 @@ class UserDetails(models.Model):
 
 
 class ConferenceRegistration(models.Model):
+    reg_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     interest = models.CharField(max_length=255)

@@ -39,17 +39,70 @@
                             </a>
                         </div>
                     {% endif %}
-                    <div class="fst-italic mb-2">
-                        {{ conference.location }}; {{ conference.venue }}
-                    </div>
-                    <div class="mb-2">
+                    <div class="fst-italic mb-3">
+                        {{ conference.location }}, {{ conference.venue }};
                         From {{ conference.start_date }} to {{ conference.end_date }}
                     </div>
-                    <div class="mb-2">
-                        Contact People: <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
-                        <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }}
+                    <div class="mb-3">
+                        <i class="fa-solid fa-user-large"></i> Contact People: <br/>
+                        <div class="row mt-2">
+                            <div class="col-sm-12 col-md-4">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile1 }}
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile2 }}
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }} <br/>
+                                <i class="fa-solid fa-phone"></i> {{ conference.mobile3 }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row m-0">
+                            {% if conferenceDetails.social_facebook %}
+                                <div class="col">
+                                    <a href="{{ conferenceDetails.social_facebook }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-facebook"></i> Facebook
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conferenceDetails.social_insta %}
+                                <div class="col">
+                                    <a href="{{ conferenceDetails.social_insta }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-instagram"></i> Instagram
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conferenceDetails.social_linkedin %}
+                                <div class="col">
+                                    <a href="{{ conferenceDetails.social_linkedin }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-linkedin"></i> LinkedIn
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conferenceDetails.social_twitter %}
+                                <div class="col">
+                                    <a href="{{ conferenceDetails.social_twitter }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-twitter"></i> Twitter
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if conferenceDetails.social_youtube %}
+                                <div class="col">
+                                    <a href="{{ conferenceDetails.social_youtube }}" target="_blank"
+                                       class="text-decoration-none">
+                                        <i class="fa-brands fa-youtube"></i> YouTube
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="mb-2">
                         <small>
