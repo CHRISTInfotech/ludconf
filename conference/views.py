@@ -426,7 +426,10 @@ def participateconference(request, conference_id):
                 conferenceReg.save()
             messages.success(request, 'You have registered for the conference')
             return redirect('registered_conference')
-        conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
+        try:
+            conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
+        except:
+            conferenceDetails = None
         context = {'conference': conference, 'conferenceDetails': conferenceDetails}
         return render(request, 'conference/conference_participation.html', context=context)
     else:
