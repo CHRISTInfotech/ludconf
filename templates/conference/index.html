@@ -18,7 +18,10 @@
                             <div class="col-md-3 d-flex justify-content-center">
                                 {% for confdetail in conference_details %}
                                     {% if conf.pk == confdetail.conference_id %}
-                                        <img src="{{ confdetail.conference_banner.url }}" class="img-fluid" alt="...">
+                                        {% if confdetail.conference_banner %}
+                                            <img src="{{ confdetail.conference_banner.url }}" class="img-fluid"
+                                                 alt="...">
+                                        {% endif %}
                                     {% endif %}
                                 {% endfor %}
                             </div>

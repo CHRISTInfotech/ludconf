@@ -18,7 +18,9 @@
                         <div class="col-md-3 d-flex justify-content-center">
                             {% for confdetail in conference_details %}
                                 {% if conf.pk == confdetail.conference_id %}
-                                    <img src="{{ confdetail.conference_banner.url }}" class="img-fluid" alt="...">
+                                    {% if confdetail.conference_banner %}
+                                        <img src="{{ confdetail.conference_banner.url }}" class="img-fluid" alt="...">
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </div>
@@ -39,15 +41,15 @@
                                 <span class="fw-bold">
                                      {% for confdetail in conference_details %}
                                          {% if conf.pk == confdetail.conference_id %}
-                                             {{confdetail.conference_theme}}
+                                             {{ confdetail.conference_theme }}
                                          {% endif %}
                                      {% endfor %}
                                 </span> <br/>
-                                     {% for confdetail in conference_details %}
-                                         {% if conf.pk == confdetail.conference_id %}
-                                             {{confdetail.conference_description}}
-                                         {% endif %}
-                                     {% endfor %}
+                                    {% for confdetail in conference_details %}
+                                        {% if conf.pk == confdetail.conference_id %}
+                                            {{ confdetail.conference_description }}
+                                        {% endif %}
+                                    {% endfor %}
                                 </p>
                                 <p class="card-text">
                                     {{ conf.location }} | {{ conf.venue }} <br/>
@@ -63,7 +65,7 @@
                                 </p>
                                 <p class="card-text">
                                     <small class="text-body-secondary">
-                                    Posted {{ conf.created_at|timesince }} ago.
+                                        Posted {{ conf.created_at|timesince }} ago.
                                     </small>
                                 </p>
                             </div>
