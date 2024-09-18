@@ -101,12 +101,20 @@ def ludregister_step_3(request, email):
                 newsletter = False
             else:
                 newsletter = True
-            user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name,
+
+            if User.objects.filter(email=email).exists():
+                user = User.objects.get(email=email)
+                user.set_password(password)
+                user.save()
+            else:
+                user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name,
                                             username=email)
-            user.save()
-            userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
+                user.save()
+
+            if not UserDetails.objects.filter(user=user).exists():            
+                userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
                                       organization=organization, mobile=mobile, opt_newsletter=newsletter)
-            userdetails.save()
+                userdetails.save()
 
             try:
                 conferences = ConferenceOrganisers.objects.filter(mails=user.email)
@@ -410,7 +418,7 @@ def deregisteredconference(request, conference_id):
         return redirect('home')
 
 
-@login_required(login_url='ludlogin')
+@login_required(login_url='ludlogin', redirect_field_name='next')
 def participateconference(request, conference_id):
     if request.user.is_authenticated:
         conference = Conference.objects.get(pk=conference_id)
@@ -434,7 +442,7 @@ def participateconference(request, conference_id):
         return render(request, 'conference/conference_participation.html', context=context)
     else:
         messages.error(request, 'You are not logged in')
-        return redirect('home')
+        return redirect('ludlogin')
 
 
 def conference_details(request, conference_id):
@@ -581,3 +589,58 @@ def download_emails_for_newsletter(request):
     else:
         messages.error(request, 'You are not logged in')
         return redirect('home')
+
+
+def one_time_participation(request,conference_id):
+    if Conference.objects.filter(pk=conference_id).exists():
+        conference = Conference.objects.get(pk=conference_id)
+        if request.method == "POST":
+            email = request.POST['email']
+            first_name = request.POST['firstname']
+            last_name = request.POST['lastname']
+            gender = request.POST['gender']
+            dob = request.POST['dob']
+            designation = request.POST['designation']
+            orgnization = request.POST['organization']
+            mobile = request.POST['mobile']
+            newsletter = False
+            
+            if not User.objects.filter(email=email).exists():
+                user = User.objects.create(email=email, password=mobile, first_name=first_name, last_name=last_name,
+                                            username=email)
+                user.save()
+            else:
+                user = User.objects.get(email=email)
+
+            if not UserDetails.objects.filter(user=user).exists():
+                userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
+                                      organization=orgnization, mobile=mobile, opt_newsletter=newsletter)
+                userdetails.save()
+
+            if ConferenceRegistration.objects.filter(conference_id=conference_id, user=user.id).exists():
+                conference_reg = ConferenceRegistration.objects.get(user=user, conference_id=conference_id)
+                conference_reg.interest = "Attend-Onetime"
+                conference_reg.save()
+            else:
+                conferenceReg = ConferenceRegistration(interest="Attend-Onetime", conference_id=conference.conference_id,
+                                                       user=user)
+                conferenceReg.save()
+
+            messages.success(request, 'You have registered for the conference')
+            return redirect('conference_details', conference_id)
+        else: 
+            try:
+                conference_details = ConferenceDetails.objects.get(conference=conference.pk)
+            except:
+                conference_details = None
+            return render(request, 'conference/one_time_reg.html', context={'conference': conference, 'conference_details':conference_details})
+    else:
+        messages.error(request, 'Conference does not exist')
+        return redirect('home')
+    
+
+def error_view_404(request, exception):
+    return render(request, 'userauth/error_page.html')
+
+def error_view_500(request):
+    return render(request, 'userauth/error_page.html')

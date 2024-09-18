@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="my-5 border p-3">
+    <div class="row">
+        <div class="col-sm-12 col-md-6">
+            <div class="col-12">
+                {% if conference_details.conference_banner %}
+                <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" alt="...">
+                {% endif %}
+            </div>
+            <div class="col-12">
+                <div>
+                    {{ conference.location }} | {{ conference.venue }}
+                </div>
+                <div class="mb-3 fst-italic">
+                    {{ conference.start_date }} - {{ conference.end_date }}
+                </div>
+                <div class="mb-3">
+                    {% if conference_details.conference_brochure %}
+                    <hr />
+                    <a href="{{ conference_details.conference_brochure.url }}" target="_blank"
+                        class="text-decoration-none">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        Conference Brochure
+                    </a>
+                    <hr />
+                    {% endif %}
+                </div>
+                <div>
+                    <small>
+                        {{ conference.created_at|timesince }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        <form method="POST" class="col-sm-12 col-md-6">
+            {% csrf_token %}
+            <div class="col-12 text-center mb-4 fs-5 mt-4">
+                Register to LUD Conference <br />
+                #{{ conference.pk }}
+                <hr />
+            </div>
+            <div class="col-12 mb-3">
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" name="email" required>
+                    <label for="email">Email address</label>
+                </div>
+            </div>
+            <div class="col-12 mb-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder="First Name"
+                        required>
+                    <label for="firstname">First Name</label>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Last Name"
+                        required>
+                    <label for="lastname">Last Name</label>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-floating">
+                    <select class="form-select" id="gender" name="gender" aria-label="Gender" required>
+                        <option value="" selected>--select--</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Others">Others</option>
+                    </select>
+                    <label for="gender">Gender</label>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="dob" name="dob" placeholder="Date of Birth" required>
+                    <label for="dob">Date of Birth</label>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="designation" name="designation"
+                        placeholder="Designation" required>
+                    <label for="designation">Designation</label>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="organization" name="organization"
+                        placeholder="Organization" required>
+                    <label for="organization">Organization</label>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="mobile" name="mobile" placeholder="WhatsApp Number"
+                        required>
+                    <label for="mobile">WhatsApp / Phone Number</label>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-3">
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn btn-success" type="submit">
+                        <i class="fa-regular fa-floppy-disk"></i>
+                        Register
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+
+{% endblock content %}

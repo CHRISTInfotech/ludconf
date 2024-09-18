@@ -4,7 +4,8 @@ from conference.views import home, ludlogin, dashboard, adminconferencecreate, l
     adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference, \
     participateconference, participatedconference, adminmanageconference, adminconferencestatuschange, \
     stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass, staffupdateconference, \
-    download_registration_details, adminconferenceupdate, download_emails_for_newsletter, conference_details
+    download_registration_details, adminconferenceupdate, download_emails_for_newsletter, conference_details, \
+    one_time_participation
 
 urlpatterns = [
     path('', home, name='home'),
@@ -32,4 +33,5 @@ urlpatterns = [
     path('download_registration_details/<str:conference_id>', download_registration_details,
          name='download_registration_details'),
     path('download_emails_for_newsletter', download_emails_for_newsletter, name='download_emails_for_newsletter'),
+    path('one_time_registration/<str:conference_id>', one_time_participation, name='one_time_registration'),
 ]

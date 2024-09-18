@@ -118,8 +118,14 @@
 
             <div class="col-12 d-flex justify-content-around mt-4">
                 <a class="btn btn-success text-decoration-none"
-                   href="{% url 'admin_conference_update' conference.conference_id %}">
-                    Participate
+                   href="{% url 'participate_conference' conference.conference_id %}">
+                   <i class="fa-solid fa-floppy-disk"></i>
+                    Create an account & save your conference participation history
+                </a>
+                <a class="btn btn-warning text-decoration-none"
+                   href="{% url 'one_time_registration' conference.conference_id %}">
+                   <i class="fa-solid fa-stopwatch"></i>
+                    One time participation
                 </a>
             </div>
         </div>
