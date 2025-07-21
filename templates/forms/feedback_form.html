@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'partials/nav.html' %}
+
+<div class="container my-5">
+  <h2 class="mb-4">Let Us Dream Community Conference</h2>
+  <h4 class="fw-bold">Post-Conference Feedback Survey</h4>
+  <p>To be filled immediately after the conference – focuses on initial impressions, learning, and experience.</p>
+  <p>Thank you for attending the Let Us Dream Annual Community Conference. This survey is designed to gather your reflections on the overall experience.</p>
+  <p>
+    <strong>⏱️ Estimated time to complete:</strong> 10 minutes<br>
+    <strong>🎓 Certificate:</strong> Will be sent within 24–48 hours post-conference.
+  </p>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group mb-3">
+      <label for="conference_id"><strong>Q1.</strong> Select the Conference You Attended:</label>
+      <select name="conference_id" id="conference_id" class="form-control" required onchange="this.form.submit();">
+        <option value="">-- Choose a conference --</option>
+        {% for conf in conferences %}
+          <option value="{{ conf.conference_id }}" {% if selected_conference and conf == selected_conference %}selected{% endif %}>
+            {{ conf.title }} ({{ conf.start_date }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  {% if selected_conference %}
+  <hr>
+  <form method="POST" class="question-list">
+    {% csrf_token %}
+    <input type="hidden" name="conference_id" value="{{ selected_conference.conference_id }}">
+
+    <h5 class="fw-bold">Participant Information</h5>
+
+    <div class="mb-3">
+      <label><strong>Q2.</strong> Name (as you want on the certificate)</label>
+      <input type="text" class="form-control" name="full_name" required>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q3.</strong> Email Address</label>
+      <input type="email" class="form-control" name="email" required>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q4.</strong> WhatsApp Number</label>
+      <input type="text" class="form-control" name="phone">
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q5.</strong> Age</label>
+      <select name="age" class="form-control" required>
+        <option value="">-- Select Age Range --</option>
+        <option>18–24</option>
+        <option>25–40</option>
+        <option>41–56</option>
+        <option>57+</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q6.</strong> Gender</label>
+      <select name="gender" class="form-control" required>
+        <option value="">-- Select Gender --</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Prefer not to say</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q7.</strong> Profession</label>
+      <select name="occupation" class="form-control" required>
+        <option value="">-- Select --</option>
+        <option>University/College Faculty</option>
+        <option>Post-secondary faculty (vocational/technical)</option>
+        <option>Student</option>
+        <option>Social Worker</option>
+        <option>Healthcare</option>
+        <option>Corporate Professional</option>
+        <option>Retired Professional</option>
+        <option>Entrepreneur</option>
+        <option>Other</option>
+      </select>
+      <input type="text" name="occupation_other" class="form-control mt-2" placeholder="If other, please specify">
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q8.</strong> Location you reside in</label>
+      <select name="location_type" class="form-control" required>
+        <option value="">-- Select --</option>
+        <option>Chennai, India</option>
+        <option>Texas, USA</option>
+        <option>NewYork, USA</option>
+        <option>Pune, India</option>
+        <option>Hyderabad, India</option>
+        <option>Bengaluru, India</option>
+        <option>Louisiana, USA</option>
+        <option>Delhi, India</option>
+        <option>Kolkata, India</option>
+        <option>TVM, Kerala</option>
+        <option>Virginia, USA</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q9.</strong> Is this your first time attending a Let Us Dream Conference?</label>
+      <div class="radio-options">
+        <input type="radio" name="first_time" value="True" id="first_time_yes" required>
+        <label for="first_time_yes">Yes</label>
+        <input type="radio" name="first_time" value="False" id="first_time_no">
+        <label for="first_time_no">No</label>
+      </div>
+    </div>
+
+    <hr>
+    <h5 class="fw-bold">Volunteerism, Social Responsibility & Learning</h5>
+
+    {% include 'forms/radio_group.html' with name="q1_volunteer" label="Q10. I felt motivated to volunteer or serve my community after attending the conference." %}
+    {% include 'forms/radio_group.html' with name="q2_belonging" label="Q11. I felt a strong sense of belonging and community at the event." %}
+    {% include 'forms/radio_group.html' with name="q3_inspiration" label="Q12. I was inspired by the stories and speakers." %}
+    {% include 'forms/radio_group.html' with name="q4_stalls" label="Q13. The stalls and exhibitions added to my learning and engagement." %}
+    {% include 'forms/radio_group.html' with name="q5_reflection" label="Q14. The sessions helped me reflect on my own actions and purpose." %}
+
+    <h5 class="fw-bold">Social Entrepreneurship & Community Service</h5>
+
+    {% include 'forms/radio_group.html' with name="q6_initiative" label="Q15. I feel motivated to start or support social initiatives after the conference." %}
+    {% include 'forms/radio_group.html' with name="q7_models" label="Q16. I understood new models of social entrepreneurship." %}
+    {% include 'forms/radio_group.html' with name="q8_motivation" label="Q17. I felt encouraged to be a changemaker." %}
+    {% include 'forms/radio_group.html' with name="q9_clarity" label="Q18. I gained more clarity about social responsibility." %}
+    {% include 'forms/radio_group.html' with name="q10_insight" label="Q19. The sessions gave me insights about community leadership." %}
+
+    <h5 class="fw-bold">Learning & Knowledge Sharing</h5>
+
+    {% include 'forms/radio_group.html' with name="q11_concepts" label="Q20. I learned new concepts or perspectives during the conference." %}
+    {% include 'forms/radio_group.html' with name="q12_application" label="Q21. I can apply what I learned to my daily life or work." %}
+    {% include 'forms/radio_group.html' with name="q13_expansion" label="Q22. My worldview or understanding expanded because of the sessions." %}
+    {% include 'forms/radio_group.html' with name="q14_keynotes" label="Q23. The keynote sessions were thought-provoking and useful." %}
+
+    <h5 class="fw-bold">Networking & Collaborations</h5>
+
+    {% include 'forms/radio_group.html' with name="q15_collab" label="Q24. I found opportunities to collaborate with like-minded individuals." %}
+    {% include 'forms/radio_group.html' with name="q16_convo" label="Q25. I had meaningful conversations during the conference." %}
+    {% include 'forms/radio_group.html' with name="q17_diversity" label="Q26. I appreciated the diversity of ideas and participants." %}
+    {% include 'forms/radio_group.html' with name="q18_community" label="Q27. I feel more connected to the larger community after attending." %}
+    {% include 'forms/radio_group.html' with name="q19_followup" label="Q28. I would like to stay involved and attend future LUD events." %}
+
+    <hr>
+    <h5 class="fw-bold">Final Reflections</h5>
+
+    <div class="mb-3">
+      <label><strong>Q29.</strong> Would you be interested in a follow-up study on social sensitization and personal growth?</label>
+      <div class="radio-options">
+        <input type="radio" name="followup_study" value="True" id="followup_yes" required>
+        <label for="followup_yes">Yes</label>
+        <input type="radio" name="followup_study" value="False" id="followup_no">
+        <label for="followup_no">No</label>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q30.</strong> How satisfied were you overall with the conference?</label>
+      <div class="radio-options">
+        {% for i in "12345"|make_list %}
+          <input type="radio" name="satisfaction" value="{{ i }}" id="satisfaction_{{ i }}" required>
+          <label for="satisfaction_{{ i }}">{{ i }}</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q31.</strong> What were your key takeaways from this event?</label>
+      <textarea name="takeaways" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q32.</strong> What suggestions do you have to improve the conference experience?</label>
+      <textarea name="suggestions" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q33.</strong> Would you like to be part of the LUD Community Conference Team at your location?</label>
+      <div class="radio-options">
+        <input type="radio" name="team_interest" value="True" id="team_yes" required>
+        <label for="team_yes">Yes</label>
+        <input type="radio" name="team_interest" value="False" id="team_no">
+        <label for="team_no">No</label>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label><strong>Q34.</strong> Most engaging activity for you (select one):</label>
+      <select name="engaging_activity" class="form-control" required>
+        <option value="">-- Choose --</option>
+        <option>Keynote</option>
+        <option>Panels</option>
+        <option>Group Discussion</option>
+        <option>Changemakers</option>
+        <option>Stalls</option>
+        <option>Networking</option>
+        <option>Volunteering</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Submit Feedback</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

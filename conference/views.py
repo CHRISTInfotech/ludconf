@@ -1,9 +1,22 @@
+import logging
+import matplotlib
+matplotlib.use('Agg') 
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
+from .utils import str_to_bool, str_to_int 
+from collections import Counter
+import matplotlib.pyplot as plt
+import io
+import base64
+
+
+
+
 
 from conference.functions import generate_otp
 from conference.mails import send_otp_email
@@ -644,3 +657,261 @@ def error_view_404(request, exception):
 
 def error_view_500(request):
     return render(request, 'userauth/error_page.html')
+
+def str_to_bool(value):
+    return value == 'True'
+
+def str_to_int(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
+
+@login_required
+def feedback_survey(request):
+    conferences = Conference.objects.filter(is_published=True)
+    selected_conference = None
+
+    if request.method == 'POST':
+        selected_id = request.POST.get('conference_id')
+        if selected_id:
+            selected_conference = get_object_or_404(Conference, conference_id=selected_id)
+
+        if 'full_name' in request.POST:
+            FeedbackSurveyResponse.objects.create(
+                user=request.user,
+                conference=selected_conference,
+                full_name=request.POST.get('full_name'),
+                email=request.POST.get('email'),
+                phone=request.POST.get('phone') or None,
+                age=request.POST.get('age') or None,
+                gender=request.POST.get('gender') or None,
+                occupation=request.POST.get('occupation'),
+                occupation_other=request.POST.get('occupation_other') or None,
+                location_type=request.POST.get('location_type') or None,
+                first_time=str_to_bool(request.POST.get('first_time')),
+
+                # Volunteerism & Community Engagement
+                q1_volunteer=str_to_int(request.POST.get('q1_volunteer')),
+                q2_belonging=str_to_int(request.POST.get('q2_belonging')),
+                q3_inspiration=str_to_int(request.POST.get('q3_inspiration')),
+                q4_stalls=str_to_int(request.POST.get('q4_stalls')),
+                q5_reflection=str_to_int(request.POST.get('q5_reflection')),
+
+                # Social Entrepreneurship & Community Service
+                q6_initiative=str_to_int(request.POST.get('q6_initiative')),
+                q7_models=str_to_int(request.POST.get('q7_models')),
+                q8_motivation=str_to_int(request.POST.get('q8_motivation')),
+                q9_clarity=str_to_int(request.POST.get('q9_clarity')),
+                q10_insight=str_to_int(request.POST.get('q10_insight')),
+
+                # Learning & Knowledge Sharing
+                q11_concepts=str_to_int(request.POST.get('q11_concepts')),
+                q12_application=str_to_int(request.POST.get('q12_application')),
+                q13_expansion=str_to_int(request.POST.get('q13_expansion')),
+                q14_keynotes=str_to_int(request.POST.get('q14_keynotes')),
+
+                # Networking & Collaboration
+                q15_collab=str_to_int(request.POST.get('q15_collab')),
+                q16_convo=str_to_int(request.POST.get('q16_convo')),
+                q17_diversity=str_to_int(request.POST.get('q17_diversity')),
+                q18_community=str_to_int(request.POST.get('q18_community')),
+                q19_followup=str_to_int(request.POST.get('q19_followup')),
+
+                # Final Reflections
+                followup_study=str_to_bool(request.POST.get('followup_study')) if request.POST.get('followup_study') else False,
+                satisfaction=str_to_int(request.POST.get('satisfaction')),
+                takeaways=request.POST.get('takeaways'),
+                suggestions=request.POST.get('suggestions'),
+                team_interest=str_to_bool(request.POST.get('team_interest')) if request.POST.get('team_interest') else False,
+                engaging_activity=request.POST.get('engaging_activity') or None,
+            )
+            messages.success(request, "Thank you for your feedback!")
+            return redirect('dashboard')
+
+    elif request.method == 'GET' and 'conference_id' in request.GET:
+        selected_id = request.GET.get('conference_id')
+        selected_conference = get_object_or_404(Conference, conference_id=selected_id)
+
+    return render(request, 'forms/feedback_form.html', {
+        'conferences': conferences,
+        'selected_conference': selected_conference
+    })
+
+@login_required
+def reflection_survey(request):
+    conferences = Conference.objects.filter(is_published=True)
+
+    selected_conference = None
+    if request.method == 'POST':
+        selected_id = request.POST.get('conference_id')
+        if selected_id:
+            selected_conference = Conference.objects.get(conference_id=selected_id)
+
+        if 'full_name' in request.POST:
+            ReflectionSurveyResponse.objects.create(
+                user=request.user,
+                conference=selected_conference,
+                full_name=request.POST.get('full_name'),
+                email=request.POST.get('email'),
+                occupation=request.POST.get('occupation'),
+                occupation_other=request.POST.get('occupation_other') or '',
+                connect_new=request.POST.get('connect_new'),
+                stayed_in_touch=request.POST.get('stayed_in_touch'),
+                opportunities_found=request.POST.get('opportunities_found'),
+                motivated_to_volunteer=request.POST.get('motivated_to_volunteer'),
+                participated_due_to_conf=request.POST.get('participated_due_to_conf'),
+                engaged_in_theme=request.POST.get('engaged_in_theme'),
+                improved_knowledge=request.POST.get('improved_knowledge'),
+                philosophy_applied=request.POST.get('philosophy_applied'),
+                more_informed=request.POST.get('more_informed'),
+                leadership_enhanced=request.POST.get('leadership_enhanced'),
+                more_socially_engaged=request.POST.get('more_socially_engaged'),
+                more_socially_sensitive=request.POST.get('more_socially_sensitive'),
+                making_impact=request.POST.get('making_impact'),
+                key_takeaway=request.POST.get('key_takeaway'),
+                recommend=request.POST.get('recommend') == 'True',
+                stay_involved=request.POST.get('stay_involved') == 'True',
+                org_willing_to_partner=request.POST.get('org_willing_to_partner') == 'True',
+            )
+            messages.success(request, "Thank you for your reflection!")
+            return redirect('dashboard')
+
+    return render(request, 'forms/reflection_survey.html', {
+        'conferences': conferences,
+        'selected_conference': selected_conference
+    })
+
+def generate_chart(title, data_dict):
+    fig, ax = plt.subplots(figsize=(5, 3))
+    bars = ax.bar(data_dict.keys(), data_dict.values(), color="#4C9BE8", edgecolor='white', linewidth=0.7)
+
+    # Rounded bars and labels
+    for bar in bars:
+        height = bar.get_height()
+        ax.annotate(f'{height}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 5),  # vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom',
+                    fontsize=9, color='black')
+
+    ax.set_title(title, fontsize=12, color='#004080')
+    ax.set_ylabel("Responses", fontsize=10)
+    ax.tick_params(axis='x', rotation=30, labelsize=9)
+    ax.yaxis.grid(True, linestyle='--', alpha=0.6)
+    ax.set_axisbelow(True)
+
+    plt.tight_layout()
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png", dpi=120)
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    plt.close(fig)
+    return base64.b64encode(image_png).decode("utf-8")
+
+
+@login_required
+def feedback_dashboard(request):
+    if not (request.user.is_superuser or request.user.is_staff):
+        return redirect("home")
+
+    responses = FeedbackSurveyResponse.objects.all().order_by("-submitted_at")
+    total_responses = responses.count()
+
+    # Define Likert/Boolean chart fields and their display titles
+    chart_fields = {
+        "q1_volunteer": "Interest in Volunteering",
+        "q2_belonging": "Sense of Belonging",
+        "q3_inspiration": "Inspired by Speakers",
+        "q7_models": "Understanding New Models",
+        "q11_concepts": "New Concepts or Perspectives",
+        "q15_collab": "Found Collaborations",
+        "followup_study": "Interest in Follow-Up Study",
+        "satisfaction": "Overall Satisfaction (1–5)",
+    }
+
+    charts = []
+
+    location_counts = Counter(res.location_type for res in responses if res.location_type)
+    if location_counts:
+        location_chart = generate_chart("Location of Participants", location_counts)
+        charts.append({
+            "title": "Location of Participants",
+            "image_base64": location_chart
+        })
+
+
+    for field, title in chart_fields.items():
+        counts = {}
+        for res in responses:
+            val = getattr(res, field, None)
+            if isinstance(val, bool):
+                key = "Yes" if val else "No"
+            elif val is not None:
+                key = str(val)
+            else:
+                continue
+            counts[key] = counts.get(key, 0) + 1
+        if counts:
+            chart_image = generate_chart(title, counts)
+            charts.append({
+                "title": title,
+                "image_base64": chart_image
+            })
+
+    return render(request, "forms/feedback_dashboard.html", {
+        "responses": responses,
+        "total_responses": total_responses,
+        "charts": charts,
+    })
+
+@login_required
+def reflection_dashboard(request):
+    if not (request.user.is_superuser or request.user.is_staff):
+        return redirect('home')
+
+    responses = ReflectionSurveyResponse.objects.all().order_by('-submitted_at')
+    total = responses.count()
+
+    chart_fields = {
+        'connect_new': 'Connected with New People',
+        'stayed_in_touch': 'Stayed in Touch Post Conference',
+        'opportunities_found': 'Found Collaboration Opportunities',
+        'motivated_to_volunteer': 'Motivated to Volunteer',
+        'participated_due_to_conf': 'Participated Because of Conference',
+        'engaged_in_theme': 'Engaged in Conference Themes',
+        'improved_knowledge': 'Improved Knowledge',
+        'philosophy_applied': 'Conference Philosophy Still Applies',
+        'more_informed': 'More Informed After Conference',
+        'leadership_enhanced': 'Enhanced Leadership Skills',
+        'more_socially_engaged': 'More Socially Engaged',
+        'more_socially_sensitive': 'More Socially Sensitive',
+        'making_impact': 'Believes Making an Impact',
+        'recommend': 'Would Recommend the Conference',
+        'stay_involved': 'Wants to Stay Involved',
+        'org_willing_to_partner': 'Willing to Partner with LUD',
+    }
+
+    charts = []
+    for field, title in chart_fields.items():
+        counts = {}
+        for res in responses:
+            val = getattr(res, field, None)
+            if isinstance(val, bool):
+                key = "Yes" if val else "No"
+            elif val is not None:
+                key = str(val)
+            else:
+                continue
+            counts[key] = counts.get(key, 0) + 1
+        if counts:
+            image = generate_chart(title, counts)
+            charts.append({'title': title, 'image_base64': image})
+
+    return render(request, 'forms/reflection_dashboard.html', {
+        'responses': responses,
+        'total_responses': total,
+        'charts': charts
+    })

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+{% include 'partials/nav.html' %}
+
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="container my-5">
+    <h2 class="mb-4">Let Us Dream Community Conference</h2>
+    <h4>Impact Reflection Survey</h4>
+    <p>To be filled six months after the conference – focuses on long-term impact, community involvement, and application of learning.</p>
+
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="conference_id">Select the Conference You Attended:</label>
+            <select name="conference_id" id="conference_id" class="form-control" required onchange="this.form.submit();">
+                <option value="">-- Choose a conference --</option>
+                {% for conf in conferences %}
+                    <option value="{{ conf.conference_id }}" {% if selected_conference and conf == selected_conference %}selected{% endif %}>
+                        {{ conf.title }} ({{ conf.start_date }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    {% if selected_conference %}
+    <hr>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="conference_id" value="{{ selected_conference.conference_id }}">
+        <h5>Section 1: Participant Information</h5>
+        <div class="mb-3">
+            <label>Full Name</label>
+            <input type="text" class="form-control" name="full_name">
+        </div>
+        <div class="mb-3">
+            <label>Email ID</label>
+            <input type="email" class="form-control" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label>Occupation / Affiliation</label>
+            <select name="occupation" class="form-control" required>
+                <option value="">-- Select --</option>
+                <option value="student">Student</option>
+                <option value="faculty">University/ College Faculty</option>
+                <option value="social_worker">Social Worker</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="corporate">Corporate Professional</option>
+                <option value="retiree">Retiree</option>
+                <option value="entrepreneur">Entrepreneur</option>
+                <option value="other">Other</option>
+            </select>
+            <input type="text" class="form-control mt-2" name="occupation_other" placeholder="If other, specify">
+        </div>
+
+        <hr>
+        <h5>Section 2: Networking and Collaboration</h5>
+        {% include 'forms/radio_group.html' with label="I was able to connect with new individuals or organizations post the conference." name="connect_new" %}
+        {% include 'forms/radio_group.html' with label="I have stayed in touch with someone I met at the conference." name="stayed_in_touch" %}
+        {% include 'forms/radio_group.html' with label="I found opportunities for collaboration." name="opportunities_found" %}
+
+        <hr>
+        <h5>Section 3: Volunteering and Community Involvement</h5>
+        {% include 'forms/radio_group.html' with label="The conference motivated me to volunteer in community-based activities." name="motivated_to_volunteer" %}
+        {% include 'forms/radio_group.html' with label="I participated in a volunteering opportunity because of the conference." name="participated_due_to_conf" %}
+        {% include 'forms/radio_group.html' with label="I am currently engaged in community work that connects to the conference themes." name="engaged_in_theme" %}
+
+        <hr>
+        <h5>Section 4: Learning and Awareness</h5>
+        {% include 'forms/radio_group.html' with label="My knowledge of community service models and initiatives has improved." name="improved_knowledge" %}
+        {% include 'forms/radio_group.html' with label="The conference philosophy/objective continues to be practical and advanced in my learning." name="philosophy_applied" %}
+        {% include 'forms/radio_group.html' with label="I am more informed about cross-sector partnerships between NGOs, academics, and communities." name="more_informed" %}
+        {% include 'forms/radio_group.html' with label="I believe my leadership skills were enhanced post the conference." name="leadership_enhanced" %}
+
+        <hr>
+        <h5>Section 5: Engagement and Inclusivity</h5>
+        {% include 'forms/radio_group.html' with label="I am more socially engaged as a result of attending the conference." name="more_socially_engaged" %}
+        {% include 'forms/radio_group.html' with label="I am more socially sensitive to include more diverse voices in my daily life." name="more_socially_sensitive" %}
+        {% include 'forms/radio_group.html' with label="I believe I am making a meaningful impact on the community." name="making_impact" %}
+
+        <hr>
+        <h5>Section 6: Reflections and Future Involvement</h5>
+        <div class="mb-3">
+            <label>What is one key takeaway or moment from the Conference that continues to stay memorable for you?</label>
+            <textarea name="key_takeaway" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label>Would you recommend this conference to others?</label><br>
+            <input type="radio" name="recommend" value="True" required> Yes
+            <input type="radio" name="recommend" value="False"> No
+        </div>
+        <div class="mb-3">
+            <label>Would you like to stay involved in future Let Us Dream activities?</label><br>
+            <input type="radio" name="stay_involved" value="True" required> Yes
+            <input type="radio" name="stay_involved" value="False"> No
+        </div>
+        <div class="mb-3">
+            <label>Would your organization/institution like to partner with Let Us Dream?</label><br>
+            <input type="radio" name="org_willing_to_partner" value="True" required> Yes
+            <input type="radio" name="org_willing_to_partner" value="False"> No
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Survey</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
