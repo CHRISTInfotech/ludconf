@@ -193,36 +193,3 @@ class ReflectionSurveyResponse(models.Model):
         verbose_name = 'Reflection Survey Response'
         verbose_name_plural = 'Reflection Survey Responses'
 
-class ReflectionSurveyResponse(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=255, blank=True)
-    email = models.EmailField()
-    occupation = models.CharField(max_length=50, choices=OCCUPATION_CHOICES)
-    occupation_other = models.CharField(max_length=255, blank=True, null=True)
-
-
-
-    connect_new = models.IntegerField(choices=SCALE_CHOICES)
-    stayed_in_touch = models.IntegerField(choices=SCALE_CHOICES)
-    opportunities_found = models.IntegerField(choices=SCALE_CHOICES)
-
-    motivated_to_volunteer = models.IntegerField(choices=SCALE_CHOICES)
-    participated_due_to_conf = models.IntegerField(choices=SCALE_CHOICES)
-    engaged_in_theme = models.IntegerField(choices=SCALE_CHOICES)
-
-    improved_knowledge = models.IntegerField(choices=SCALE_CHOICES)
-    philosophy_applied = models.IntegerField(choices=SCALE_CHOICES)
-    more_informed = models.IntegerField(choices=SCALE_CHOICES)
-    leadership_enhanced = models.IntegerField(choices=SCALE_CHOICES)
-
-    more_socially_engaged = models.IntegerField(choices=SCALE_CHOICES)
-    more_socially_sensitive = models.IntegerField(choices=SCALE_CHOICES)
-    making_impact = models.IntegerField(choices=SCALE_CHOICES)
-
-    key_takeaway = models.TextField()
-    recommend = models.BooleanField()
-    stay_involved = models.BooleanField()
-    org_willing_to_partner = models.BooleanField()
-
-    submitted_at = models.DateTimeField(auto_now_add=True)

@@ -666,7 +666,6 @@ def str_to_int(value):
         return int(value)
     except (ValueError, TypeError):
         return None
-
 @login_required
 def feedback_survey(request):
     conferences = Conference.objects.filter(is_published=True)
@@ -678,54 +677,58 @@ def feedback_survey(request):
             selected_conference = get_object_or_404(Conference, conference_id=selected_id)
 
         if 'full_name' in request.POST:
+            # Handle multiple engaging activities
+            engaging_activities = request.POST.getlist('engaging_activity')  # Get list from checkboxes
+            engaging_activities_str = ', '.join(engaging_activities) if engaging_activities else None
+
             FeedbackSurveyResponse.objects.create(
-                user=request.user,
-                conference=selected_conference,
-                full_name=request.POST.get('full_name'),
-                email=request.POST.get('email'),
-                phone=request.POST.get('phone') or None,
-                age=request.POST.get('age') or None,
-                gender=request.POST.get('gender') or None,
-                occupation=request.POST.get('occupation'),
-                occupation_other=request.POST.get('occupation_other') or None,
-                location_type=request.POST.get('location_type') or None,
-                first_time=str_to_bool(request.POST.get('first_time')),
+    user=request.user,
+    conference=selected_conference,
+    full_name=request.POST.get('full_name'),
+    email=request.POST.get('email'),
+    phone=request.POST.get('phone') or None,
+    age=request.POST.get('age') or None,
+    gender=request.POST.get('gender') or None,
+    occupation=request.POST.get('occupation'),
+    occupation_other=request.POST.get('occupation_other') or None,
+    location_type=request.POST.get('location_type') or None,
+    first_time=str_to_bool(request.POST.get('first_time')),
 
-                # Volunteerism & Community Engagement
-                q1_volunteer=str_to_int(request.POST.get('q1_volunteer')),
-                q2_belonging=str_to_int(request.POST.get('q2_belonging')),
-                q3_inspiration=str_to_int(request.POST.get('q3_inspiration')),
-                q4_stalls=str_to_int(request.POST.get('q4_stalls')),
-                q5_reflection=str_to_int(request.POST.get('q5_reflection')),
+    # Volunteerism & Community Engagement
+    q1_volunteer=str_to_int(request.POST.get('q1_volunteer')) or 3,
+    q2_belonging=str_to_int(request.POST.get('q2_belonging')) or 3,
+    q3_inspiration=str_to_int(request.POST.get('q3_inspiration')) or 3,
+    q4_stalls=str_to_int(request.POST.get('q4_stalls')) or 3,
+    q5_reflection=str_to_int(request.POST.get('q5_reflection')) or 3,
 
-                # Social Entrepreneurship & Community Service
-                q6_initiative=str_to_int(request.POST.get('q6_initiative')),
-                q7_models=str_to_int(request.POST.get('q7_models')),
-                q8_motivation=str_to_int(request.POST.get('q8_motivation')),
-                q9_clarity=str_to_int(request.POST.get('q9_clarity')),
-                q10_insight=str_to_int(request.POST.get('q10_insight')),
+    # Social Entrepreneurship & Community Service
+    q6_initiative=str_to_int(request.POST.get('q6_initiative')) or 3,
+    q7_models=str_to_int(request.POST.get('q7_models')) or 3,
+    q8_motivation=str_to_int(request.POST.get('q8_motivation')) or 3,
+    q9_clarity=str_to_int(request.POST.get('q9_clarity')) or 3,
+    q10_insight=str_to_int(request.POST.get('q10_insight')) or 3,  # ✅ Fix added here
 
-                # Learning & Knowledge Sharing
-                q11_concepts=str_to_int(request.POST.get('q11_concepts')),
-                q12_application=str_to_int(request.POST.get('q12_application')),
-                q13_expansion=str_to_int(request.POST.get('q13_expansion')),
-                q14_keynotes=str_to_int(request.POST.get('q14_keynotes')),
+    # Learning & Knowledge Sharing
+    q11_concepts=str_to_int(request.POST.get('q11_concepts')) or 3,
+    q12_application=str_to_int(request.POST.get('q12_application')) or 3,
+    q13_expansion=str_to_int(request.POST.get('q13_expansion')) or 3,
+    q14_keynotes=str_to_int(request.POST.get('q14_keynotes')) or 3,
 
-                # Networking & Collaboration
-                q15_collab=str_to_int(request.POST.get('q15_collab')),
-                q16_convo=str_to_int(request.POST.get('q16_convo')),
-                q17_diversity=str_to_int(request.POST.get('q17_diversity')),
-                q18_community=str_to_int(request.POST.get('q18_community')),
-                q19_followup=str_to_int(request.POST.get('q19_followup')),
+    # Networking & Collaboration
+    q15_collab=str_to_int(request.POST.get('q15_collab')) or 3,
+    q16_convo=str_to_int(request.POST.get('q16_convo')) or 3,
+    q17_diversity=str_to_int(request.POST.get('q17_diversity')) or 3,
+    q18_community=str_to_int(request.POST.get('q18_community')) or 3,
+    q19_followup=str_to_int(request.POST.get('q19_followup')) or 3,
 
-                # Final Reflections
-                followup_study=str_to_bool(request.POST.get('followup_study')) if request.POST.get('followup_study') else False,
-                satisfaction=str_to_int(request.POST.get('satisfaction')),
-                takeaways=request.POST.get('takeaways'),
-                suggestions=request.POST.get('suggestions'),
-                team_interest=str_to_bool(request.POST.get('team_interest')) if request.POST.get('team_interest') else False,
-                engaging_activity=request.POST.get('engaging_activity') or None,
-            )
+    # Final Reflections
+    followup_study=str_to_bool(request.POST.get('followup_study')) if request.POST.get('followup_study') else False,
+    satisfaction=str_to_int(request.POST.get('satisfaction')) or 3,
+    takeaways=request.POST.get('takeaways'),
+    suggestions=request.POST.get('suggestions'),
+    team_interest=str_to_bool(request.POST.get('team_interest')) if request.POST.get('team_interest') else False,
+    engaging_activity=engaging_activities_str,  # save as comma-separated string
+)
             messages.success(request, "Thank you for your feedback!")
             return redirect('dashboard')
 
@@ -737,6 +740,7 @@ def feedback_survey(request):
         'conferences': conferences,
         'selected_conference': selected_conference
     })
+
 
 @login_required
 def reflection_survey(request):
@@ -834,6 +838,7 @@ def feedback_dashboard(request):
 
     charts = []
 
+    # Location of participants
     location_counts = Counter(res.location_type for res in responses if res.location_type)
     if location_counts:
         location_chart = generate_chart("Location of Participants", location_counts)
@@ -842,7 +847,7 @@ def feedback_dashboard(request):
             "image_base64": location_chart
         })
 
-
+    # Loop through chart_fields to generate Likert/Boolean charts
     for field, title in chart_fields.items():
         counts = {}
         for res in responses:
@@ -860,6 +865,19 @@ def feedback_dashboard(request):
                 "title": title,
                 "image_base64": chart_image
             })
+
+    # 🆕 Engaging Activities Chart
+    engaging_counts = Counter(
+        res.engaging_activity.strip()
+        for res in responses
+        if res.engaging_activity and res.engaging_activity.strip()
+    )
+    if engaging_counts:
+        engaging_chart = generate_chart("Most Engaging Activities", engaging_counts)
+        charts.append({
+            "title": "Most Engaging Activities",
+            "image_base64": engaging_chart
+        })
 
     return render(request, "forms/feedback_dashboard.html", {
         "responses": responses,
