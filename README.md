@@ -9,3 +9,8 @@ Three main users are there for the LUD application
 3. Conference Participant
 
 The conference management toolkit helps to manage and record the conference registration information.
+
+# TODO List
+
+1. Create an email template to sendout the email for OTP for new user login.
+2. 

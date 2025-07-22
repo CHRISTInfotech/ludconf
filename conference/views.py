@@ -1,6 +1,4 @@
 import logging
-import matplotlib
-matplotlib.use('Agg') 
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -9,14 +7,6 @@ from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
 from .utils import str_to_bool, str_to_int 
-from collections import Counter
-import matplotlib.pyplot as plt
-import io
-import base64
-
-
-
-
 
 from conference.functions import generate_otp
 from conference.mails import send_otp_email

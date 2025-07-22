@@ -51,7 +51,6 @@ body {
 }
 
 .navbar.top-header a.text-wrap {
-  font-size: 0.95rem;
   font-weight: 500;
   color: #ffffff !important;
   line-height: 1.3;
@@ -110,7 +109,6 @@ footer,
 .navbar.footer {
   background-color: #004080;
   color: #ffffff;
-  font-size: 0.95rem;
   text-align: center;
   padding: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -122,7 +120,6 @@ footer,
 
 @media (max-width: 576px) {
   .navbar.footer {
-    font-size: 0.85rem;
     padding: 0.75rem;
   }
 }
@@ -207,7 +204,7 @@ form label {
   display: none;
 }
 
-.radio-options input[type="radio"] + label {
+.radio-options input[type="radio"]+label {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 20px;
@@ -219,7 +216,7 @@ form label {
   transition: background-color 0.3s, color 0.3s;
 }
 
-.radio-options input[type="radio"]:checked + label {
+.radio-options input[type="radio"]:checked+label {
   background-color: #004080;
   color: white;
   font-weight: 600;
@@ -236,7 +233,7 @@ form label {
   display: none;
 }
 
-.checkbox-group input[type="checkbox"] + label {
+.checkbox-group input[type="checkbox"]+label {
   display: inline-block;
   padding: 8px 16px;
   border-radius: 20px;
@@ -247,7 +244,7 @@ form label {
   transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
 }
 
-.checkbox-group input[type="checkbox"]:checked + label {
+.checkbox-group input[type="checkbox"]:checked+label {
   background-color: #004080;
   color: #fff;
   font-weight: 600;
