@@ -270,16 +270,6 @@ button.btn-primary:hover {
   background-color: #002f5c;
 }
 
-/* ======= Card Hover ======= */
-.card {
-  transition: transform 0.2s ease-in-out;
-}
-
-.card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 18px rgba(0, 64, 128, 0.15);
-}
-
 /* ======= Question Numbering ======= */
 .question-number {
   display: inline-block;
