@@ -1,7 +1,34 @@
 from django.contrib import admin
 
-from conference.models import Conference, OTPRequest, UserDetails, ConferenceOrganisers, ConferenceDetails, \
-    ConferenceRegistration
+from .models import (
+    Conference,
+    OTPRequest,
+    UserDetails,
+    ConferenceRegistration,
+    ConferenceDetails,
+    ConferenceOrganisers,
+    FeedbackSurveyResponse,
+    ReflectionSurveyResponse,
+)
+
+@admin.register(FeedbackSurveyResponse)
+class FeedbackSurveyResponseAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'email', 'conference', 'location_type', 'satisfaction', 'submitted_at')
+    list_filter = ('conference', 'location_type', 'satisfaction', 'submitted_at')
+    search_fields = ('full_name', 'email', 'phone', 'conference__title')
+    ordering = ('-submitted_at',)
+    readonly_fields = ('submitted_at',)
+
+
+@admin.register(ReflectionSurveyResponse)
+class ReflectionSurveyResponseAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'email', 'conference', 'occupation', 'recommend', 'submitted_at')
+    list_filter = ('conference', 'occupation', 'recommend', 'submitted_at')
+    search_fields = ('full_name', 'email', 'conference__title')
+    ordering = ('-submitted_at',)
+    readonly_fields = ('submitted_at',)
+
+
 
 # Register your models here.
 admin.site.register(Conference)
