@@ -25,3 +25,9 @@ Create a python virtual environment and install the dependencies
 
 -----
 The conference management toolkit helps to manage and record the conference registration information.
+The conference management toolkit helps to manage and record the conference registration information.
+
+# TODO List
+
+1. Create an email template to sendout the email for OTP for new user login.
+2. 

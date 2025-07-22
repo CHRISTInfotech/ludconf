@@ -70,3 +70,14 @@ def export_emails_for_newsletters(queryset):
 
     workbook.save(response)
     return response
+
+def str_to_bool(value):
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ['true', '1', 'yes', 'on']
+
+def str_to_int(value, default=3):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default

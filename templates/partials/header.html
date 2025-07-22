@@ -2,18 +2,18 @@
 <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
         <div class="d-flex">
-            <a href="https://letusdream.org/conferences" target="_blank" class="text-decoration-none">
+            <a href="{% url 'home' %}" class="text-decoration-none">
                 <img src="{% static 'img/logo.png' %}" alt="Logo" width="75" height="50"
                  class="d-inline-block align-text-center">
             </a>
-            <a class="text-wrap text-dark text-decoration-none" href="{% url 'home' %}">
-                &nbsp;&nbsp; Let Us Dream <br>
+            <a class="text-wrap text-light text-decoration-none" href="{% url 'home' %}">
+                &nbsp;&nbsp; <span class="fw-bolder">Let Us Dream</span> <br>
                 &nbsp;&nbsp; Conference Management Toolkit
             </a>
         </div>
         <form class="d-flex">
             {% if not request.user.is_authenticated %}
-                <a class="btn btn-sm btn-outline-success " href="{% url 'ludlogin' %}">
+                <a class="btn btn-sm btn-outline-light " href="{% url 'ludlogin' %}">
                     <i class="fa-solid fa-right-to-bracket"></i>
                     Login
                 </a>
@@ -24,7 +24,7 @@
                     </a>
                 </div>
                 <div class="p-1">
-                    <a class="btn btn-sm btn-outline-success " href="{% url 'ludlogout' %}">
+                    <a class="btn btn-sm btn-outline-light" href="{% url 'ludlogout' %}">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         Logout
                     </a>
