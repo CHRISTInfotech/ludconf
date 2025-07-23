@@ -97,7 +97,6 @@ OCCUPATION_CHOICES = [
 ]
 
 class FeedbackSurveyResponse(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
 
     # Personal Information
@@ -157,7 +156,6 @@ class FeedbackSurveyResponse(models.Model):
         return f'{self.full_name or "Anonymous"} - {self.conference}'
 
 class ReflectionSurveyResponse(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
     submitted_at = models.DateTimeField(auto_now_add=True)
     

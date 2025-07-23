@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}Impact Reflection Survey{% endblock %}
+
 {% block content %}
-{% include 'partials/nav.html' %}
 
 <div class="container my-5">
   <h2 class="mb-4 text-center">Let Us Dream Community Conference</h2>
@@ -19,7 +21,8 @@
       <select name="conference_id" id="conference_id" class="form-control" required onchange="this.form.submit();">
         <option value="">-- Choose a conference --</option>
         {% for conf in conferences %}
-          <option value="{{ conf.conference_id }}" {% if selected_conference and conf == selected_conference %}selected{% endif %}>
+          <option value="{{ conf.conference_id }}" 
+          {% if selected_conference and conf == selected_conference %}selected{% endif %}>
             {{ conf.title }} ({{ conf.start_date }})
           </option>
         {% endfor %}
@@ -40,19 +43,19 @@
         <h5 class="fw-bold">Participant Information</h5>
 
         <!-- Q2 - Q9 -->
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label><strong>Q2.</strong> Name (as you want on the certificate)</label>
           <input type="text" class="form-control" name="full_name" required>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label><strong>Q3.</strong> Email Address</label>
           <input type="email" class="form-control" name="email" required>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label><strong>Q4.</strong> WhatsApp Number</label>
           <input type="text" class="form-control" name="phone">
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label><strong>Q5.</strong> Age</label>
           <select name="age" class="form-control" required>
             <option value="">-- Select Age Range --</option>
@@ -62,7 +65,7 @@
             <option>57+</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="form-group  mb-3">
           <label><strong>Q6.</strong> Gender</label>
           <select name="gender" class="form-control" required>
             <option value="">-- Select Gender --</option>
@@ -71,7 +74,7 @@
             <option>Prefer not to say</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="form-group  mb-3">
           <label><strong>Q7.</strong> Profession</label>
           <select name="occupation" class="form-control" required>
             <option value="">-- Select --</option>
@@ -87,7 +90,7 @@
           </select>
           <input type="text" name="occupation_other" class="form-control mt-2" placeholder="If other, please specify">
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label><strong>Q8.</strong> Location you reside in</label>
           <select name="location_type" class="form-control" required>
             <option value="">-- Select --</option>
@@ -104,7 +107,7 @@
             <option>Virginia, USA</option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label><strong>Q9.</strong> Is this your first time attending a Let Us Dream Conference?</label>
           <div class="radio-options">
             <input type="radio" name="first_time" value="True" id="first_time_yes" required>
@@ -151,7 +154,7 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label><strong>Q30.</strong> How satisfied were you overall with the conference?</label>
           <div class="radio-options">
             {% for i in "12345"|make_list %}
@@ -161,17 +164,17 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label><strong>Q31.</strong> What were your key takeaways from this event?</label>
           <textarea name="takeaways" class="form-control" rows="3" required></textarea>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label><strong>Q32.</strong> Suggestions to improve the conference:</label>
           <textarea name="suggestions" class="form-control" rows="3" required></textarea>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label><strong>Q33.</strong> Would you like to be part of the LUD Conference Team?</label>
           <div class="radio-options">
             <input type="radio" name="team_interest" value="True" id="team_yes" required>
@@ -181,7 +184,7 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group mt-3">
           <label><strong>Q34.</strong> Most engaging activities for you (select up to 3):</label>
           <div class="checkbox-group">
             <input type="checkbox" name="engaging_activity" value="Keynote" id="activity_keynote">
