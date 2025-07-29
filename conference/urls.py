@@ -38,7 +38,7 @@ urlpatterns = [
     path('one_time_registration/<str:conference_id>', one_time_participation, name='one_time_registration'),
 
     # Surveys 
-    path('conference', conference_toolkit, name='conference'),
+    path('conference/', conference_toolkit, name='conference'),
     path('conference/feedback/', feedback_survey, name='conference_feedback'),
     path('conference/reflection/', reflection_survey, name='reflection_survey'),
     path('conference/feedback-dashboard/', feedback_dashboard, name='feedback_dashboard'),
