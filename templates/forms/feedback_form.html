@@ -8,17 +8,17 @@
 <div class="container my-5">
   <h2 class="mb-4 text-center">Let Us Dream Community Conference</h2>
   <h4 class="fw-bold text-center">Post-Conference Feedback Survey</h4>
-  <p class="text-center">To be filled immediately after the conference – focuses on initial impressions, learning, and experience.</p>
   <p class="text-center">
-    <strong>⏱️ Estimated time to complete:</strong> 10 minutes<br>
-    <strong>🎓 Certificate:</strong> Will be sent within 24–48 hours post-conference.
+    To be filled immediately after the conference – focuses on initial impressions, learning, and experience.
+  <br/>
+    <strong>⏱️ Estimated time to complete:</strong> 10 minutes
   </p>
 
   <form method="POST">
     {% csrf_token %}
     <div class="form-card mb-4">
       <label for="conference_id"><strong>Q1.</strong> Select the Conference You Attended:</label>
-      <select name="conference_id" id="conference_id" class="form-control" required onchange="this.form.submit();">
+      <select name="conference_id" id="conference_id" class="form-select" required onchange="this.form.submit();">
         <option value="">-- Choose a conference --</option>
         {% for conf in conferences %}
           <option value="{{ conf.conference_id }}" 
@@ -31,7 +31,6 @@
   </form>
 
   {% if selected_conference %}
-  <hr>
   <form method="POST" class="feedback-form">
     {% csrf_token %}
     <input type="hidden" name="conference_id" value="{{ selected_conference.conference_id }}">

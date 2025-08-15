@@ -185,8 +185,6 @@ form label {
 .form-section {
   background: #ffffff;
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(0, 64, 128, 0.08);
 }
 
 @media (max-width: 992px) {
