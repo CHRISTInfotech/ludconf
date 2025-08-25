@@ -17,7 +17,7 @@
   <form method="POST">
     {% csrf_token %}
     <div class="form-card mb-4">
-      <label for="conference_id"><strong>Q1.</strong> Select the Conference You Attended:</label>
+      <label for="conference_id">Select the Conference You Attended:</label>
       <select name="conference_id" id="conference_id" class="form-select" required onchange="this.form.submit();">
         <option value="">-- Choose a conference --</option>
         {% for conf in conferences %}

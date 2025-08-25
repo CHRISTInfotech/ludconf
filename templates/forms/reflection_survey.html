@@ -6,21 +6,23 @@
 {% block content %}
 <div class="container my-5">
     <h2 class="mb-4 text-center">Let Us Dream Community Conference</h2>
-    <h4 class="text-center">Impact Reflection Survey</h4>
+    <h4 class="fw-bold text-center">Impact Reflection Survey</h4>
     <p class="text-center">
-        To be filled six months after the conference – focuses on long-term impact, community involvement, and application of learning.
+        To be filled six months after the conference – focuses on long-term impact, community involvement, and
+        application of learning.
     </p>
 
     <form method="POST">
         {% csrf_token %}
-        <div class="form-group mb-4">
-            <label for="conference_id"><strong>Q0.</strong> Select the Conference You Attended:</label>
-            <select name="conference_id" id="conference_id" class="form-control" required onchange="this.form.submit();">
+        <div class="form-card mb-4">
+            <label for="conference_id">Select the Conference You Attended:</label>
+            <select name="conference_id" id="conference_id" class="form-select" required onchange="this.form.submit();">
                 <option value="">-- Choose a conference --</option>
                 {% for conf in conferences %}
-                    <option value="{{ conf.conference_id }}" {% if selected_conference and conf == selected_conference %}selected{% endif %}>
-                        {{ conf.title }} ({{ conf.start_date }})
-                    </option>
+                <option value="{{ conf.conference_id }}" 
+                {% if selected_conference and conf == selected_conference %} selected {% endif %}>
+                    {{ conf.title }} ({{ conf.start_date }})
+                </option>
                 {% endfor %}
             </select>
         </div>
@@ -36,15 +38,15 @@
             <!-- Left Column -->
             <div class="form-section">
                 <h5 class="fw-bold">Section 1: Participant Information</h5>
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label>Full Name</label>
                     <input type="text" class="form-control" name="full_name">
                 </div>
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label>Email ID</label>
                     <input type="email" class="form-control" name="email" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group mb-3">
                     <label>Occupation / Affiliation</label>
                     <select name="occupation" class="form-control" required>
                         <option value="">-- Select --</option>
@@ -57,7 +59,8 @@
                         <option value="entrepreneur">Entrepreneur</option>
                         <option value="other">Other</option>
                     </select>
-                    <input type="text" class="form-control mt-2" name="occupation_other" placeholder="If other, specify">
+                    <input type="text" class="form-control mt-2" name="occupation_other"
+                        placeholder="If other, specify">
                 </div>
 
                 <h5 class="fw-bold mt-4">Section 2: Networking & Collaboration</h5>
@@ -77,7 +80,7 @@
                 {% include 'forms/radio_group.html' with label="Q7. My knowledge of community service models and initiatives has improved." name="improved_knowledge" %}
                 {% include 'forms/radio_group.html' with label="Q8. The conference philosophy/objective continues to be practical and advanced in my learning." name="philosophy_applied" %}
                 {% include 'forms/radio_group.html' with label="Q9. I am more informed about cross-sector partnerships between NGOs, academics, and communities." name="more_informed" %}
-                {% include 'forms/radio_group.html' with label="Q10. I believe my leadership skills were enhanced post the conference." name="leadership_enhanced" %}
+                {% include 'forms/radio_group.html' with label="Q10. I believe my leadership skills were enhanced post conference." name="leadership_enhanced" %}
 
                 <h5 class="fw-bold mt-4">Section 5: Engagement and Inclusivity</h5>
                 {% include 'forms/radio_group.html' with label="Q11. I am more socially engaged as a result of attending the conference." name="more_socially_engaged" %}
@@ -85,24 +88,38 @@
                 {% include 'forms/radio_group.html' with label="Q13. I believe I am making a meaningful impact on the community." name="making_impact" %}
 
                 <h5 class="fw-bold mt-4">Section 6: Reflections & Future Involvement</h5>
-                <div class="form-group">
-                    <label>Q14. What is one key takeaway or moment from the Conference that continues to stay memorable for you?</label>
+                <div class="form-group  mb-3">
+                    <label>Q14. What is one key takeaway or moment from the Conference that continues to stay memorable
+                        for you?</label>
                     <textarea name="key_takeaway" class="form-control" rows="3" required></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Q15. Would you recommend this conference to others?</label><br>
-                    <input type="radio" name="recommend" value="True" required> Yes
-                    <input type="radio" name="recommend" value="False"> No
+
+                <div class="form-group  mb-3">
+                    <label>Q15. Would you recommend this conference to others?</label>
+                    <div class="radio-options">
+                        <input type="radio" name="recommend" value="True" required id="recommend_yes">
+                        <label for="recommend_yes"> Yes</label>
+                        <input type="radio" name="recommend" value="False" id="recommend_no">
+                        <label for="recommend_no"> No</label>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Q16. Would you like to stay involved in future Let Us Dream activities?</label><br>
-                    <input type="radio" name="stay_involved" value="True" required> Yes
-                    <input type="radio" name="stay_involved" value="False"> No
+                <div class="form-group mb-3">
+                    <label>Q16. Would you like to stay involved in future Let Us Dream activities?</label>
+                    <div class="radio-options">
+                        <input type="radio" name="stay_involved" value="True" required id="stay_involved_yes">
+                        <label for="stay_involved_yes"> Yes</label>
+                        <input type="radio" name="stay_involved" value="False" id="stay_involved_no">
+                        <label for="stay_involved_no"> No</label>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Q17. Would your organization/institution like to partner with Let Us Dream?</label><br>
-                    <input type="radio" name="org_willing_to_partner" value="True" required> Yes
-                    <input type="radio" name="org_willing_to_partner" value="False"> No
+                <div class="form-group mb-3">
+                    <label>Q17. Would your organization/institution like to partner with Let Us Dream?</label>
+                    <div class="radio-options">
+                        <input type="radio" name="org_willing_to_partner" value="True" required id="org_willing_to_partner_yes">
+                        <label for="org_willing_to_partner_yes"> Yes</label>
+                        <input type="radio" name="org_willing_to_partner" value="False" id="org_willing_to_partner_no">
+                        <label for="org_willing_to_partner_no"> No</label>
+                    </div>
                 </div>
             </div>
         </div>
