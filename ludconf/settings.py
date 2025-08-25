@@ -24,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ih_1e!$x1sys6fb13r&p9b95#o)iia6)&ea%zq!o5bha@yaq49'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['https://cmt.letusdream.org/', '10.5.5.31']
+    ALLOWED_HOSTS = ['cmt.letusdream.org', '10.5.5.31']
 
 # Application definition
 INSTALLED_APPS = [
@@ -115,7 +115,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-if not DEBUG:
+if DEBUG:
     STATICFILES_DIRS = [
         BASE_DIR / 'static'
     ]
