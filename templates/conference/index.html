@@ -3,8 +3,8 @@
 
 {% block content %}
 
-    <div class="row">
-        <div class="col-12">
+    <div class="row m-0">
+        <div class="col-12 text-center fw-boldder fs-3">
             Upcoming LUD Conferences
         </div>
 
@@ -42,7 +42,6 @@
                                     <h5 class="card-title text-wrap">
                                         {{ conf.title }}
                                     </h5>
-                                    <hr/>
                                     <p class="card-text">
                                        <span class="fw-bold">
                                          {% for confdetail in conference_details %}
@@ -94,7 +93,7 @@
 
                 {% endfor %}
             {% else %}
-                <div class="text-center p-3 fw-bolder">
+                <div class="text-center p-5 mt-5 fw-bolder border">
                     No conferences added yet.
                 </div>
             {% endif %}

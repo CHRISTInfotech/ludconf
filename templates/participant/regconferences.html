@@ -6,11 +6,10 @@
     {% include 'partials/nav.html' %}
 
     <div class="row m-auto py-3">
-        <div class="col-12 fs-6 fw-bold text-center">
-            Registered Conferences <br/>
-            <hr/>
+        <div class="col-12 fs-6 fw-bold text-center mb-3">
+            Registered Conferences
         </div>
-        <div class="">
+        <div class="col-12">
             <table class="table table-hover">
                 <tbody>
                 {% if conferences %}
@@ -60,7 +59,7 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td class="p-2">
+                        <td class="row p-2">
                             No conferences registered yet.
                         </td>
                     </tr>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reflection Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+  <h4 class="mb-3">📊 Reflection Survey Dashboard</h4>
+
+  <div class="alert alert-info">
+    Total Reflection Responses: <strong>{{ total_responses }}</strong>
+  </div>
+
+  <div class="row">
+    {% for chart in charts %}
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h6 class="card-title text-primary">{{ chart.title }}</h6>
+            <img src="data:image/png;base64,{{ chart.image_base64 }}" class="img-fluid" alt="{{ chart.title }}">
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <hr>
+  <h5 class="mt-5">📝 Individual Responses</h5>
+  {% for r in responses %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6>{{ r.full_name }} <small class="text-muted">({{ r.email }})</small></h6>
+        <p><strong>Occupation:</strong> {{ r.occupation }}</p>
+        <p><strong>Submitted At:</strong> {{ r.submitted_at|date:"Y-m-d H:i" }}</p>
+        <p><strong>Key Takeaway:</strong><br>{{ r.key_takeaway }}</p>
+        <p><strong>Recommend?</strong> {{ r.recommend|yesno:"Yes,No" }}</p>
+        <p><strong>Stay Involved?</strong> {{ r.stay_involved|yesno:"Yes,No" }}</p>
+        <p><strong>Willing to Partner?</strong> {{ r.org_willing_to_partner|yesno:"Yes,No" }}</p>
+      </div>
+    </div>
+  {% empty %}
+    <p>No responses submitted yet.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

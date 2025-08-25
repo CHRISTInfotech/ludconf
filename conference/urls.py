@@ -1,11 +1,14 @@
 from django.urls import path
 
-from conference.views import home, ludlogin, dashboard, adminconferencecreate, ludlogout, adminlistactiveconference, \
-    adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference, \
-    participateconference, participatedconference, adminmanageconference, adminconferencestatuschange, \
-    stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass, staffupdateconference, \
-    download_registration_details, adminconferenceupdate, download_emails_for_newsletter, conference_details, \
-    one_time_participation
+from conference.views import (
+    home, ludlogin, dashboard, adminconferencecreate, ludlogout, adminlistactiveconference,
+    adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference,
+    participateconference, participatedconference, adminmanageconference, adminconferencestatuschange,
+    stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass,
+    staffupdateconference, download_registration_details, adminconferenceupdate, download_emails_for_newsletter,
+    conference_details, one_time_participation, conference_toolkit, feedback_survey, reflection_survey,
+    feedback_dashboard, reflection_dashboard
+)
 
 urlpatterns = [
     path('', home, name='home'),
@@ -30,8 +33,14 @@ urlpatterns = [
     path('staff_organizing_conference', stafforganisingconferenes, name='staff_organizing_conference'),
     path('staff_organized_conference', stafforganisedconferene, name='staff_organized_conference'),
     path('staff_update_conference/<str:conference_id>', staffupdateconference, name='staff_update_conference'),
-    path('download_registration_details/<str:conference_id>', download_registration_details,
-         name='download_registration_details'),
+    path('download_registration_details/<str:conference_id>', download_registration_details, name='download_registration_details'),
     path('download_emails_for_newsletter', download_emails_for_newsletter, name='download_emails_for_newsletter'),
     path('one_time_registration/<str:conference_id>', one_time_participation, name='one_time_registration'),
+
+    # Surveys 
+    path('conference/', conference_toolkit, name='conference'),
+    path('conference/feedback/', feedback_survey, name='conference_feedback'),
+    path('conference/reflection/', reflection_survey, name='reflection_survey'),
+    path('conference/feedback-dashboard/', feedback_dashboard, name='feedback_dashboard'),
+    path('conference/reflection-dashboard/', reflection_dashboard, name='reflection_dashboard'),
 ]

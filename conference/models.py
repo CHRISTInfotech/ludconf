@@ -1,4 +1,5 @@
 import uuid
+import logging
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -79,3 +80,114 @@ class ConferenceOrganisers(models.Model):
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+
+SCALE_CHOICES = [(i, str(i)) for i in range(1, 6)]
+OCCUPATION_CHOICES = [
+    ("University/College Faculty", "University/College Faculty"),
+    ("Post-secondary faculty (vocational/technical)", "Post-secondary faculty (vocational/technical)"),
+    ("Student", "Student"),
+    ("Social Worker", "Social Worker"),
+    ("Healthcare", "Healthcare"),
+    ("Corporate Professional", "Corporate Professional"),
+    ("Retired Professional", "Retired Professional"),
+    ("Entrepreneur", "Entrepreneur"),
+    ("Other", "Other"),
+]
+
+class FeedbackSurveyResponse(models.Model):
+    conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
+
+    # Personal Information
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    age = models.CharField(max_length=20, blank=True, null=True)
+    gender = models.CharField(max_length=50, blank=True, null=True)
+    occupation = models.CharField(max_length=100, choices=OCCUPATION_CHOICES)
+    occupation_other = models.CharField(max_length=100, blank=True, null=True)
+    location_type = models.CharField(max_length=50, blank=True, null=True)
+    first_time = models.BooleanField(default=False)
+
+    # Volunteerism & Community Engagement
+    q1_volunteer = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q2_belonging = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q3_inspiration = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q4_stalls = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q5_reflection = models.IntegerField(choices=SCALE_CHOICES, default=3)
+
+    # Social Entrepreneurship & Community Service
+    q6_initiative = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q7_models = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q8_motivation = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q9_clarity = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q10_insight = models.IntegerField(choices=SCALE_CHOICES, default=3)
+
+    # Learning & Knowledge Sharing
+    q11_concepts = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q12_application = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q13_expansion = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q14_keynotes = models.IntegerField(choices=SCALE_CHOICES, default=3)
+
+    # Networking & Collaborations
+    q15_collab = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q16_convo = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q17_diversity = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q18_community = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q19_followup = models.IntegerField(choices=SCALE_CHOICES, default=3)
+
+    # Final Reflection Questions
+    followup_study = models.BooleanField(default=False)
+    satisfaction = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    takeaways = models.TextField(blank=True, null=True)
+    suggestions = models.TextField(blank=True, null=True)
+    team_interest = models.BooleanField(default=False)
+    engaging_activity = models.CharField(max_length=255, blank=True, null=True)
+
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-submitted_at']
+        verbose_name = 'Feedback Survey Response'
+        verbose_name_plural = 'Feedback Survey Responses'
+
+    def __str__(self):
+        return f'{self.full_name or "Anonymous"} - {self.conference}'
+
+class ReflectionSurveyResponse(models.Model):
+    conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    
+    # Personal Information
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    occupation = models.CharField(max_length=50, choices=OCCUPATION_CHOICES)
+    occupation_other = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Survey Responses
+    connect_new = models.IntegerField(choices=SCALE_CHOICES)
+    stayed_in_touch = models.IntegerField(choices=SCALE_CHOICES)
+    opportunities_found = models.IntegerField(choices=SCALE_CHOICES)
+    motivated_to_volunteer = models.IntegerField(choices=SCALE_CHOICES)
+    participated_due_to_conf = models.IntegerField(choices=SCALE_CHOICES)
+    engaged_in_theme = models.IntegerField(choices=SCALE_CHOICES)
+    improved_knowledge = models.IntegerField(choices=SCALE_CHOICES)
+    philosophy_applied = models.IntegerField(choices=SCALE_CHOICES)
+    more_informed = models.IntegerField(choices=SCALE_CHOICES)
+    leadership_enhanced = models.IntegerField(choices=SCALE_CHOICES)
+    more_socially_engaged = models.IntegerField(choices=SCALE_CHOICES)
+    more_socially_sensitive = models.IntegerField(choices=SCALE_CHOICES)
+    making_impact = models.IntegerField(choices=SCALE_CHOICES)
+    
+    # Final responses
+    key_takeaway = models.TextField()
+    recommend = models.BooleanField()
+    stay_involved = models.BooleanField()
+    org_willing_to_partner = models.BooleanField()
+
+    class Meta:
+        ordering = ['-submitted_at']
+        verbose_name = 'Reflection Survey Response'
+        verbose_name_plural = 'Reflection Survey Responses'
+

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Feedback Dashboard{% endblock %}
+
+{% block styles %}
+{% endblock styles %}
+
+{% block content %}
+
+<div class="container my-5">
+  <h3 class="mb-4">📊 Feedback Survey Dashboard</h3>
+
+  <div class="alert alert-info">
+    Total Submissions: <strong>{{ total_responses }}</strong>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+      <p class="text-center fw-bold">
+        Age Distribution of Participants
+      </p>
+        <div id="age-chart"></div>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+      <p class="text-center fw-bold">
+        I felt motivated to volunteer or serve my community after attending the conference.
+      </p>
+        <div id="q1-chart"></div>
+    </div>    
+    <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+      <p class="text-center fw-bold">
+        Profession.
+      </p>
+        <div id="profession"></div>
+    </div>
+    
+  </div>
+
+
+
+
+  <h5 class="mt-5">📝 Individual Reflections</h5>
+  {% for r in responses %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h6>{{ r.full_name }} <small class="text-muted">({{ r.email }})</small></h6>
+      <p><strong>Submitted At:</strong> {{ r.submitted_at|date:"Y-m-d H:i" }}</p>
+
+      {% if r.takeaways %}
+      <p><strong>Key Takeaways:</strong><br>{{ r.takeaways }}</p>
+      {% endif %}
+
+      {% if r.suggestions %}
+      <p><strong>Suggestions:</strong><br>{{ r.suggestions }}</p>
+      {% endif %}
+
+      {% if r.engaging_activity %}
+      <p><strong>Engaging Activity:</strong> {{ r.engaging_activity }}</p>
+      {% endif %}
+
+      <p><strong>Would like to join team?</strong> {{ r.team_interest|yesno:"Yes,No" }}</p>
+    </div>
+  </div>
+  {% empty %}
+  <p>No responses found.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="{% static 'scripts/feedback_dashboard.js' %}"></script>
+{% endblock scripts %}

@@ -1,0 +1,9 @@
+<div class="mb-3">
+    <label class="fw-semibold">{{ label }}</label>
+    <div class="radio-options">
+        {% for i in "12345"|make_list %}
+            <input type="radio" name="{{ name }}" value="{{ i }}" id="{{ name }}_{{ i }}" required>
+            <label for="{{ name }}_{{ i }}">{{ i }}</label>
+        {% endfor %}
+    </div>
+</div>
