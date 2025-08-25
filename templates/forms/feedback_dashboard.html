@@ -11,7 +11,7 @@
 <div class="container my-5">
   <h3 class="mb-4">📊 Feedback Survey Dashboard</h3>
 
-  <div class="alert alert-info">
+  <div class="alert alert-info mb-3">
     Total Submissions: <strong>{{ total_responses }}</strong>
   </div>
 
@@ -37,34 +37,6 @@
     
   </div>
 
-
-
-
-  <h5 class="mt-5">📝 Individual Reflections</h5>
-  {% for r in responses %}
-  <div class="card mb-3">
-    <div class="card-body">
-      <h6>{{ r.full_name }} <small class="text-muted">({{ r.email }})</small></h6>
-      <p><strong>Submitted At:</strong> {{ r.submitted_at|date:"Y-m-d H:i" }}</p>
-
-      {% if r.takeaways %}
-      <p><strong>Key Takeaways:</strong><br>{{ r.takeaways }}</p>
-      {% endif %}
-
-      {% if r.suggestions %}
-      <p><strong>Suggestions:</strong><br>{{ r.suggestions }}</p>
-      {% endif %}
-
-      {% if r.engaging_activity %}
-      <p><strong>Engaging Activity:</strong> {{ r.engaging_activity }}</p>
-      {% endif %}
-
-      <p><strong>Would like to join team?</strong> {{ r.team_interest|yesno:"Yes,No" }}</p>
-    </div>
-  </div>
-  {% empty %}
-  <p>No responses found.</p>
-  {% endfor %}
 </div>
 
 {% endblock %}

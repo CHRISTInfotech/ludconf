@@ -775,8 +775,9 @@ def feedback_survey(request):
             )
             messages.success(request, "Thank you for your feedback!")
             return redirect('home')
+            # return redirect('feedback_dashboard')
 
-    elif request.method == 'GET' and 'conference_id' in request.GET:
+    elif request.method == 'POST' and 'conference_id' in request.POST:
         selected_id = request.GET.get('conference_id')
         selected_conference = get_object_or_404(
             Conference, conference_id=selected_id)
@@ -799,7 +800,6 @@ def reflection_survey(request):
 
         if 'full_name' in request.POST:
             ReflectionSurveyResponse.objects.create(
-                user=request.user,
                 conference=selected_conference,
                 full_name=request.POST.get('full_name'),
                 email=request.POST.get('email'),
@@ -830,6 +830,7 @@ def reflection_survey(request):
             )
             messages.success(request, "Thank you for your reflection!")
             return redirect('home')
+            # return redirect('reflection_dashboard')
 
     return render(request, 'forms/reflection_survey.html', {
         'conferences': conferences,
