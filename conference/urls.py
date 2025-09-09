@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 
 from conference.views import (
     home, ludlogin, dashboard, adminconferencecreate, ludlogout, adminlistactiveconference,
@@ -6,8 +7,7 @@ from conference.views import (
     participateconference, participatedconference, adminmanageconference, adminconferencestatuschange,
     stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass,
     staffupdateconference, download_registration_details, adminconferenceupdate, download_emails_for_newsletter,
-    conference_details, one_time_participation, conference_toolkit, feedback_survey, reflection_survey,
-    feedback_dashboard, reflection_dashboard
+    conference_details, one_time_participation
 )
 
 urlpatterns = [
@@ -38,9 +38,8 @@ urlpatterns = [
     path('one_time_registration/<str:conference_id>', one_time_participation, name='one_time_registration'),
 
     # Surveys 
-    path('conference/', conference_toolkit, name='conference'),
-    path('conference/feedback/', feedback_survey, name='conference_feedback'),
-    path('conference/reflection/', reflection_survey, name='reflection_survey'),
-    path('conference/feedback-dashboard/', feedback_dashboard, name='feedback_dashboard'),
-    path('conference/reflection-dashboard/', reflection_dashboard, name='reflection_dashboard'),
+    path('conference/feedback/', views.feedback_survey, name='conference_feedback'),
+    path('conference/reflection/', views.reflection_survey, name='reflection_survey'),
+    path('feedback-dashboard/', views.feedback_dashboard, name='feedback_dashboard'),
+    path('reflection-dashboard/', views.reflection_dashboard, name='reflection_dashboard'),
 ]

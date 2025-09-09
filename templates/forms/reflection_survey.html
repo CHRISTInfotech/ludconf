@@ -1,126 +1,339 @@
 {% extends 'base.html' %}
 {% load static %}
-
-{% block title %}Impact Reflection Survey{% endblock %}
-
 {% block content %}
+{% include 'partials/nav.html' %}
+
 <div class="container my-5">
     <h2 class="mb-4 text-center">Let Us Dream Community Conference</h2>
     <h4 class="fw-bold text-center">Impact Reflection Survey</h4>
     <p class="text-center">
-        To be filled six months after the conference – focuses on long-term impact, community involvement, and
-        application of learning.
+        To be filled six months after the conference – focuses on long-term impact, community involvement, and application of learning.
+    </p>
+    <p class="text-center text-danger">
+        <strong>* All fields are mandatory unless specified otherwise</strong>
     </p>
 
     <form method="POST">
         {% csrf_token %}
-        <div class="form-card mb-4">
-            <label for="conference_id">Select the Conference You Attended:</label>
-            <select name="conference_id" id="conference_id" class="form-select" required onchange="this.form.submit();">
+        <!-- Conference Selection -->
+        <div class="form-group mb-4">
+            <label for="conference_id"><strong>Q0.</strong> Select the Conference You Attended: <span class="text-danger">*</span></label>
+            <select name="conference_id" id="conference_id" class="form-control" required onchange="this.form.submit();">
                 <option value="">-- Choose a conference --</option>
                 {% for conf in conferences %}
-                <option value="{{ conf.conference_id }}" 
-                {% if selected_conference and conf == selected_conference %} selected {% endif %}>
-                    {{ conf.title }} ({{ conf.start_date }})
-                </option>
+                    <option value="{{ conf.conference_id }}" {% if selected_conference and conf == selected_conference %}selected{% endif %}>
+                        {{ conf.title }} ({{ conf.start_date }})
+                    </option>
                 {% endfor %}
             </select>
         </div>
     </form>
 
     {% if selected_conference %}
-    <hr>
-    <form method="POST" class="feedback-form">
+    <form method="POST" class="feedback-form" id="surveyForm" novalidate>
         {% csrf_token %}
         <input type="hidden" name="conference_id" value="{{ selected_conference.conference_id }}">
 
-        <div class="form-container">
-            <!-- Left Column -->
-            <div class="form-section">
-                <h5 class="fw-bold">Section 1: Participant Information</h5>
-                <div class="form-group mb-3">
-                    <label>Full Name</label>
-                    <input type="text" class="form-control" name="full_name">
-                </div>
-                <div class="form-group mb-3">
-                    <label>Email ID</label>
-                    <input type="email" class="form-control" name="email" required>
-                </div>
-                <div class="form-group mb-3">
-                    <label>Occupation / Affiliation</label>
-                    <select name="occupation" class="form-control" required>
-                        <option value="">-- Select --</option>
-                        <option value="student">Student</option>
-                        <option value="faculty">University/ College Faculty</option>
-                        <option value="social_worker">Social Worker</option>
-                        <option value="healthcare">Healthcare</option>
-                        <option value="corporate">Corporate Professional</option>
-                        <option value="retiree">Retiree</option>
-                        <option value="entrepreneur">Entrepreneur</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <input type="text" class="form-control mt-2" name="occupation_other"
-                        placeholder="If other, specify">
-                </div>
-
-                <h5 class="fw-bold mt-4">Section 2: Networking & Collaboration</h5>
-                {% include 'forms/radio_group.html' with label="Q1. I was able to connect with new individuals or organizations post the conference." name="connect_new" %}
-                {% include 'forms/radio_group.html' with label="Q2. I have stayed in touch with someone I met at the conference." name="stayed_in_touch" %}
-                {% include 'forms/radio_group.html' with label="Q3. I found opportunities for collaboration." name="opportunities_found" %}
-
-                <h5 class="fw-bold mt-4">Section 3: Community Involvement</h5>
-                {% include 'forms/radio_group.html' with label="Q4. The conference motivated me to volunteer in community-based activities." name="motivated_to_volunteer" %}
-                {% include 'forms/radio_group.html' with label="Q5. I participated in a volunteering opportunity because of the conference." name="participated_due_to_conf" %}
-                {% include 'forms/radio_group.html' with label="Q6. I am currently engaged in community work that connects to the conference themes." name="engaged_in_theme" %}
+        <!-- Participant Information Section -->
+        <div class="form-card mb-4">
+            <h5 class="fw-bold">Section 1: Participant Information</h5>
+            
+            <div class="form-group">
+                <label><strong>1.</strong> Full Name</label>
+                <input type="text" class="form-control" name="full_name">
             </div>
+            
+            <div class="form-group">
+                <label><strong>2.</strong> Email ID <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" name="email" required>
+                <div class="invalid-feedback">Please provide a valid email address.</div>
+            </div>
+            
+            <div class="form-group">
+                <label><strong>3.</strong> Occupation / Affiliation <span class="text-danger">*</span></label>
+                <select name="occupation" class="form-control" required>
+                    <option value="">-- Select --</option>
+                    <option value="student">Student</option>
+                    <option value="faculty">University/ College Faculty</option>
+                    <option value="social_worker">Social Worker</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="corporate">Corporate Professional</option>
+                    <option value="retiree">Retiree</option>
+                    <option value="entrepreneur">Entrepreneur</option>
+                    <option value="other">Other</option>
+                </select>
+                <input type="text" class="form-control mt-2" name="occupation_other" placeholder="If other, specify" style="display: none;">
+                <div class="invalid-feedback">Please select your occupation.</div>
+            </div>
+        </div>
 
-            <!-- Right Column -->
-            <div class="form-section">
-                <h5 class="fw-bold">Section 4: Learning and Awareness</h5>
-                {% include 'forms/radio_group.html' with label="Q7. My knowledge of community service models and initiatives has improved." name="improved_knowledge" %}
-                {% include 'forms/radio_group.html' with label="Q8. The conference philosophy/objective continues to be practical and advanced in my learning." name="philosophy_applied" %}
-                {% include 'forms/radio_group.html' with label="Q9. I am more informed about cross-sector partnerships between NGOs, academics, and communities." name="more_informed" %}
-                {% include 'forms/radio_group.html' with label="Q10. I believe my leadership skills were enhanced post conference." name="leadership_enhanced" %}
+        <!-- Networking & Collaboration Section -->
+        <div class="form-card mb-4">
+            <h5 class="fw-bold">Section 2: Networking & Collaboration <span class="text-danger">*</span></h5>
+            <p class="fst-italic">Please rate the following statements:</p>
+            
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 60%">Question</th>
+                        <th class="text-center">Strongly Disagree</th>
+                        <th class="text-center">Disagree</th>
+                        <th class="text-center">Neutral</th>
+                        <th class="text-center">Agree</th>
+                        <th class="text-center">Strongly Agree</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="question-row" data-name="connect_new">
+                        <td>I was able to connect with new individuals or organizations post the conference. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="connect_new" id="connect_new_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="stayed_in_touch">
+                        <td>I have stayed in touch with someone I met at the conference. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="stayed_in_touch" id="stayed_in_touch_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="opportunities_found">
+                        <td>I found opportunities for collaboration. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="opportunities_found" id="opportunities_found_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                <h5 class="fw-bold mt-4">Section 5: Engagement and Inclusivity</h5>
-                {% include 'forms/radio_group.html' with label="Q11. I am more socially engaged as a result of attending the conference." name="more_socially_engaged" %}
-                {% include 'forms/radio_group.html' with label="Q12. I am more socially sensitive to include more diverse voices in my daily life." name="more_socially_sensitive" %}
-                {% include 'forms/radio_group.html' with label="Q13. I believe I am making a meaningful impact on the community." name="making_impact" %}
+        <!-- Community Involvement Section -->
+        <div class="form-card mb-4">
+            <h5 class="fw-bold">Section 3: Community Involvement <span class="text-danger">*</span></h5>
+            <p class="fst-italic">Please rate the following statements:</p>
+            
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 60%">Question</th>
+                        <th class="text-center">Strongly Disagree</th>
+                        <th class="text-center">Disagree</th>
+                        <th class="text-center">Neutral</th>
+                        <th class="text-center">Agree</th>
+                        <th class="text-center">Strongly Agree</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="question-row" data-name="motivated_to_volunteer">
+                        <td>The conference motivated me to volunteer in community-based activities. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="motivated_to_volunteer" id="motivated_to_volunteer_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="participated_due_to_conf">
+                        <td>I participated in a volunteering opportunity because of the conference. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="participated_due_to_conf" id="participated_due_to_conf_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="engaged_in_theme">
+                        <td>I am currently engaged in community work that connects to the conference themes. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="engaged_in_theme" id="engaged_in_theme_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                <h5 class="fw-bold mt-4">Section 6: Reflections & Future Involvement</h5>
-                <div class="form-group  mb-3">
-                    <label>Q14. What is one key takeaway or moment from the Conference that continues to stay memorable
-                        for you?</label>
-                    <textarea name="key_takeaway" class="form-control" rows="3" required></textarea>
-                </div>
+        <!-- Learning and Awareness Section -->
+        <div class="form-card mb-4">
+            <h5 class="fw-bold">Section 4: Learning and Awareness <span class="text-danger">*</span></h5>
+            <p class="fst-italic">Please rate the following statements:</p>
+            
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 60%">Question</th>
+                        <th class="text-center">Strongly Disagree</th>
+                        <th class="text-center">Disagree</th>
+                        <th class="text-center">Neutral</th>
+                        <th class="text-center">Agree</th>
+                        <th class="text-center">Strongly Agree</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="question-row" data-name="improved_knowledge">
+                        <td>My knowledge of community service models and initiatives has improved. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="improved_knowledge" id="improved_knowledge_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="philosophy_applied">
+                        <td>The conference philosophy/objective continues to be practical and advanced in my learning. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="philosophy_applied" id="philosophy_applied_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="more_informed">
+                        <td>I am more informed about cross-sector partnerships between NGOs, academics, and communities. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="more_informed" id="more_informed_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="leadership_enhanced">
+                        <td>I believe my leadership skills were enhanced post the conference. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="leadership_enhanced" id="leadership_enhanced_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-                <div class="form-group  mb-3">
-                    <label>Q15. Would you recommend this conference to others?</label>
-                    <div class="radio-options">
-                        <input type="radio" name="recommend" value="True" required id="recommend_yes">
-                        <label for="recommend_yes"> Yes</label>
-                        <input type="radio" name="recommend" value="False" id="recommend_no">
-                        <label for="recommend_no"> No</label>
+        <!-- Engagement and Inclusivity Section -->
+        <div class="form-card mb-4">
+            <h5 class="fw-bold">Section 5: Engagement and Inclusivity <span class="text-danger">*</span></h5>
+            <p class="fst-italic">Please rate the following statements:</p>
+            
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width: 60%">Question</th>
+                        <th class="text-center">Strongly Disagree</th>
+                        <th class="text-center">Disagree</th>
+                        <th class="text-center">Neutral</th>
+                        <th class="text-center">Agree</th>
+                        <th class="text-center">Strongly Agree</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="question-row" data-name="more_socially_engaged">
+                        <td>I am more socially engaged as a result of attending the conference. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="more_socially_engaged" id="more_socially_engaged_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="more_socially_sensitive">
+                        <td>I am more socially sensitive to include more diverse voices in my daily life. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="more_socially_sensitive" id="more_socially_sensitive_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="question-row" data-name="making_impact">
+                        <td>I believe I am making a meaningful impact on the community. <span class="text-danger">*</span></td>
+                        {% for i in "12345"|make_list %}
+                        <td class="text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="making_impact" id="making_impact_{{ i }}" value="{{ i }}" required>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Reflections & Future Involvement Section -->
+        <div class="form-card mb-4">
+            <h5 class="fw-bold">Section 6: Reflections & Future Involvement <span class="text-danger">*</span></h5>
+            
+            <div class="form-group">
+                <label><strong>14.</strong> What is one key takeaway or moment from the Conference that continues to stay memorable for you? <span class="text-danger">*</span></label>
+                <textarea name="key_takeaway" class="form-control" rows="3" required></textarea>
+                <div class="invalid-feedback">Please provide your key takeaway.</div>
+            </div>
+            
+            <div class="form-group">
+                <label><strong>15.</strong> Would you recommend this conference to others? <span class="text-danger">*</span></label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="recommend" id="recommend_yes" value="True" required>
+                        <label class="form-check-label" for="recommend_yes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="recommend" id="recommend_no" value="False">
+                        <label class="form-check-label" for="recommend_no">No</label>
                     </div>
                 </div>
-                <div class="form-group mb-3">
-                    <label>Q16. Would you like to stay involved in future Let Us Dream activities?</label>
-                    <div class="radio-options">
-                        <input type="radio" name="stay_involved" value="True" required id="stay_involved_yes">
-                        <label for="stay_involved_yes"> Yes</label>
-                        <input type="radio" name="stay_involved" value="False" id="stay_involved_no">
-                        <label for="stay_involved_no"> No</label>
+                <div class="invalid-feedback">Please select an option.</div>
+            </div>
+            
+            <div class="form-group">
+                <label><strong>16.</strong> Would you like to stay involved in future Let Us Dream activities? <span class="text-danger">*</span></label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="stay_involved" id="stay_involved_yes" value="True" required>
+                        <label class="form-check-label" for="stay_involved_yes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="stay_involved" id="stay_involved_no" value="False">
+                        <label class="form-check-label" for="stay_involved_no">No</label>
                     </div>
                 </div>
-                <div class="form-group mb-3">
-                    <label>Q17. Would your organization/institution like to partner with Let Us Dream?</label>
-                    <div class="radio-options">
-                        <input type="radio" name="org_willing_to_partner" value="True" required id="org_willing_to_partner_yes">
-                        <label for="org_willing_to_partner_yes"> Yes</label>
-                        <input type="radio" name="org_willing_to_partner" value="False" id="org_willing_to_partner_no">
-                        <label for="org_willing_to_partner_no"> No</label>
+                <div class="invalid-feedback">Please select an option.</div>
+            </div>
+            
+            <div class="form-group">
+                <label><strong>17.</strong> Would your organization/institution like to partner with Let Us Dream? <span class="text-danger">*</span></label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="org_willing_to_partner" id="org_partner_yes" value="True" required>
+                        <label class="form-check-label" for="org_partner_yes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="org_willing_to_partner" id="org_partner_no" value="False">
+                        <label class="form-check-label" for="org_partner_no">No</label>
                     </div>
                 </div>
+                <div class="invalid-feedback">Please select an option.</div>
             </div>
         </div>
 
@@ -130,4 +343,156 @@
     </form>
     {% endif %}
 </div>
+
+<style>
+.form-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.fst-italic {
+    font-style: italic;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.was-validated .form-control:invalid, 
+.was-validated .form-select:invalid,
+.was-validated .form-check-input:invalid {
+    border-color: #dc3545;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback,
+.was-validated .form-select:invalid ~ .invalid-feedback,
+.was-validated .form-check-input:invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.question-row.invalid {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.question-row.invalid td:first-child {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Darker radio buttons for better visibility */
+.form-check-input {
+    width: 1.1em;
+    height: 1.1em;
+    margin-top: 0.15em;
+    border: 2px solid #495057;
+}
+
+.form-check-input:checked {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.form-check-input:focus {
+    border-color: #212529;
+    box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+}
+
+/* Darker checkboxes for consistency */
+.form-check-input[type="checkbox"]:checked {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.form-check-inline {
+    margin-right: 0.5rem;
+}
+</style>
+
+<script>
+// Show/hide "other" occupation field
+document.querySelector('select[name="occupation"]').addEventListener('change', function() {
+    const otherField = document.querySelector('input[name="occupation_other"]');
+    otherField.style.display = this.value === 'other' ? 'block' : 'none';
+    if (this.value !== 'other') {
+        otherField.value = '';
+    }
+});
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('surveyForm');
+    
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Add was-validated class to show validation messages
+                form.classList.add('was-validated');
+                
+                // Highlight table rows with missing radio button selections
+                document.querySelectorAll('.question-row').forEach(row => {
+                    const questionName = row.getAttribute('data-name');
+                    const radioButtons = document.querySelectorAll(`input[name="${questionName}"]`);
+                    let isChecked = false;
+                    
+                    radioButtons.forEach(radio => {
+                        if (radio.checked) isChecked = true;
+                    });
+                    
+                    if (!isChecked) {
+                        row.classList.add('invalid');
+                    } else {
+                        row.classList.remove('invalid');
+                    }
+                });
+                
+                // Scroll to first error
+                const firstError = form.querySelector('.invalid-feedback:not([style*="display: none"]), .invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+        
+        // Remove validation styling when user interacts with form
+        form.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.type === 'radio') {
+                    const questionName = this.name;
+                    const row = document.querySelector(`.question-row[data-name="${questionName}"]`);
+                    if (row) row.classList.remove('invalid');
+                }
+                
+                this.classList.remove('is-invalid');
+                form.classList.remove('was-validated');
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

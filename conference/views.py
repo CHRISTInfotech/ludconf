@@ -1,4 +1,6 @@
 import logging
+import matplotlib
+matplotlib.use('Agg') 
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -6,7 +8,15 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
-from .utils import str_to_bool, str_to_int
+from .utils import str_to_bool, str_to_int 
+from collections import Counter
+import matplotlib.pyplot as plt
+import io
+import base64
+
+
+
+
 
 from conference.functions import generate_otp
 from conference.mails import send_otp_email
@@ -20,10 +30,8 @@ def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     conferences = Conference.objects.filter(is_published=True)
-    conferenceDetails = ConferenceDetails.objects.filter(
-        conference_id__in=conferences)
-    context = {'conferences': conferences,
-               'conference_details': conferenceDetails}
+    conferenceDetails = ConferenceDetails.objects.filter(conference_id__in=conferences)
+    context = {'conferences': conferences, 'conference_details': conferenceDetails}
     return render(request, 'conference/index.html', context=context)
 
 
@@ -79,8 +87,7 @@ def ludregister_step_2(request, email):
         if request.method == 'POST':
             otp = request.POST.get('otp')
             if otp == otpRequest.otp:
-                messages.success(
-                    request, 'Your OTP has been been validated, please create an account')
+                messages.success(request, 'Your OTP has been been validated, please create an account')
                 return redirect('ludregister_step_3', email)
             else:
                 messages.error(request, 'Invalid OTP')
@@ -114,22 +121,20 @@ def ludregister_step_3(request, email):
                 user.save()
             else:
                 user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name,
-                                                username=email)
+                                            username=email)
                 user.save()
 
-            if not UserDetails.objects.filter(user=user).exists():
+            if not UserDetails.objects.filter(user=user).exists():            
                 userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
-                                          organization=organization, mobile=mobile, opt_newsletter=newsletter)
+                                      organization=organization, mobile=mobile, opt_newsletter=newsletter)
                 userdetails.save()
 
             try:
-                conferences = ConferenceOrganisers.objects.filter(
-                    mails=user.email)
+                conferences = ConferenceOrganisers.objects.filter(mails=user.email)
                 if conferences.exists():
                     user.is_staff = True
                     user.save()
-                    messages.success(
-                        request, 'You are a conference organiser, your conferences are now linked')
+                    messages.success(request, 'You are a conference organiser, your conferences are now linked')
             except:
                 pass
 
@@ -144,8 +149,7 @@ def ludregister_step_3(request, email):
 
 def dashboard(request):
     if request.user.is_authenticated and request.user.is_superuser:
-        active_conferences = Conference.objects.filter(
-            is_published=True).count()
+        active_conferences = Conference.objects.filter(is_published=True).count()
         all_conferences = Conference.objects.all().count()
         registrations = Conference.objects.annotate(registration_count=Count("conferenceregistration")).values("title",
                                                                                                                "registration_count",
@@ -155,22 +159,15 @@ def dashboard(request):
                    'registrations': registrations}
         return render(request, 'siteadmin/dashboard.html', context=context)
     if request.user.is_authenticated and request.user.is_staff:
-        registeredconference = ConferenceRegistration.objects.filter(
-            user=request.user).values('conference_id')
-        conferences = Conference.objects.exclude(
-            conference_id__in=registeredconference).exclude(is_published=False)
-        conferenceDetails = ConferenceDetails.objects.filter(
-            conference_id__in=conferences)
-        context = {'conferences': conferences,
-                   'conference_details': conferenceDetails}
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
+        conferenceDetails = ConferenceDetails.objects.filter(conference_id__in=conferences)
+        context = {'conferences': conferences, 'conference_details': conferenceDetails}
         return render(request, 'organiser/dashboard.html', context=context)
     if request.user.is_authenticated:
-        registeredconference = ConferenceRegistration.objects.filter(
-            user=request.user).values('conference_id')
-        conferences = Conference.objects.exclude(
-            conference_id__in=registeredconference).exclude(is_published=False)
-        conferenceDetails = ConferenceDetails.objects.filter(
-            conference_id__in=conferences)
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.exclude(conference_id__in=registeredconference).exclude(is_published=False)
+        conferenceDetails = ConferenceDetails.objects.filter(conference_id__in=conferences)
         context = {
             'conferences': conferences,
             'registeredconference': registeredconference,
@@ -203,16 +200,13 @@ def adminconferencecreate(request):
             newconference.save()
 
             if not ConferenceOrganisers.objects.filter(mails=organizer1, conference=newconference).exists():
-                cof_org_1 = ConferenceOrganisers(
-                    mails=organizer1, conference=newconference, created_by=request.user)
+                cof_org_1 = ConferenceOrganisers(mails=organizer1, conference=newconference, created_by=request.user)
                 cof_org_1.save()
             if not ConferenceOrganisers.objects.filter(mails=organizer2, conference=newconference).exists():
-                cof_org_2 = ConferenceOrganisers(
-                    mails=organizer2, conference=newconference, created_by=request.user)
+                cof_org_2 = ConferenceOrganisers(mails=organizer2, conference=newconference, created_by=request.user)
                 cof_org_2.save()
             if not ConferenceOrganisers.objects.filter(mails=organizer3, conference=newconference).exists():
-                cof_org_3 = ConferenceOrganisers(
-                    mails=organizer3, conference=newconference, created_by=request.user)
+                cof_org_3 = ConferenceOrganisers(mails=organizer3, conference=newconference, created_by=request.user)
                 cof_org_3.save()
 
             if User.objects.filter(username=organizer1).exists():
@@ -240,8 +234,7 @@ def adminconferencecreate(request):
 
 def adminlistactiveconference(request):
     if request.user.is_authenticated and request.user.is_superuser:
-        conferences = Conference.objects.filter(
-            is_published=True).order_by('-created_at')
+        conferences = Conference.objects.filter(is_published=True).order_by('-created_at')
         return render(request, 'siteadmin/activeconference.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
@@ -250,8 +243,7 @@ def adminlistactiveconference(request):
 
 def adminlistcompletedconference(request):
     if request.user.is_authenticated and request.user.is_superuser:
-        conferences = Conference.objects.filter(
-            is_published=False).order_by('-created_at')
+        conferences = Conference.objects.filter(is_published=False).order_by('-created_at')
         return render(request, 'siteadmin/listconferences.html', context={'conferences': conferences})
 
 
@@ -259,14 +251,12 @@ def adminmanageconference(request, conference_id):
     if request.user.is_authenticated and request.user.is_superuser:
         conference = Conference.objects.get(pk=conference_id)
         try:
-            conference_details = ConferenceDetails.objects.get(
-                conference_id=conference_id)
+            conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
         except:
             conference_details = None
 
         try:
-            participant_count = ConferenceRegistration.objects.filter(
-                conference_id=conference.conference_id).count()
+            participant_count = ConferenceRegistration.objects.filter(conference_id=conference.conference_id).count()
         except:
             participant_count = 0
 
@@ -331,16 +321,13 @@ def adminconferenceupdate(request, conference_id):
             conference.save()
 
             if not ConferenceOrganisers.objects.filter(mails=organizer1, conference=conference).exists():
-                cof_org_1 = ConferenceOrganisers(
-                    mails=organizer1, conference=conference, created_by=request.user)
+                cof_org_1 = ConferenceOrganisers(mails=organizer1, conference=conference, created_by=request.user)
                 cof_org_1.save()
             if not ConferenceOrganisers.objects.filter(mails=organizer2, conference=conference).exists():
-                cof_org_2 = ConferenceOrganisers(
-                    mails=organizer2, conference=conference, created_by=request.user)
+                cof_org_2 = ConferenceOrganisers(mails=organizer2, conference=conference, created_by=request.user)
                 cof_org_2.save()
             if not ConferenceOrganisers.objects.filter(mails=organizer3, conference=conference).exists():
-                cof_org_3 = ConferenceOrganisers(
-                    mails=organizer3, conference=conference, created_by=request.user)
+                cof_org_3 = ConferenceOrganisers(mails=organizer3, conference=conference, created_by=request.user)
                 cof_org_3.save()
 
             if User.objects.filter(username=organizer1).exists():
@@ -359,8 +346,7 @@ def adminconferenceupdate(request, conference_id):
                 user.save()
 
             if ConferenceDetails.objects.filter(conference_id=conference.conference_id).exists():
-                conferenceDetails = ConferenceDetails.objects.get(
-                    conference_id=conference.conference_id)
+                conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
                 if banner:
                     conferenceDetails.conference_banner = banner
                 if brochure:
@@ -396,14 +382,12 @@ def adminconferenceupdate(request, conference_id):
             return redirect('admin_conference_update', conference_id)
 
         try:
-            conference_details = ConferenceDetails.objects.get(
-                conference_id=conference_id)
+            conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
         except:
             conference_details = None
 
         try:
-            participant_count = ConferenceRegistration.objects.filter(
-                conference_id=conference.conference_id).count()
+            participant_count = ConferenceRegistration.objects.filter(conference_id=conference.conference_id).count()
         except:
             participant_count = 0
 
@@ -418,10 +402,8 @@ def adminconferenceupdate(request, conference_id):
 
 def participatedconference(request):
     if request.user.is_authenticated:
-        registeredconference = ConferenceRegistration.objects.filter(
-            user=request.user).values('conference_id')
-        conferences = Conference.objects.filter(
-            conference_id__in=registeredconference).exclude(is_published=True)
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.filter(conference_id__in=registeredconference).exclude(is_published=True)
         return render(request, 'participant/listconferences.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
@@ -430,10 +412,8 @@ def participatedconference(request):
 
 def registeredconference(request):
     if request.user.is_authenticated:
-        registeredconference = ConferenceRegistration.objects.filter(
-            user=request.user).values('conference_id')
-        conferences = Conference.objects.filter(
-            conference_id__in=registeredconference).exclude(is_published=False)
+        registeredconference = ConferenceRegistration.objects.filter(user=request.user).values('conference_id')
+        conferences = Conference.objects.filter(conference_id__in=registeredconference).exclude(is_published=False)
         return render(request, 'participant/regconferences.html', context={'conferences': conferences})
     else:
         messages.error(request, 'You are not logged in')
@@ -442,11 +422,9 @@ def registeredconference(request):
 
 def deregisteredconference(request, conference_id):
     if request.user.is_authenticated:
-        registeredconference = ConferenceRegistration.objects.get(
-            user=request.user, conference_id=conference_id)
+        registeredconference = ConferenceRegistration.objects.get(user=request.user, conference_id=conference_id)
         registeredconference.delete()
-        messages.success(
-            request, 'Your conference registration has been deleted')
+        messages.success(request, 'Your conference registration has been deleted')
         return redirect('dashboard')
     else:
         messages.error(request, 'You are not logged in')
@@ -460,8 +438,7 @@ def participateconference(request, conference_id):
         if request.method.lower() == 'post':
             interest = request.POST.get('participation')
             if ConferenceRegistration.objects.filter(conference_id=conference_id, user=request.user).exists():
-                conference_reg = ConferenceRegistration.objects.get(
-                    user=request.user, conference_id=conference_id)
+                conference_reg = ConferenceRegistration.objects.get(user=request.user, conference_id=conference_id)
                 conference_reg.interest = interest
                 conference_reg.save()
             else:
@@ -471,12 +448,10 @@ def participateconference(request, conference_id):
             messages.success(request, 'You have registered for the conference')
             return redirect('registered_conference')
         try:
-            conferenceDetails = ConferenceDetails.objects.get(
-                conference_id=conference.conference_id)
+            conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
         except:
             conferenceDetails = None
-        context = {'conference': conference,
-                   'conferenceDetails': conferenceDetails}
+        context = {'conference': conference, 'conferenceDetails': conferenceDetails}
         return render(request, 'conference/conference_participation.html', context=context)
     else:
         messages.error(request, 'You are not logged in')
@@ -486,13 +461,11 @@ def participateconference(request, conference_id):
 def conference_details(request, conference_id):
     conference = Conference.objects.get(pk=conference_id)
     try:
-        conference_details = ConferenceDetails.objects.get(
-            conference_id=conference_id)
+        conference_details = ConferenceDetails.objects.get(conference_id=conference_id)
     except:
         conference_details = None
 
-    context = {'conference': conference,
-               'conference_details': conference_details}
+    context = {'conference': conference, 'conference_details': conference_details}
     return render(request, 'conference/conference_details.html', context=context)
 
 
@@ -502,8 +475,7 @@ def conferencepass(request, conference_id):
         conferenceRegistration = ConferenceRegistration.objects.get(user=request.user,
                                                                     conference_id=conference.conference_id)
         try:
-            conferenceDetails = ConferenceDetails.objects.get(
-                conference_id=conference.conference_id)
+            conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
         except:
             conferenceDetails = None
         context = {'conference': conference, 'conferenceRegistration': conferenceRegistration,
@@ -516,8 +488,7 @@ def conferencepass(request, conference_id):
 
 def stafforganisingconferenes(request):
     if request.user.is_authenticated and request.user.is_staff:
-        organisingConference = ConferenceOrganisers.objects.filter(
-            mails=request.user.email).values('conference_id')
+        organisingConference = ConferenceOrganisers.objects.filter(mails=request.user.email).values('conference_id')
         conferences = Conference.objects.filter(is_published=True, conference_id__in=organisingConference).order_by(
             '-created_at')
         return render(request, 'organiser/newconference.html', context={'conferences': conferences})
@@ -528,8 +499,7 @@ def stafforganisingconferenes(request):
 
 def stafforganisedconferene(request):
     if request.user.is_authenticated and request.user.is_staff:
-        organisingConference = ConferenceOrganisers.objects.filter(
-            mails=request.user.email).values('conference_id')
+        organisingConference = ConferenceOrganisers.objects.filter(mails=request.user.email).values('conference_id')
         conferences = Conference.objects.filter(is_published=False, conference_id__in=organisingConference).order_by(
             '-created_at')
         return render(request, 'organiser/listconferences.html', context={'conferences': conferences})
@@ -553,9 +523,9 @@ def staffupdateconference(request, conference_id):
             social_twitter = request.POST.get('social_twitter')
             social_youtube = request.POST.get('social_youtube')
 
+
             if ConferenceDetails.objects.filter(conference_id=conference.conference_id).exists():
-                conferenceDetails = ConferenceDetails.objects.get(
-                    conference_id=conference.conference_id)
+                conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
                 if banner:
                     conferenceDetails.conference_banner = banner
                 if brochure:
@@ -587,12 +557,10 @@ def staffupdateconference(request, conference_id):
                                                       social_twitter=social_twitter, social_youtube=social_youtube)
                 conferenceDetails.save()
 
-            messages.success(
-                request, 'Your conference details has been updated')
+            messages.success(request, 'Your conference details has been updated')
             return redirect('staff_update_conference', conference_id)
         try:
-            conferenceDetails = ConferenceDetails.objects.get(
-                conference_id=conference.conference_id)
+            conferenceDetails = ConferenceDetails.objects.get(conference_id=conference.conference_id)
         except:
             conferenceDetails = None
         context = {
@@ -636,7 +604,7 @@ def download_emails_for_newsletter(request):
         return redirect('home')
 
 
-def one_time_participation(request, conference_id):
+def one_time_participation(request,conference_id):
     if Conference.objects.filter(pk=conference_id).exists():
         conference = Conference.objects.get(pk=conference_id)
         if request.method == "POST":
@@ -649,22 +617,21 @@ def one_time_participation(request, conference_id):
             orgnization = request.POST['organization']
             mobile = request.POST['mobile']
             newsletter = False
-
+            
             if not User.objects.filter(email=email).exists():
                 user = User.objects.create(email=email, password=mobile, first_name=first_name, last_name=last_name,
-                                           username=email)
+                                            username=email)
                 user.save()
             else:
                 user = User.objects.get(email=email)
 
             if not UserDetails.objects.filter(user=user).exists():
                 userdetails = UserDetails(user=user, gender=gender, dob=dob, designation=designation,
-                                          organization=orgnization, mobile=mobile, opt_newsletter=newsletter)
+                                      organization=orgnization, mobile=mobile, opt_newsletter=newsletter)
                 userdetails.save()
 
             if ConferenceRegistration.objects.filter(conference_id=conference_id, user=user.id).exists():
-                conference_reg = ConferenceRegistration.objects.get(
-                    user=user, conference_id=conference_id)
+                conference_reg = ConferenceRegistration.objects.get(user=user, conference_id=conference_id)
                 conference_reg.interest = "Attend-Onetime"
                 conference_reg.save()
             else:
@@ -674,31 +641,33 @@ def one_time_participation(request, conference_id):
 
             messages.success(request, 'You have registered for the conference')
             return redirect('conference_details', conference_id)
-        else:
+        else: 
             try:
-                conference_details = ConferenceDetails.objects.get(
-                    conference=conference.pk)
+                conference_details = ConferenceDetails.objects.get(conference=conference.pk)
             except:
                 conference_details = None
-            return render(request, 'conference/one_time_reg.html', context={'conference': conference, 'conference_details': conference_details})
+            return render(request, 'conference/one_time_reg.html', context={'conference': conference, 'conference_details':conference_details})
     else:
         messages.error(request, 'Conference does not exist')
         return redirect('home')
-
+    
 
 def error_view_404(request, exception):
     return render(request, 'userauth/error_page.html')
 
-
 def error_view_500(request):
     return render(request, 'userauth/error_page.html')
 
+def str_to_bool(value):
+    return value == 'True'
 
-def conference_toolkit(request):
-    return render(request, 'forms/conference_toolkit.html')
+def str_to_int(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return None
 
-
-
+@login_required
 def feedback_survey(request):
     conferences = Conference.objects.filter(is_published=True)
     selected_conference = None
@@ -706,88 +675,71 @@ def feedback_survey(request):
     if request.method == 'POST':
         selected_id = request.POST.get('conference_id')
         if selected_id:
-            selected_conference = get_object_or_404(
-                Conference, conference_id=selected_id)
+            selected_conference = get_object_or_404(Conference, conference_id=selected_id)
+        else:
+            messages.error(request, "Please select a conference.")
+            return render(request, 'forms/feedback_form.html', {'conferences': conferences})
 
-        if 'full_name' in request.POST:
-            # Handle multiple engaging activities
-            engaging_activities = request.POST.getlist('engaging_activity')
-            engaging_activities_str = ', '.join(
-                engaging_activities) if engaging_activities else None
+        if 'full_name' in request.POST and selected_conference:
+            engaging_activities = request.POST.getlist('engaging_activities')
+            engaging_activities_str = ', '.join(engaging_activities) if engaging_activities else None
 
             FeedbackSurveyResponse.objects.create(
+                user=request.user,
                 conference=selected_conference,
                 full_name=request.POST.get('full_name'),
                 email=request.POST.get('email'),
-                phone=request.POST.get('phone') or None,
+                phone=request.POST.get('whatsapp') or None,
                 age=request.POST.get('age') or None,
                 gender=request.POST.get('gender') or None,
-                occupation=request.POST.get('occupation'),
-                occupation_other=request.POST.get('occupation_other') or None,
-                location_type=request.POST.get('location_type') or None,
+                occupation=request.POST.get('profession'),
+                occupation_other=request.POST.get('profession_other') or None,
+                location_type=request.POST.get('residence_type') or None,
                 first_time=str_to_bool(request.POST.get('first_time')),
 
-                # Volunteerism & Community Engagement
-                q1_volunteer=str_to_int(request.POST.get('q1_volunteer')) or 3,
-                q2_belonging=str_to_int(request.POST.get('q2_belonging')) or 3,
-                q3_inspiration=str_to_int(
-                    request.POST.get('q3_inspiration')) or 3,
-                q4_stalls=str_to_int(request.POST.get('q4_stalls')) or 3,
-                q5_reflection=str_to_int(
-                    request.POST.get('q5_reflection')) or 3,
+                q9_1=str_to_int(request.POST.get('q9_1')) or 3,
+                q9_2=str_to_int(request.POST.get('q9_2')) or 3,
+                q9_3=str_to_int(request.POST.get('q9_3')) or 3,
+                q9_4=str_to_int(request.POST.get('q9_4')) or 3,
+                q9_5=str_to_int(request.POST.get('q9_5')) or 3,
 
-                # Social Entrepreneurship & Community Service
-                q6_initiative=str_to_int(
-                    request.POST.get('q6_initiative')) or 3,
-                q7_models=str_to_int(request.POST.get('q7_models')) or 3,
-                q8_motivation=str_to_int(
-                    request.POST.get('q8_motivation')) or 3,
-                q9_clarity=str_to_int(request.POST.get('q9_clarity')) or 3,
-                q10_insight=str_to_int(request.POST.get(
-                    'q10_insight')) or 3,  # ✅ Fix added here
+                q10_1=str_to_int(request.POST.get('q10_1')) or 3,
+                q10_2=str_to_int(request.POST.get('q10_2')) or 3,
+                q10_3=str_to_int(request.POST.get('q10_3')) or 3,
+                q10_4=str_to_int(request.POST.get('q10_4')) or 3,
+                q10_5=str_to_int(request.POST.get('q10_5')) or 3,
 
-                # Learning & Knowledge Sharing
-                q11_concepts=str_to_int(request.POST.get('q11_concepts')) or 3,
-                q12_application=str_to_int(
-                    request.POST.get('q12_application')) or 3,
-                q13_expansion=str_to_int(
-                    request.POST.get('q13_expansion')) or 3,
-                q14_keynotes=str_to_int(request.POST.get('q14_keynotes')) or 3,
+                q11_1=str_to_int(request.POST.get('q11_1')) or 3,
+                q11_2=str_to_int(request.POST.get('q11_2')) or 3,
+                q11_3=str_to_int(request.POST.get('q11_3')) or 3,
+                q11_4=str_to_int(request.POST.get('q11_4')) or 3,
 
-                # Networking & Collaboration
-                q15_collab=str_to_int(request.POST.get('q15_collab')) or 3,
-                q16_convo=str_to_int(request.POST.get('q16_convo')) or 3,
-                q17_diversity=str_to_int(
-                    request.POST.get('q17_diversity')) or 3,
-                q18_community=str_to_int(
-                    request.POST.get('q18_community')) or 3,
-                q19_followup=str_to_int(request.POST.get('q19_followup')) or 3,
+                q12_1=str_to_int(request.POST.get('q12_1')) or 3,
+                q12_2=str_to_int(request.POST.get('q12_2')) or 3,
+                q12_3=str_to_int(request.POST.get('q12_3')) or 3,
+                q12_4=str_to_int(request.POST.get('q12_4')) or 3,
+                q12_5=str_to_int(request.POST.get('q12_5')) or 3,
 
-                # Final Reflections
-                followup_study=str_to_bool(request.POST.get(
-                    'followup_study')) if request.POST.get('followup_study') else False,
+                followup_study=str_to_bool(request.POST.get('followup_study')) if request.POST.get('followup_study') else False,
                 satisfaction=str_to_int(request.POST.get('satisfaction')) or 3,
                 takeaways=request.POST.get('takeaways'),
                 suggestions=request.POST.get('suggestions'),
-                team_interest=str_to_bool(request.POST.get(
-                    'team_interest')) if request.POST.get('team_interest') else False,
-                engaging_activity=engaging_activities_str,  # save as comma-separated string
+                team_interest=str_to_bool(request.POST.get('team_interest')) if request.POST.get('team_interest') else False,
+                engaging_activity=engaging_activities_str,
             )
-            messages.success(request, "Thank you for your feedback!")
-            return redirect('home')
-            # return redirect('feedback_dashboard')
 
-    elif request.method == 'POST' and 'conference_id' in request.POST:
-        selected_id = request.GET.get('conference_id')
-        selected_conference = get_object_or_404(
-            Conference, conference_id=selected_id)
+            messages.success(request, "Thank you for your feedback!")
+            return redirect('dashboard')
+
+        else:
+            messages.error(request, "Please fill in all required fields.")
 
     return render(request, 'forms/feedback_form.html', {
         'conferences': conferences,
         'selected_conference': selected_conference
     })
 
-
+@login_required
 def reflection_survey(request):
     conferences = Conference.objects.filter(is_published=True)
 
@@ -795,11 +747,11 @@ def reflection_survey(request):
     if request.method == 'POST':
         selected_id = request.POST.get('conference_id')
         if selected_id:
-            selected_conference = Conference.objects.get(
-                conference_id=selected_id)
+            selected_conference = Conference.objects.get(conference_id=selected_id)
 
         if 'full_name' in request.POST:
             ReflectionSurveyResponse.objects.create(
+                user=request.user,
                 conference=selected_conference,
                 full_name=request.POST.get('full_name'),
                 email=request.POST.get('email'),
@@ -808,56 +760,172 @@ def reflection_survey(request):
                 connect_new=request.POST.get('connect_new'),
                 stayed_in_touch=request.POST.get('stayed_in_touch'),
                 opportunities_found=request.POST.get('opportunities_found'),
-                motivated_to_volunteer=request.POST.get(
-                    'motivated_to_volunteer'),
-                participated_due_to_conf=request.POST.get(
-                    'participated_due_to_conf'),
+                motivated_to_volunteer=request.POST.get('motivated_to_volunteer'),
+                participated_due_to_conf=request.POST.get('participated_due_to_conf'),
                 engaged_in_theme=request.POST.get('engaged_in_theme'),
                 improved_knowledge=request.POST.get('improved_knowledge'),
                 philosophy_applied=request.POST.get('philosophy_applied'),
                 more_informed=request.POST.get('more_informed'),
                 leadership_enhanced=request.POST.get('leadership_enhanced'),
-                more_socially_engaged=request.POST.get(
-                    'more_socially_engaged'),
-                more_socially_sensitive=request.POST.get(
-                    'more_socially_sensitive'),
+                more_socially_engaged=request.POST.get('more_socially_engaged'),
+                more_socially_sensitive=request.POST.get('more_socially_sensitive'),
                 making_impact=request.POST.get('making_impact'),
                 key_takeaway=request.POST.get('key_takeaway'),
                 recommend=request.POST.get('recommend') == 'True',
                 stay_involved=request.POST.get('stay_involved') == 'True',
-                org_willing_to_partner=request.POST.get(
-                    'org_willing_to_partner') == 'True',
+                org_willing_to_partner=request.POST.get('org_willing_to_partner') == 'True',
             )
             messages.success(request, "Thank you for your reflection!")
-            return redirect('home')
-            # return redirect('reflection_dashboard')
+            return redirect('dashboard')
 
     return render(request, 'forms/reflection_survey.html', {
         'conferences': conferences,
         'selected_conference': selected_conference
     })
 
+def generate_chart(title, data_dict):
+    fig, ax = plt.subplots(figsize=(5, 3))
+    bars = ax.bar(data_dict.keys(), data_dict.values(), color="#4C9BE8", edgecolor='white', linewidth=0.7)
+
+    # Rounded bars and labels
+    for bar in bars:
+        height = bar.get_height()
+        ax.annotate(f'{height}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 5),  # vertical offset
+                    textcoords="offset points",
+                    ha='center', va='bottom',
+                    fontsize=9, color='black')
+
+    ax.set_title(title, fontsize=12, color='#004080')
+    ax.set_ylabel("Responses", fontsize=10)
+    ax.tick_params(axis='x', rotation=30, labelsize=9)
+    ax.yaxis.grid(True, linestyle='--', alpha=0.6)
+    ax.set_axisbelow(True)
+
+    plt.tight_layout()
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png", dpi=120)
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    plt.close(fig)
+    return base64.b64encode(image_png).decode("utf-8")
 
 
+@login_required
 def feedback_dashboard(request):
+    # Limit access: only superuser or staff
+    if not (request.user.is_superuser or request.user.is_staff):
+        return redirect("home")
+
     responses = FeedbackSurveyResponse.objects.all().order_by("-submitted_at")
     total_responses = responses.count()
 
+    # Map of model field names to chart display titles
+    chart_fields = {
+        "q1_volunteer": "Interest in Volunteering",
+        "q2_belonging": "Sense of Belonging",
+        "q3_inspiration": "Inspired by Speakers",
+        "q7_models": "Understanding New Models",
+        "q11_concepts": "New Concepts or Perspectives",
+        "q15_collab": "Found Collaborations",
+        "followup_study": "Interest in Follow-Up Study",
+        "satisfaction": "Overall Satisfaction (1–5)",
+    }
+
     charts = []
-    
+
+    # Location of participants chart
+    location_counts = Counter(res.location_type for res in responses if res.location_type)
+    if location_counts:
+        location_chart = generate_chart("Location of Participants", location_counts)
+        charts.append({
+            "title": "Location of Participants",
+            "image_base64": location_chart
+        })
+
+    # Generate charts for Likert scale / boolean fields
+    for field, title in chart_fields.items():
+        counts = {}
+        for res in responses:
+            val = getattr(res, field, None)
+            if isinstance(val, bool):
+                key = "Yes" if val else "No"
+            elif val is not None:
+                key = str(val)
+            else:
+                continue
+            counts[key] = counts.get(key, 0) + 1
+        if counts:
+            chart_image = generate_chart(title, counts)
+            charts.append({
+                "title": title,
+                "image_base64": chart_image
+            })
+
+    # Engaging Activities chart: split comma-separated values and count each
+    engaging_counts = Counter()
+    for res in responses:
+        if res.engaging_activity:
+            activities = [act.strip() for act in res.engaging_activity.split(',') if act.strip()]
+            engaging_counts.update(activities)
+
+    if engaging_counts:
+        engaging_chart = generate_chart("Most Engaging Activities", engaging_counts)
+        charts.append({
+            "title": "Most Engaging Activities",
+            "image_base64": engaging_chart
+        })
+
     return render(request, "forms/feedback_dashboard.html", {
         "responses": responses,
         "total_responses": total_responses,
         "charts": charts,
     })
 
-
-
+@login_required
 def reflection_dashboard(request):
+    if not (request.user.is_superuser or request.user.is_staff):
+        return redirect('home')
+
     responses = ReflectionSurveyResponse.objects.all().order_by('-submitted_at')
     total = responses.count()
 
+    chart_fields = {
+        'connect_new': 'Connected with New People',
+        'stayed_in_touch': 'Stayed in Touch Post Conference',
+        'opportunities_found': 'Found Collaboration Opportunities',
+        'motivated_to_volunteer': 'Motivated to Volunteer',
+        'participated_due_to_conf': 'Participated Because of Conference',
+        'engaged_in_theme': 'Engaged in Conference Themes',
+        'improved_knowledge': 'Improved Knowledge',
+        'philosophy_applied': 'Conference Philosophy Still Applies',
+        'more_informed': 'More Informed After Conference',
+        'leadership_enhanced': 'Enhanced Leadership Skills',
+        'more_socially_engaged': 'More Socially Engaged',
+        'more_socially_sensitive': 'More Socially Sensitive',
+        'making_impact': 'Believes Making an Impact',
+        'recommend': 'Would Recommend the Conference',
+        'stay_involved': 'Wants to Stay Involved',
+        'org_willing_to_partner': 'Willing to Partner with LUD',
+    }
+
     charts = []
+    for field, title in chart_fields.items():
+        counts = {}
+        for res in responses:
+            val = getattr(res, field, None)
+            if isinstance(val, bool):
+                key = "Yes" if val else "No"
+            elif val is not None:
+                key = str(val)
+            else:
+                continue
+            counts[key] = counts.get(key, 0) + 1
+        if counts:
+            image = generate_chart(title, counts)
+            charts.append({'title': title, 'image_base64': image})
 
     return render(request, 'forms/reflection_dashboard.html', {
         'responses': responses,
