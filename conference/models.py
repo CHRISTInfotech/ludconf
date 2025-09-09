@@ -82,7 +82,6 @@ class ConferenceOrganisers(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-
 SCALE_CHOICES = [(i, str(i)) for i in range(1, 6)]
 OCCUPATION_CHOICES = [
     ("University/College Faculty", "University/College Faculty"),
@@ -97,6 +96,7 @@ OCCUPATION_CHOICES = [
 ]
 
 class FeedbackSurveyResponse(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
 
     # Personal Information
@@ -110,32 +110,32 @@ class FeedbackSurveyResponse(models.Model):
     location_type = models.CharField(max_length=50, blank=True, null=True)
     first_time = models.BooleanField(default=False)
 
-    # Volunteerism & Community Engagement
-    q1_volunteer = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q2_belonging = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q3_inspiration = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q4_stalls = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q5_reflection = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    # Volunteerism & Community Engagement (Q9)
+    q9_1 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q9_2 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q9_3 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q9_4 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q9_5 = models.IntegerField(choices=SCALE_CHOICES, default=3)
 
-    # Social Entrepreneurship & Community Service
-    q6_initiative = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q7_models = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q8_motivation = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q9_clarity = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q10_insight = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    # Social Entrepreneurship & Community Service (Q10)
+    q10_1 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q10_2 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q10_3 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q10_4 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q10_5 = models.IntegerField(choices=SCALE_CHOICES, default=3)
 
-    # Learning & Knowledge Sharing
-    q11_concepts = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q12_application = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q13_expansion = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q14_keynotes = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    # Learning & Knowledge Sharing (Q11)
+    q11_1 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q11_2 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q11_3 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q11_4 = models.IntegerField(choices=SCALE_CHOICES, default=3)
 
-    # Networking & Collaborations
-    q15_collab = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q16_convo = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q17_diversity = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q18_community = models.IntegerField(choices=SCALE_CHOICES, default=3)
-    q19_followup = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    # Networking & Collaborations (Q12)
+    q12_1 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q12_2 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q12_3 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q12_4 = models.IntegerField(choices=SCALE_CHOICES, default=3)
+    q12_5 = models.IntegerField(choices=SCALE_CHOICES, default=3)
 
     # Final Reflection Questions
     followup_study = models.BooleanField(default=False)
@@ -155,7 +155,9 @@ class FeedbackSurveyResponse(models.Model):
     def __str__(self):
         return f'{self.full_name or "Anonymous"} - {self.conference}'
 
+
 class ReflectionSurveyResponse(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
     submitted_at = models.DateTimeField(auto_now_add=True)
     
