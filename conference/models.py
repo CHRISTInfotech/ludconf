@@ -19,6 +19,7 @@ class Conference(models.Model):
     organizer3 = models.EmailField(max_length=255)
     mobile3 = models.CharField(max_length=255, blank=True, null=True)
     is_published = models.BooleanField(default=True)
+    google_maps_link = models.URLField(max_length=500, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)
 
@@ -192,4 +193,3 @@ class ReflectionSurveyResponse(models.Model):
         ordering = ['-submitted_at']
         verbose_name = 'Reflection Survey Response'
         verbose_name_plural = 'Reflection Survey Responses'
-

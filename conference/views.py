@@ -1,7 +1,4 @@
 import logging
-import matplotlib
-
-matplotlib.use("Agg")
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -11,10 +8,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
 from .utils import str_to_bool, str_to_int
 from collections import Counter
-import matplotlib.pyplot as plt
 import io
 import base64
-
 
 from conference.functions import generate_otp
 from conference.mails import send_otp_email
@@ -184,7 +179,7 @@ def dashboard(request):
         all_conferences = Conference.objects.all().count()
         registrations = Conference.objects.annotate(
             registration_count=Count("conferenceregistration")
-        ).values("title", "registration_count", "is_published", "conference_id")
+        ).values("title", "registration_count", "is_published", "conference_id").filter(is_published=True)
         context = {
             "active_conferences": active_conferences,
             "all_conferences": all_conferences,
@@ -238,6 +233,7 @@ def adminconferencecreate(request):
             org_mob_1 = request.POST.get("org_mob_1")
             org_mob_2 = request.POST.get("org_mob_2")
             org_mob_3 = request.POST.get("org_mob_3")
+            gmaps_link = request.POST.get("gmaps")
             newconference = Conference(
                 title=conference_title,
                 location=location,
@@ -250,6 +246,7 @@ def adminconferencecreate(request):
                 mobile1=org_mob_1,
                 mobile2=org_mob_2,
                 mobile3=org_mob_3,
+                google_maps_link=gmaps_link,
                 created_by=request.user,
             )
             newconference.save()
@@ -382,6 +379,7 @@ def adminconferenceupdate(request, conference_id):
             org_mob_1 = request.POST.get("org_mob_1")
             org_mob_2 = request.POST.get("org_mob_2")
             org_mob_3 = request.POST.get("org_mob_3")
+            gmaps_link = request.POST.get("gmaps")
             banner = request.FILES.get("confbanner")
             brochure = request.FILES.get("confbrochure")
             theme = request.POST.get("conftheme")
@@ -396,14 +394,15 @@ def adminconferenceupdate(request, conference_id):
             conference.title = conference_title
             conference.location = location
             conference.venue = venue
-            conference.startDate = startDate
-            conference.endDate = endDate
+            conference.start_date = startDate
+            conference.end_date = endDate
             conference.organizer1 = organizer1
             conference.organizer2 = organizer2
             conference.organizer3 = organizer3
             conference.mobile1 = org_mob_1
             conference.mobile2 = org_mob_2
             conference.mobile3 = org_mob_3
+            conference.google_maps_link = gmaps_link
             conference.save()
 
             if not ConferenceOrganisers.objects.filter(
@@ -472,7 +471,7 @@ def adminconferenceupdate(request, conference_id):
                 conferenceDetails.save()
             else:
                 conferenceDetails = ConferenceDetails(
-                    conference_id=conference.conference_id,
+                    conference=conference,
                     conference_banner=banner,
                     conference_brochure=brochure,
                     conference_theme=theme,
@@ -491,16 +490,16 @@ def adminconferenceupdate(request, conference_id):
 
         try:
             conference_details = ConferenceDetails.objects.get(
-                conference_id=conference_id
+                conference=conference
             )
-        except:
+        except ConferenceDetails.DoesNotExist:
             conference_details = None
 
         try:
             participant_count = ConferenceRegistration.objects.filter(
                 conference_id=conference.conference_id
             ).count()
-        except:
+        except Exception:
             participant_count = 0
 
         context = {
@@ -716,7 +715,7 @@ def staffupdateconference(request, conference_id):
                 conferenceDetails.save()
             else:
                 conferenceDetails = ConferenceDetails(
-                    conference_id=conference.conference_id,
+                    conference=conference,
                     conference_banner=banner,
                     conference_brochure=brochure,
                     conference_theme=theme,
@@ -734,7 +733,7 @@ def staffupdateconference(request, conference_id):
             return redirect("staff_update_conference", conference_id)
         try:
             conferenceDetails = ConferenceDetails.objects.get(
-                conference_id=conference.conference_id
+                conference=conference
             )
         except:
             conferenceDetails = None
@@ -803,6 +802,7 @@ def one_time_participation(request, conference_id):
             mobile = request.POST["mobile"]
             newsletter = False
 
+            user = request.user
             if not User.objects.filter(email=email).exists():
                 user = User.objects.create(
                     email=email,
@@ -828,7 +828,7 @@ def one_time_participation(request, conference_id):
                 userdetails.save()
 
             if ConferenceRegistration.objects.filter(
-                conference_id=conference_id, user=user.id
+                conference_id=conference_id, user=user.pk
             ).exists():
                 conference_reg = ConferenceRegistration.objects.get(
                     user=user, conference_id=conference_id
@@ -1015,45 +1015,6 @@ def reflection_survey(request):
         {"conferences": conferences, "selected_conference": selected_conference},
     )
 
-
-def generate_chart(title, data_dict):
-    fig, ax = plt.subplots(figsize=(5, 3))
-    bars = ax.bar(
-        data_dict.keys(),
-        data_dict.values(),
-        color="#4C9BE8",
-        edgecolor="white",
-        linewidth=0.7,
-    )
-
-    # Rounded bars and labels
-    for bar in bars:
-        height = bar.get_height()
-        ax.annotate(
-            f"{height}",
-            xy=(bar.get_x() + bar.get_width() / 2, height),
-            xytext=(0, 5),  # vertical offset
-            textcoords="offset points",
-            ha="center",
-            va="bottom",
-            fontsize=9,
-            color="black",
-        )
-
-    ax.set_title(title, fontsize=12, color="#004080")
-    ax.set_ylabel("Responses", fontsize=10)
-    ax.tick_params(axis="x", rotation=30, labelsize=9)
-    ax.yaxis.grid(True, linestyle="--", alpha=0.6)
-    ax.set_axisbelow(True)
-
-    plt.tight_layout()
-    buffer = io.BytesIO()
-    plt.savefig(buffer, format="png", dpi=120)
-    buffer.seek(0)
-    image_png = buffer.getvalue()
-    buffer.close()
-    plt.close(fig)
-    return base64.b64encode(image_png).decode("utf-8")
 
 
 def feedback_dashboard(request):
