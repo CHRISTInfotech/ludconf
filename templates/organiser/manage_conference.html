@@ -49,6 +49,13 @@
             {% endif %}
             <div class="fst-italic mb-3">
                 {{ conference.location }} | {{ conference.venue }}; From {{ conference.start_date }} to {{ conference.end_date }}
+                {% if conference.google_maps_link %}
+                    <br/>
+                    <a href="{{ conference.google_maps_link }}" target="_blank" class="text-decoration-none">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        View on Map
+                    </a>
+                {% endif %}
             </div>
             <div class="mb-2">
                 <i class="fa-solid fa-user-large"></i> Contact People: <br/>

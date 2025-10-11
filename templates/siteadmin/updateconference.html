@@ -29,6 +29,17 @@
                     <th scope="row">Conference Venue</th>
                     <td>{{ conference.venue }}</td>
                 </tr>
+                {% if conference.google_maps_link %}
+                    <tr>
+                        <th scope="row">Map</th>
+                        <td>
+                            <a href="{{ conference.google_maps_link }}" target="_blank">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                View on Google Maps
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <th scope="row">Conference Start Date</th>
                     <td>{{ conference.start_date }}</td>
@@ -184,6 +195,11 @@
                     <input type="text" class="form-control" id="venue" name="venue" value="{{ conference.venue }}"
                            required>
                     <label for="venue">Venue</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="url" class="form-control" id="gmaps" name="gmaps"
+                           value="{{ conference.google_maps_link|default_if_none:'' }}">
+                    <label for="gmaps">Google Maps Link</label>
                 </div>
                 <div class="form-floating mb-3">
                     <input type="date" class="form-control" id="fromdate" name="fromdate"

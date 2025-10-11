@@ -15,17 +15,10 @@
         <!-- Navigation links -->
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav ms-auto">
-                {% if request.user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'conference_feedback' %}">Post Conference Feedback Survey</a>
-                    <a class="nav-link" href="{% url 'reflection_survey' %}">Impact Reflection Survey</a>
-                {% endif %}
-
                 {% if request.user.is_superuser %}
                     <a class="nav-link" href="{% url 'admin_conference_create' %}">New Conference</a>
                     <a class="nav-link" href="{% url 'admin_list_active_conference' %}">Active Conferences</a>
                     <a class="nav-link" href="{% url 'admin_list_completed' %}">Completed Conferences</a>
-                    <a class="nav-link" href="{% url 'feedback_dashboard' %}">Feedback Dashboard</a>
-                    <a class="nav-link" href="{% url 'reflection_dashboard' %}">Reflection Dashboard</a>
 
                 {% elif request.user.is_staff %}
                     <a class="nav-link" href="{% url 'staff_organizing_conference' %}">Organising Conferences</a>
@@ -36,8 +29,6 @@
                 {% else %}
                     <a class="nav-link" href="{% url 'registered_conference' %}">Registered Conferences</a>
                     <a class="nav-link" href="{% url 'participated_conference' %}">Participated Conferences</a>
-                    <a class="nav-link" href="{% url 'feedback_dashboard' %}">Feedback Dashboard</a>
-                    <a class="nav-link" href="{% url 'reflection_dashboard' %}">Reflection Dashboard</a>
                 {% endif %}
             </div>
         </div>
