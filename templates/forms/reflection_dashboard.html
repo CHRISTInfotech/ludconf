@@ -1,48 +1,93 @@
 {% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Reflection Dashboard{% endblock %}
 
 {% block content %}
-{% include 'partials/nav.html' %}
 
-<div class="container mt-4">
-  <h4 class="mb-3">📊 Reflection Survey Dashboard</h4>
+    <nav aria-label="breadcrumb" class="bg-light py-2">
+        <ol class="breadcrumb container mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'conference' %}">Conference Toolkit</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Reflection Dashboard</li>
+        </ol>
+    </nav>
 
-  <div class="alert alert-info">
-    Total Reflection Responses: <strong>{{ total_responses }}</strong>
-  </div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-3">Reflection Survey Dashboard</h1>
 
-  <div class="row">
-    {% for chart in charts %}
-      <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6 class="card-title text-primary">{{ chart.title }}</h6>
-            <img src="data:image/png;base64,{{ chart.image_base64 }}" class="img-fluid" alt="{{ chart.title }}">
-          </div>
+                <form method="get" class="row g-2 align-items-end mb-3">
+                    <div class="col-md-6">
+                        <label for="conferenceFilter" class="form-label">Filter by Conference</label>
+                        <select name="conference_id" id="conferenceFilter" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Conferences</option>
+                            {% for conf in conferences %}
+                                <option value="{{ conf.conference_id }}" {% if selected_conference_id == conf.conference_id|stringformat:'s' %}selected{% endif %}>
+                                    {{ conf.title }} ({{ conf.start_date }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" type="submit">Apply</button>
+                    </div>
+                </form>
+
+                <p class="lead">Total Responses: {{ total_responses }}</p>
+                <hr/>
+            </div>
         </div>
-      </div>
-    {% endfor %}
-  </div>
 
-  <hr>
-  <h5 class="mt-5">📝 Individual Responses</h5>
-  {% for r in responses %}
-    <div class="card mb-3">
-      <div class="card-body">
-        <h6>{{ r.full_name }} <small class="text-muted">({{ r.email }})</small></h6>
-        <p><strong>Occupation:</strong> {{ r.occupation }}</p>
-        <p><strong>Submitted At:</strong> {{ r.submitted_at|date:"Y-m-d H:i" }}</p>
-        <p><strong>Key Takeaway:</strong><br>{{ r.key_takeaway }}</p>
-        <p><strong>Recommend?</strong> {{ r.recommend|yesno:"Yes,No" }}</p>
-        <p><strong>Stay Involved?</strong> {{ r.stay_involved|yesno:"Yes,No" }}</p>
-        <p><strong>Willing to Partner?</strong> {{ r.org_willing_to_partner|yesno:"Yes,No" }}</p>
-      </div>
+        <div class="row">
+            {% for chart in charts_data %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header fw-bold">
+                            {{ chart.title }}
+                        </div>
+                        <div class="card-body">
+                            <canvas id="{{ chart.chart_id }}"></canvas>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p>No data available to display charts.</p>
+                </div>
+            {% endfor %}
+        </div>
     </div>
-  {% empty %}
-    <p>No responses submitted yet.</p>
-  {% endfor %}
-</div>
 
+    {{ charts_data|json_script:"charts-data" }}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartsData = JSON.parse(document.getElementById('charts-data').textContent);
+
+            chartsData.forEach(chartInfo => {
+                const ctx = document.getElementById(chartInfo.chart_id).getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartInfo.labels,
+                        datasets: [{
+                            label: '# of Responses',
+                            data: chartInfo.data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

@@ -6,11 +6,7 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
-from .utils import str_to_bool, str_to_int
 from collections import Counter
-import io
-import base64
-
 from conference.functions import generate_otp
 from conference.mails import send_otp_email
 from conference.models import (
@@ -21,7 +17,12 @@ from conference.models import (
     ConferenceDetails,
     ConferenceRegistration,
 )
-from conference.utils import export_to_excel, export_emails_for_newsletters
+from conference.utils import (
+    export_to_excel,
+    export_emails_for_newsletters,
+    str_to_bool,
+    str_to_int,
+)
 
 
 # Create your views here.
@@ -177,9 +178,13 @@ def dashboard(request):
     if request.user.is_authenticated and request.user.is_superuser:
         active_conferences = Conference.objects.filter(is_published=True).count()
         all_conferences = Conference.objects.all().count()
-        registrations = Conference.objects.annotate(
-            registration_count=Count("conferenceregistration")
-        ).values("title", "registration_count", "is_published", "conference_id").filter(is_published=True)
+        registrations = (
+            Conference.objects.annotate(
+                registration_count=Count("conferenceregistration")
+            )
+            .values("title", "registration_count", "is_published", "conference_id")
+            .filter(is_published=True)
+        )
         context = {
             "active_conferences": active_conferences,
             "all_conferences": all_conferences,
@@ -489,9 +494,7 @@ def adminconferenceupdate(request, conference_id):
             return redirect("admin_conference_update", conference_id)
 
         try:
-            conference_details = ConferenceDetails.objects.get(
-                conference=conference
-            )
+            conference_details = ConferenceDetails.objects.get(conference=conference)
         except ConferenceDetails.DoesNotExist:
             conference_details = None
 
@@ -732,9 +735,7 @@ def staffupdateconference(request, conference_id):
             messages.success(request, "Your conference details has been updated")
             return redirect("staff_update_conference", conference_id)
         try:
-            conferenceDetails = ConferenceDetails.objects.get(
-                conference=conference
-            )
+            conferenceDetails = ConferenceDetails.objects.get(conference=conference)
         except:
             conferenceDetails = None
         context = {"conference": conference, "conferenceDetails": conferenceDetails}
@@ -874,7 +875,10 @@ def error_view_500(request):
 
 
 def str_to_bool(value):
-    return value == "True"
+    if value is None:
+        return False
+    truthy = {"true", "1", "yes", "y", "on"}
+    return str(value).strip().lower() in truthy
 
 
 def str_to_int(value):
@@ -1016,54 +1020,89 @@ def reflection_survey(request):
     )
 
 
-
 def feedback_dashboard(request):
-    # Limit access: only superuser or staff
-    if not (request.user.is_superuser or request.user.is_staff):
-        return redirect("home")
+
+    conferences = Conference.objects.filter(is_published=True).order_by("title")
+    selected_conference_id = request.GET.get("conference_id")
 
     responses = FeedbackSurveyResponse.objects.all().order_by("-submitted_at")
+    if selected_conference_id:
+        responses = responses.filter(conference_id=selected_conference_id)
     total_responses = responses.count()
 
     # Map of model field names to chart display titles
-    chart_fields = {
-        "q1_volunteer": "Interest in Volunteering",
-        "q2_belonging": "Sense of Belonging",
-        "q3_inspiration": "Inspired by Speakers",
-        "q7_models": "Understanding New Models",
-        "q11_concepts": "New Concepts or Perspectives",
-        "q15_collab": "Found Collaborations",
-        "followup_study": "Interest in Follow-Up Study",
+    likert_chart_fields = {
+        # Q9 – Volunteerism & Community Engagement
+        "q9_1": "Interest in Community Volunteering",
+        "q9_2": "Sense of Belonging to Community",
+        "q9_3": "Inspired by Speakers/Stories",
+        "q9_4": "Stalls/Interactions Offered Practical Insights",
+        "q9_5": "Encouraged Reflection on Community Role",
+        # Q10 – Social Entrepreneurship & Community Service
+        "q10_1": "Confidence to Start an Initiative",
+        "q10_2": "Showcased Practical Service Models",
+        "q10_3": "Motivated to Volunteer/Serve",
+        "q10_4": "Increased Awareness of Social Issues",
+        "q10_5": "Connected with Organizations/Opportunities",
+        # Q11 – Learning & Knowledge Sharing
+        "q11_1": "Learned New Concepts/Approaches",
+        "q11_2": "Better Understanding of Community Needs",
+        "q11_3": "Applicable Learnings to Context",
+        "q11_4": "Improved Problem-Solving/Decision Making",
+        # Q12 – Networking & Collaborations
+        "q12_1": "Met People with Similar Goals",
+        "q12_2": "Gained Mentorship/Guidance",
+        "q12_3": "Found Collaboration Opportunities",
+        "q12_4": "Facilitated New Partnerships",
+        "q12_5": "Strengthened Existing Relationships",
+        # Final
+        "followup_study": "Interest in Follow-Up Study (Yes/No)",
         "satisfaction": "Overall Satisfaction (1–5)",
     }
 
-    charts = []
+    charts_data = []
 
     # Location of participants chart
     location_counts = Counter(
         res.location_type for res in responses if res.location_type
     )
     if location_counts:
-        location_chart = generate_chart("Location of Participants", location_counts)
-        charts.append(
-            {"title": "Location of Participants", "image_base64": location_chart}
+        charts_data.append(
+            {
+                "chart_id": "locationChart",
+                "title": "Location of Participants",
+                "labels": list(location_counts.keys()),
+                "data": list(location_counts.values()),
+            }
         )
 
     # Generate charts for Likert scale / boolean fields
-    for field, title in chart_fields.items():
-        counts = {}
-        for res in responses:
-            val = getattr(res, field, None)
-            if isinstance(val, bool):
-                key = "Yes" if val else "No"
-            elif val is not None:
-                key = str(val)
-            else:
-                continue
-            counts[key] = counts.get(key, 0) + 1
+    for field, title in likert_chart_fields.items():
+        counts = Counter(
+            getattr(res, field)
+            for res in responses
+            if hasattr(res, field) and getattr(res, field) is not None
+        )
         if counts:
-            chart_image = generate_chart(title, counts)
-            charts.append({"title": title, "image_base64": chart_image})
+            keys = (
+                sorted(counts.keys())
+                if not isinstance(next(iter(counts.keys())), bool)
+                else [False, True]
+            )
+            labels = (
+                ["No", "Yes"]
+                if keys and isinstance(keys[0], bool)
+                else [str(k) for k in keys]
+            )
+            data = [counts.get(k, 0) for k in keys]
+            charts_data.append(
+                {
+                    "chart_id": f"{field}Chart",
+                    "title": title,
+                    "labels": labels,
+                    "data": data,
+                }
+            )
 
     # Engaging Activities chart: split comma-separated values and count each
     engaging_counts = Counter()
@@ -1075,9 +1114,13 @@ def feedback_dashboard(request):
             engaging_counts.update(activities)
 
     if engaging_counts:
-        engaging_chart = generate_chart("Most Engaging Activities", engaging_counts)
-        charts.append(
-            {"title": "Most Engaging Activities", "image_base64": engaging_chart}
+        charts_data.append(
+            {
+                "chart_id": "engagingActivitiesChart",
+                "title": "Most Engaging Activities",
+                "labels": list(engaging_counts.keys()),
+                "data": list(engaging_counts.values()),
+            }
         )
 
     return render(
@@ -1086,16 +1129,21 @@ def feedback_dashboard(request):
         {
             "responses": responses,
             "total_responses": total_responses,
-            "charts": charts,
+            "charts_data": charts_data,
+            "conferences": conferences,
+            "selected_conference_id": selected_conference_id or "",
         },
     )
 
 
 def reflection_dashboard(request):
-    if not (request.user.is_superuser or request.user.is_staff):
-        return redirect("home")
+
+    conferences = Conference.objects.filter(is_published=True).order_by("title")
+    selected_conference_id = request.GET.get("conference_id")
 
     responses = ReflectionSurveyResponse.objects.all().order_by("-submitted_at")
+    if selected_conference_id:
+        responses = responses.filter(conference_id=selected_conference_id)
     total = responses.count()
 
     chart_fields = {
@@ -1117,24 +1165,41 @@ def reflection_dashboard(request):
         "org_willing_to_partner": "Willing to Partner with LUD",
     }
 
-    charts = []
+    charts_data = []
     for field, title in chart_fields.items():
-        counts = {}
-        for res in responses:
-            val = getattr(res, field, None)
-            if isinstance(val, bool):
-                key = "Yes" if val else "No"
-            elif val is not None:
-                key = str(val)
-            else:
-                continue
-            counts[key] = counts.get(key, 0) + 1
+        counts = Counter(
+            getattr(res, field)
+            for res in responses
+            if hasattr(res, field) and getattr(res, field) is not None
+        )
         if counts:
-            image = generate_chart(title, counts)
-            charts.append({"title": title, "image_base64": image})
+            labels = (
+                ["Yes", "No"]
+                if isinstance(list(counts.keys())[0], bool)
+                else [str(k) for k in sorted(counts.keys())]
+            )
+            data = (
+                [counts.get(True, 0), counts.get(False, 0)]
+                if isinstance(list(counts.keys())[0], bool)
+                else [counts[k] for k in sorted(counts.keys())]
+            )
+            charts_data.append(
+                {
+                    "chart_id": f"{field}Chart",
+                    "title": title,
+                    "labels": labels,
+                    "data": data,
+                }
+            )
 
     return render(
         request,
         "forms/reflection_dashboard.html",
-        {"responses": responses, "total_responses": total, "charts": charts},
+        {
+            "responses": responses,
+            "total_responses": total,
+            "charts_data": charts_data,
+            "conferences": conferences,
+            "selected_conference_id": selected_conference_id or "",
+        },
     )

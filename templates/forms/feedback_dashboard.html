@@ -1,48 +1,93 @@
 {% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Feedback Dashboard{% endblock %}
-
-{% block styles %}
-{% endblock styles %}
 
 {% block content %}
-{% include 'partials/nav.html' %}
 
-<div class="container my-5">
-  <h3 class="mb-4">📊 Feedback Survey Dashboard</h3>
+    <nav aria-label="breadcrumb" class="bg-light py-2">
+        <ol class="breadcrumb container mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'conference' %}">Conference Toolkit</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Feedback Dashboard</li>
+        </ol>
+    </nav>
 
-  <div class="alert alert-info mb-3">
-    Total Submissions: <strong>{{ total_responses }}</strong>
-  </div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-3">Feedback Survey Dashboard</h1>
 
-  <div class="row">
-    <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-      <p class="text-center fw-bold">
-        Age Distribution of Participants
-      </p>
-        <div id="age-chart"></div>
+                <form method="get" class="row g-2 align-items-end mb-3">
+                    <div class="col-md-6">
+                        <label for="conferenceFilter" class="form-label">Filter by Conference</label>
+                        <select name="conference_id" id="conferenceFilter" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Conferences</option>
+                            {% for conf in conferences %}
+                                <option value="{{ conf.conference_id }}" {% if selected_conference_id == conf.conference_id|stringformat:'s' %}selected{% endif %}>
+                                    {{ conf.title }} ({{ conf.start_date }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" type="submit">Apply</button>
+                    </div>
+                </form>
+
+                <p class="lead">Total Responses: {{ total_responses }}</p>
+                <hr/>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for chart in charts_data %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header fw-bold">
+                            {{ chart.title }}
+                        </div>
+                        <div class="card-body">
+                            <canvas id="{{ chart.chart_id }}"></canvas>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p>No data available to display charts.</p>
+                </div>
+            {% endfor %}
+        </div>
     </div>
-    <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-      <p class="text-center fw-bold">
-        I felt motivated to volunteer or serve my community after attending the conference.
-      </p>
-        <div id="q1-chart"></div>
-    </div>    
-    <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-      <p class="text-center fw-bold">
-        Profession.
-      </p>
-        <div id="profession"></div>
-    </div>
-    
-  </div>
 
-</div>
+    {{ charts_data|json_script:"charts-data" }}
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartsData = JSON.parse(document.getElementById('charts-data').textContent);
+
+            chartsData.forEach(chartInfo => {
+                const ctx = document.getElementById(chartInfo.chart_id).getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartInfo.labels,
+                        datasets: [{
+                            label: '# of Responses',
+                            data: chartInfo.data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}
-
-{% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script src="{% static 'scripts/feedback_dashboard.js' %}"></script>
-{% endblock scripts %}
