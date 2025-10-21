@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="my-5 border p-3">
+<div class="container my-5 p-3">
     <div class="row">
         <div class="col-sm-12 col-md-6">
             <div class="col-12">
@@ -10,12 +10,6 @@
                 {% endif %}
             </div>
             <div class="col-12">
-                <div>
-                    {{ conference.location }} | {{ conference.venue }}
-                </div>
-                <div class="mb-3 fst-italic">
-                    {{ conference.start_date }} - {{ conference.end_date }}
-                </div>
                 <div class="mb-3">
                     {% if conference_details.conference_brochure %}
                     <hr />
@@ -27,19 +21,21 @@
                     <hr />
                     {% endif %}
                 </div>
-                <div>
-                    <small>
-                        {{ conference.created_at|timesince }}
-                    </small>
-                </div>
             </div>
         </div>
         <form method="POST" class="col-sm-12 col-md-6">
             {% csrf_token %}
             <div class="col-12 text-center mb-4 fs-5 mt-4">
-                Register to LUD Conference <br />
-                #{{ conference.pk }}
-                <hr />
+                Register to LUD Conference
+                <div class="fw-bold">
+                    {{ conference.location }} | {{ conference.venue }}
+                </div>
+                <div class="fst-italic">
+                    {{ conference.start_date }} - {{ conference.end_date }}
+                </div>
+                <small>
+                     #{{ conference.pk }}
+                </small>
             </div>
             <div class="col-12 mb-3">
                 <div class="form-floating">

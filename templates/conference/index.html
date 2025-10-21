@@ -3,103 +3,137 @@
 
 {% block content %}
 
-    <div class="row m-0">
-        <div class="col-12 text-center fw-boldder fs-3">
-            Upcoming LUD Conferences
-        </div>
+<div class="row m-0">
+    <div class="col-12 text-center fw-boldder fs-3 mt-3">
+        Upcoming LUD Conferences
+    </div>
 
-        <div class="col-12 py-3">
-
-            {% if conferences %}
-                {% for conf in conferences %}
-
-                    <div class="card mb-3">
-                        <div class="row p-1">
-                            <div class="col-md-3 d-flex justify-content-center">
-                                {% for confdetail in conference_details %}
-                                    {% if conf.pk == confdetail.conference_id %}
-                                        {% if confdetail.conference_banner %}
-                                            <img src="{{ confdetail.conference_banner.url }}" class="img-fluid"
-                                                 alt="...">
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            <div class="col-md-9">
-                                <div class="card-body">
-                                    <div class="float-end mb-3">
-                                        <a class="btn btn-sm btn-warning"
-                                           href="{% url 'one_time_registration' conf.pk %}">
-                                            <i class="fa-regular fa-circle-check"></i>
-                                            Participate
-                                        </a>
-                                        <a class="btn btn-sm btn-success"
-                                           href="{% url 'conference_details' conf.pk %}">
-                                            <i class="fa-solid fa-eye"></i>
-                                            View More
-                                        </a>
-                                    </div>
-                                    <h5 class="card-title text-wrap">
-                                        {{ conf.title }}
-                                    </h5>
-                                    <p class="card-text">
-                                       <span class="fw-bold">
-                                         {% for confdetail in conference_details %}
-                                             {% if conf.pk == confdetail.conference_id %}
-                                                 {{ confdetail.conference_theme }}
-                                             {% endif %}
-                                         {% endfor %}
-                                        </span> <br/>
-                                        {% for confdetail in conference_details %}
-                                            {% if conf.pk == confdetail.conference_id %}
-                                                {{ confdetail.conference_description }}
-                                            {% endif %}
-                                        {% endfor %}
-                                    </p>
-                                    <p class="card-text">
-                                        {{ conf.location }} | {{ conf.venue }} <br/>
-                                        <span class="fst-italic">
-                                            {{ conf.start_date }} | {{ conf.end_date }}
-                                        </span>
-                                    </p>
-                                    <div class="card-text">
-                                        <i class="fa-solid fa-user-large"></i> Contact People: <br/>
-                                        <div class="row mt-2">
-                                            <div class="col-sm-12 col-md-4">
-                                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} <br/>
-                                                <i class="fa-solid fa-phone"></i> {{ conf.mobile1 }}
-                                            </div>
-                                            <div class="col-sm-12 col-md-4">
-                                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} <br/>
-                                                <i class="fa-solid fa-phone"></i> {{ conf.mobile2 }}
-                                            </div>
-                                            <div class="col-sm-12 col-md-4">
-                                                <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }} <br/>
-                                                <i class="fa-solid fa-phone"></i> {{ conf.mobile3 }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="card-text mt-3">
-                                        <small class="text-body-secondary">
-                                            <small class="text-body-secondary">
-                                                Posted {{ conf.created_at|timesince }} ago.
-                                            </small>
-                                        </small>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+    {% if conferences %}
+    <div class="row row-cols-1 row-cols-md-2 g-2 align-items-stretch mt-3 mb-5">
+        {% for conf in conferences %}
+        <div class="col d-flex">
+            <div class="card flex-fill h-100">
+                <div class="row g-0 h-100">
+                    <div class="col-md-3">
+                        {% for confdetail in conference_details %}
+                        {% if conf.pk == confdetail.conference_id %}
+                        {% if confdetail.conference_banner %}
+                        <img src="{{ confdetail.conference_banner.url }}" class="img-fluid h-100 object-fit-cover"
+                            alt="...">
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
                     </div>
 
-                {% endfor %}
-            {% else %}
-                <div class="text-center p-5 mt-5 fw-bolder border">
-                    No conferences added yet.
+                    <div class="col-md-9 d-flex flex-column">
+                        <div class="card-body flex-grow-1">
+                            <div class="float-end mb-3">
+                                <a class="btn btn-sm btn-warning" href="{% url 'one_time_registration' conf.pk %}">
+                                    <i class="fa-regular fa-circle-check"></i> Participate
+                                </a>
+                                <a class="btn btn-sm btn-success" href="{% url 'conference_details' conf.pk %}">
+                                    <i class="fa-solid fa-eye"></i> View More
+                                </a>
+                            </div>
+                            <h5 class="card-title text-wrap">{{ conf.title }}</h5>
+                            <p class="card-text">
+                                <span class="fw-bold">
+                                    {% for confdetail in conference_details %}
+                                    {% if conf.pk == confdetail.conference_id %}
+                                    {{ confdetail.conference_theme }}
+                                    {% endif %}
+                                    {% endfor %}
+                                </span><br>
+                                {% for confdetail in conference_details %}
+                                {% if conf.pk == confdetail.conference_id %}
+                                {{ confdetail.conference_description|truncatechars:250 }}
+                                {% endif %}
+                                {% endfor %}
+                            </p>
+                            <p class="card-text">
+                                {{ conf.location }} | {{ conf.venue }}<br>
+                                <span class="fst-italic">
+                                    {{ conf.start_date }} | {{ conf.end_date }}
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="p-3 border-top">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fa-solid fa-user-large me-2"></i>
+                                <span class="fw-semibold">Contacts</span>
+                            </div>
+                            {% if conf.organizer1 or conf.organizer2 or conf.organizer3 %}
+                            <div class="row g-3 text-wrap">
+                                {% if conf.organizer1 %}
+                                <div class="col-12 col-md-4">
+                                    <div class="p-2 border rounded h-100">
+                                        <div class="small text-truncate">
+                                            <i class="fa-regular fa-envelope me-1"></i>
+                                            <a href="mailto:{{ conf.organizer1 }}">{{ conf.organizer1 }}</a>
+                                        </div>
+                                        {% if conf.mobile1 %}
+                                        <div class="small mt-1">
+                                            <i class="fa-solid fa-phone me-1"></i>
+                                            <a href="tel:{{ conf.mobile1 }}">{{ conf.mobile1 }}</a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if conf.organizer2 %}
+                                <div class="col-12 col-md-4">
+                                    <div class="p-2 border rounded h-100">
+                                        <div class="small text-truncate">
+                                            <i class="fa-regular fa-envelope me-1"></i>
+                                            <a href="mailto:{{ conf.organizer2 }}">{{ conf.organizer2 }}</a>
+                                        </div>
+                                        {% if conf.mobile2 %}
+                                        <div class="small mt-1">
+                                            <i class="fa-solid fa-phone me-1"></i>
+                                            <a href="tel:{{ conf.mobile2 }}">{{ conf.mobile2 }}</a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if conf.organizer3 %}
+                                <div class="col-12 col-md-4">
+                                    <div class="p-2 border rounded h-100">
+                                        <div class="small text-truncate">
+                                            <i class="fa-regular fa-envelope me-1"></i>
+                                            <a href="mailto:{{ conf.organizer3 }}">{{ conf.organizer3 }}</a>
+                                        </div>
+                                        {% if conf.mobile3 %}
+                                        <div class="small mt-1">
+                                            <i class="fa-solid fa-phone me-1"></i>
+                                            <a href="tel:{{ conf.mobile3 }}">{{ conf.mobile3 }}</a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="text-muted small">No contact information available.</div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
-
+            </div>
         </div>
-
+        {% endfor %}
     </div>
+
+    {% else %}
+
+    <div class="text-center p-5 mt-5 fw-bolder border">
+        No conferences added yet.
+    </div>
+
+    {% endif %}
+
+
+</div>
 
 {% endblock content %}
