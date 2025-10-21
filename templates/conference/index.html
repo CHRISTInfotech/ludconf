@@ -35,15 +35,15 @@
                                     <i class="fa-solid fa-eye"></i> View More
                                 </a>
                             </div>
-                            <h3 class="card-title text-wrap">{{ conf.location }} - {{ conf.start_date }}</h3>
-                            <h5> {{ conf.venue }}</h5>
-                            <p class="fw-bold mt-3">
+                            <h3 class="card-title text-wrap fw-bold">{{ conf.location }} - {{ conf.start_date }}</h3>
+                            <h4> {{ conf.venue }}</h4>
+                            <h5 class="fst-italic mt-3">
                                 {% for confdetail in conference_details %}
                                 {% if conf.pk == confdetail.conference_id %}
                                 {{ confdetail.conference_theme }}
                                 {% endif %}
                                 {% endfor %}
-                            </p>
+                            </h5>
                             <p class="card-text">
                                 {% for confdetail in conference_details %}
                                 {% if conf.pk == confdetail.conference_id %}
