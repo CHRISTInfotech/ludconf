@@ -37,9 +37,6 @@
                             </div>
                             <h3 class="card-title text-wrap">{{ conf.location }} - {{ conf.start_date }}</h3>
                             <h5> {{ conf.venue }}</h5>
-                            <p class="card-text">
-                                {{ conf.title }}
-                            </p>
                             <p class="fw-bold mt-3">
                                 {% for confdetail in conference_details %}
                                 {% if conf.pk == confdetail.conference_id %}
