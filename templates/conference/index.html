@@ -35,26 +35,24 @@
                                     <i class="fa-solid fa-eye"></i> View More
                                 </a>
                             </div>
-                            <h5 class="card-title text-wrap">{{ conf.title }}</h5>
+                            <h3 class="card-title text-wrap">{{ conf.location }} - {{ conf.start_date }}</h3>
+                            <h5> {{ conf.venue }}</h5>
                             <p class="card-text">
-                                <span class="fw-bold">
-                                    {% for confdetail in conference_details %}
-                                    {% if conf.pk == confdetail.conference_id %}
-                                    {{ confdetail.conference_theme }}
-                                    {% endif %}
-                                    {% endfor %}
-                                </span><br>
+                                {{ conf.title }}
+                            </p>
+                            <p class="fw-bold mt-3">
                                 {% for confdetail in conference_details %}
                                 {% if conf.pk == confdetail.conference_id %}
-                                {{ confdetail.conference_description|truncatechars:250 }}
+                                {{ confdetail.conference_theme }}
                                 {% endif %}
                                 {% endfor %}
                             </p>
                             <p class="card-text">
-                                {{ conf.location }} | {{ conf.venue }}<br>
-                                <span class="fst-italic">
-                                    {{ conf.start_date }} | {{ conf.end_date }}
-                                </span>
+                                {% for confdetail in conference_details %}
+                                {% if conf.pk == confdetail.conference_id %}
+                                {{ confdetail.conference_description|truncatechars:150 }}
+                                {% endif %}
+                                {% endfor %}
                             </p>
                         </div>
 
