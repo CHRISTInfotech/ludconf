@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
@@ -9,9 +9,9 @@
     </div>
 
     {% if conferences %}
-    <div class="row row-cols-1 row-cols-md-2 g-5 align-items-stretch mt-3 mb-5">
+    <div class="row row-cols-1 row-cols-md-2 g-0 g-md-5 align-items-stretch mt-3 mb-5">
         {% for conf in conferences %}
-        <div class="col d-flex">
+        <div class="col d-flex mb-3">
             <div class="card flex-fill h-100">
                 <div class="row g-0 h-100">
                     <div class="col-md-3">
