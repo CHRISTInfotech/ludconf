@@ -1,7 +1,7 @@
 from django.urls import path
 
 from conference.views import (
-    home, ludlogin, dashboard, adminconferencecreate, ludlogout, adminlistactiveconference,
+    download_feedback_survey, download_reflection_survey, home, ludlogin, dashboard, adminconferencecreate, ludlogout, adminlistactiveconference,
     adminlistcompletedconference, ludregister, ludregister_step_2, ludregister_step_3, registeredconference,
     participateconference, participatedconference, adminmanageconference, adminconferencestatuschange,
     stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass,
@@ -43,4 +43,7 @@ urlpatterns = [
     path('conference/reflection/', reflection_survey, name='reflection_survey'),
     path('conference/feedback-dashboard/', feedback_dashboard, name='feedback_dashboard'),
     path('conference/reflection-dashboard/', reflection_dashboard, name='reflection_dashboard'),
+
+    path('download-feedback-survey/<str:conference_id>/', download_feedback_survey, name='download_feedback_survey'),
+    path('download-reflection-survey/<str:conference_id>/', download_reflection_survey, name='download_reflection_survey'),
 ]
