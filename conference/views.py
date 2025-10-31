@@ -5,9 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
+from datetime import datetime
 from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
 from collections import Counter
 from conference.functions import generate_otp
+
 from conference.mails import send_otp_email
 from conference.models import (
     Conference,
@@ -1203,3 +1208,194 @@ def reflection_dashboard(request):
             "selected_conference_id": selected_conference_id or "",
         },
     )
+
+def download_feedback_survey(request, conference_id):
+    """Download feedback survey responses as Excel file"""
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to download this report.")
+        return redirect('dashboard')
+    
+    conference = get_object_or_404(Conference, conference_id=conference_id)
+    responses = FeedbackSurveyResponse.objects.filter(
+        conference=conference
+    ).order_by('-submitted_at')
+    
+    # Create workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Feedback Survey"
+    
+    # Define headers
+    headers = [
+        'Submission Date', 'Full Name', 'Email', 'Phone', 'Age', 'Gender',
+        'Occupation', 'Occupation Other', 'Location Type', 'First Time',
+        'Q9.1 (Volunteering Interest)', 'Q9.2 (Sense of Belonging)',
+        'Q9.3 (Inspired by Speakers)', 'Q9.4 (Practical Insights)',
+        'Q9.5 (Reflection on Role)', 'Q10.1 (Confidence to Start)',
+        'Q10.2 (Service Models)', 'Q10.3 (Motivated to Serve)',
+        'Q10.4 (Social Issues Awareness)', 'Q10.5 (Connected with Orgs)',
+        'Q11.1 (Learned New Concepts)', 'Q11.2 (Understanding Needs)',
+        'Q11.3 (Applicable Learnings)', 'Q11.4 (Problem Solving)',
+        'Q12.1 (Met Similar Goals)', 'Q12.2 (Gained Mentorship)',
+        'Q12.3 (Collaboration Opportunities)', 'Q12.4 (New Partnerships)',
+        'Q12.5 (Strengthened Relationships)', 'Follow-up Study Interest',
+        'Overall Satisfaction', 'Engaging Activities', 'Key Takeaways',
+        'Suggestions', 'Team Interest'
+    ]
+    
+    # Style headers
+    header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF")
+    
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num, value=header)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    
+    # Add data
+    for row_num, response in enumerate(responses, 2):
+        ws.cell(row=row_num, column=1, value=response.submitted_at.strftime('%Y-%m-%d %H:%M'))
+        ws.cell(row=row_num, column=2, value=response.full_name)
+        ws.cell(row=row_num, column=3, value=response.email)
+        ws.cell(row=row_num, column=4, value=response.phone or '')
+        ws.cell(row=row_num, column=5, value=response.age or '')
+        ws.cell(row=row_num, column=6, value=response.gender or '')
+        ws.cell(row=row_num, column=7, value=response.occupation or '')
+        ws.cell(row=row_num, column=8, value=response.occupation_other or '')
+        ws.cell(row=row_num, column=9, value=response.location_type or '')
+        ws.cell(row=row_num, column=10, value='Yes' if response.first_time else 'No')
+        ws.cell(row=row_num, column=11, value=response.q9_1)
+        ws.cell(row=row_num, column=12, value=response.q9_2)
+        ws.cell(row=row_num, column=13, value=response.q9_3)
+        ws.cell(row=row_num, column=14, value=response.q9_4)
+        ws.cell(row=row_num, column=15, value=response.q9_5)
+        ws.cell(row=row_num, column=16, value=response.q10_1)
+        ws.cell(row=row_num, column=17, value=response.q10_2)
+        ws.cell(row=row_num, column=18, value=response.q10_3)
+        ws.cell(row=row_num, column=19, value=response.q10_4)
+        ws.cell(row=row_num, column=20, value=response.q10_5)
+        ws.cell(row=row_num, column=21, value=response.q11_1)
+        ws.cell(row=row_num, column=22, value=response.q11_2)
+        ws.cell(row=row_num, column=23, value=response.q11_3)
+        ws.cell(row=row_num, column=24, value=response.q11_4)
+        ws.cell(row=row_num, column=25, value=response.q12_1)
+        ws.cell(row=row_num, column=26, value=response.q12_2)
+        ws.cell(row=row_num, column=27, value=response.q12_3)
+        ws.cell(row=row_num, column=28, value=response.q12_4)
+        ws.cell(row=row_num, column=29, value=response.q12_5)
+        ws.cell(row=row_num, column=30, value='Yes' if response.followup_study else 'No')
+        ws.cell(row=row_num, column=31, value=response.satisfaction)
+        ws.cell(row=row_num, column=32, value=response.engaging_activity or '')
+        ws.cell(row=row_num, column=33, value=response.takeaways or '')
+        ws.cell(row=row_num, column=34, value=response.suggestions or '')
+        ws.cell(row=row_num, column=35, value='Yes' if response.team_interest else 'No')
+    
+    # Adjust column widths
+    for column in ws.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+    
+    # Prepare response
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    filename = f"Feedback_Survey_{conference.title}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    wb.save(response)
+    return response
+
+
+def download_reflection_survey(request, conference_id):
+    """Download reflection survey responses as Excel file"""
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to download this report.")
+        return redirect('dashboard')
+    
+    conference = get_object_or_404(Conference, conference_id=conference_id)
+    responses = ReflectionSurveyResponse.objects.filter(
+        conference=conference
+    ).order_by('-submitted_at')
+    
+    # Create workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Reflection Survey"
+    
+    # Define headers
+    headers = [
+        'Submission Date', 'Full Name', 'Email', 'Occupation', 'Occupation Other',
+        'Connected with New People', 'Stayed in Touch', 'Found Opportunities',
+        'Motivated to Volunteer', 'Participated Due to Conference',
+        'Engaged in Theme', 'Improved Knowledge', 'Philosophy Applied',
+        'More Informed', 'Leadership Enhanced', 'More Socially Engaged',
+        'More Socially Sensitive', 'Making Impact', 'Key Takeaway',
+        'Would Recommend', 'Stay Involved', 'Willing to Partner'
+    ]
+    
+    # Style headers
+    header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF")
+    
+    for col_num, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col_num, value=header)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+    
+    # Add data
+    for row_num, response in enumerate(responses, 2):
+        ws.cell(row=row_num, column=1, value=response.submitted_at.strftime('%Y-%m-%d %H:%M'))
+        ws.cell(row=row_num, column=2, value=response.full_name)
+        ws.cell(row=row_num, column=3, value=response.email)
+        ws.cell(row=row_num, column=4, value=response.occupation or '')
+        ws.cell(row=row_num, column=5, value=response.occupation_other or '')
+        ws.cell(row=row_num, column=6, value=response.connect_new or '')
+        ws.cell(row=row_num, column=7, value=response.stayed_in_touch or '')
+        ws.cell(row=row_num, column=8, value=response.opportunities_found or '')
+        ws.cell(row=row_num, column=9, value=response.motivated_to_volunteer or '')
+        ws.cell(row=row_num, column=10, value=response.participated_due_to_conf or '')
+        ws.cell(row=row_num, column=11, value=response.engaged_in_theme or '')
+        ws.cell(row=row_num, column=12, value=response.improved_knowledge or '')
+        ws.cell(row=row_num, column=13, value=response.philosophy_applied or '')
+        ws.cell(row=row_num, column=14, value=response.more_informed or '')
+        ws.cell(row=row_num, column=15, value=response.leadership_enhanced or '')
+        ws.cell(row=row_num, column=16, value=response.more_socially_engaged or '')
+        ws.cell(row=row_num, column=17, value=response.more_socially_sensitive or '')
+        ws.cell(row=row_num, column=18, value=response.making_impact or '')
+        ws.cell(row=row_num, column=19, value=response.key_takeaway or '')
+        ws.cell(row=row_num, column=20, value='Yes' if response.recommend else 'No')
+        ws.cell(row=row_num, column=21, value='Yes' if response.stay_involved else 'No')
+        ws.cell(row=row_num, column=22, value='Yes' if response.org_willing_to_partner else 'No')
+    
+    # Adjust column widths
+    for column in ws.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = min(max_length + 2, 50)
+        ws.column_dimensions[column_letter].width = adjusted_width
+    
+    # Prepare response
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    filename = f"Reflection_Survey_{conference.title}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    wb.save(response)
+    return response
