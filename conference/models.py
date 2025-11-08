@@ -97,7 +97,7 @@ OCCUPATION_CHOICES = [
 ]
 
 class FeedbackSurveyResponse(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
 
     # Personal Information
