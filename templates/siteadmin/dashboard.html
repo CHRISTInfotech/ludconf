@@ -37,35 +37,55 @@
                     <th>Registration #</th>
                     <th>Status</th>
                     <th>Manage</th>
-                    <th>Participants</th>
+                    
                 </tr>
                 </thead>
                 <tbody>
-                {% for registration in registrations %}
+                    {% for registration in registrations %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <th scope="row">{{ registration.title }}</th>
                         <td>{{ registration.registration_count }}</td>
                         <td>
                             {% if registration.is_published %}
-                                Active
+                                <span class="badge bg-success">Active</span>
                             {% else %}
-                                In-Active
+                                <span class="badge bg-secondary">In-Active</span>
                             {% endif %}
                         </td>
                         <td>
-                            <a class="btn btn-sm btn-warning"
-                               href="{% url 'admin_manage_conference' registration.conference_id %}">
-                                <i class="fa-regular fa-circle-check"></i>
-                                Manage
-                            </a>
-                        </td>
-                        <td>
-                            <a class="btn btn-sm btn-warning "
-                               href="{% url 'download_registration_details' registration.conference_id %}">
-                                <i class="fa-regular fa-circle-check"></i>
-                                Download Registration
-                            </a>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-warning dropdown-toggle" 
+                                        type="button" 
+                                        id="actionsDropdown{{ registration.conference_id }}" 
+                                        data-bs-toggle="dropdown" 
+                                        aria-expanded="false">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i> Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ registration.conference_id }}">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'admin_manage_conference' registration.conference_id %}">
+                                            <i class="fa-solid fa-gear"></i> Manage Conference
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'download_registration_details' registration.conference_id %}">
+                                            <i class="fa-solid fa-download"></i> Download Registrations
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'download_feedback_survey' registration.conference_id %}">
+                                            <i class="fa-solid fa-file-excel"></i> Download Feedback Survey
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'download_reflection_survey' registration.conference_id %}">
+                                            <i class="fa-solid fa-file-excel"></i> Download Reflection Survey
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}
