@@ -158,7 +158,7 @@ class FeedbackSurveyResponse(models.Model):
 
 
 class ReflectionSurveyResponse(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     conference = models.ForeignKey('Conference', on_delete=models.CASCADE)
     submitted_at = models.DateTimeField(auto_now_add=True)
     
