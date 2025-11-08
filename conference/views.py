@@ -919,8 +919,10 @@ def feedback_survey(request):
                 ", ".join(engaging_activities) if engaging_activities else None
             )
 
+            user = request.user if request.user.is_authenticated else "None"
+
             FeedbackSurveyResponse.objects.create(
-                user=request.user,
+                user=user,
                 conference=selected_conference,
                 full_name=request.POST.get("full_name"),
                 email=request.POST.get("email"),
