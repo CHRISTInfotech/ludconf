@@ -970,7 +970,7 @@ def feedback_survey(request):
             )
 
             messages.success(request, "Thank you for your feedback!")
-            return redirect("dashboard")
+            return redirect("ludlogin")
 
         else:
             messages.error(request, "Please fill in all required fields.")
@@ -1020,7 +1020,7 @@ def reflection_survey(request):
                 == "True",
             )
             messages.success(request, "Thank you for your reflection!")
-            return redirect("dashboard")
+            return redirect("ludlogin")
 
     return render(
         request,
