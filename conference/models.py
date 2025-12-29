@@ -38,7 +38,7 @@ class OTPRequest(models.Model):
 class UserDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     gender = models.CharField(max_length=10)
-    dob = models.DateField()
+    city_location = models.CharField(max_length=255, blank=True, null=True)
     designation = models.CharField(max_length=255)
     organization = models.CharField(max_length=255)
     mobile = models.CharField(max_length=255)

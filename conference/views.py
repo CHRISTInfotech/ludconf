@@ -120,7 +120,7 @@ def ludregister_step_3(request, email):
             first_name = request.POST.get("firstname")
             last_name = request.POST.get("lastname")
             gender = request.POST.get("gender")
-            dob = request.POST.get("dob")
+            city_location = request.POST.get("city_location")
             designation = request.POST.get("designation")
             organization = request.POST.get("organization")
             mobile = request.POST.get("mobile")
@@ -149,7 +149,7 @@ def ludregister_step_3(request, email):
                 userdetails = UserDetails(
                     user=user,
                     gender=gender,
-                    dob=dob,
+                    city_location=city_location,
                     designation=designation,
                     organization=organization,
                     mobile=mobile,
@@ -767,7 +767,7 @@ def download_registration_details(request, conference_id):
             "user__email",
             "user__userdetails__mobile",
             "user__userdetails__gender",
-            "user__userdetails__dob",
+            "user__userdetails__city_location",
             "user__userdetails__designation",
             "user__userdetails__organization",
         )
@@ -803,7 +803,7 @@ def one_time_participation(request, conference_id):
             first_name = request.POST["firstname"]
             last_name = request.POST["lastname"]
             gender = request.POST["gender"]
-            dob = request.POST["dob"]
+            city_location = request.POST["city_location"]
             designation = request.POST["designation"]
             orgnization = request.POST["organization"]
             mobile = request.POST["mobile"]
@@ -826,7 +826,7 @@ def one_time_participation(request, conference_id):
                 userdetails = UserDetails(
                     user=user,
                     gender=gender,
-                    dob=dob,
+                    city_location=city_location,
                     designation=designation,
                     organization=orgnization,
                     mobile=mobile,

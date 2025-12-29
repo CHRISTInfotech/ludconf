@@ -13,7 +13,9 @@
         <div class="col-12">
             <div class="row m-0">
                 <div class="col-sm-12 col-md-4">
-                    <img src="{{ conferenceDetails.conference_banner.url }}" class="img-fluid " alt="...">
+                    {% if conferenceDetails and conferenceDetails.conference_banner %}
+                        <img src="{{ conferenceDetails.conference_banner.url }}" class="img-fluid" alt="...">
+                    {% endif %}
                 </div>
                 <div class="col-sm-12 col-md-8">
                     <div class="fw-bolder fs-2 mb-2">
@@ -32,6 +34,10 @@
                                 <i class="fa-solid fa-download"></i>
                                 Download Brochure
                             </a>
+                        </div>
+                    {% endif %}
+                    {% if conferenceDetails and conferenceDetails.conference_banner %}
+                        <div class="mb-2">
                             <a class="btn btn-sm btn-success" href="{{ conferenceDetails.conference_banner.url }}"
                                target="_blank">
                                 <i class="fa-solid fa-download"></i>

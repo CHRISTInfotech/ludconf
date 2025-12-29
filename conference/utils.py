@@ -20,12 +20,12 @@ def export_to_excel(queryset):
                'user__email',
                'user__userdetails__mobile',
                'user__userdetails__gender',
-               'user__userdetails__dob',
+               'user__userdetails__city_location',
                'user__userdetails__designation',
                'user__userdetails__organization']
 
     columns_to_excel = ['Registration Date', 'Participat Interest', 'First Name', 'Last Name', 'Email', 'Mobile Number',
-                        'Gender', 'DOB', 'Designation', 'Organization']
+                        'Gender', 'City/Location', 'Designation', 'Organization']
 
     # Header row (optional styling for bold)
     for col_num, column in enumerate(columns_to_excel, 1):

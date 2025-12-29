@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ih_1e!$x1sys6fb13r&p9b95#o)iia6)&ea%zq!o5bha@yaq49'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     ALLOWED_HOSTS = ['*']
@@ -136,5 +136,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'office@letusdream.org'
-EMAIL_HOST_PASSWORD = 'banm rvfd dirs tgrv'  # Use the generated app password here
+EMAIL_HOST_PASSWORD = 'ohrp pram bfvw jcyd'  # Use the generated app password here
 DEFAULT_FROM_EMAIL = 'office@letusdream.org'
