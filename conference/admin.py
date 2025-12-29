@@ -22,9 +22,9 @@ class FeedbackSurveyResponseAdmin(admin.ModelAdmin):
 
 @admin.register(ReflectionSurveyResponse)
 class ReflectionSurveyResponseAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'email', 'conference', 'occupation', 'recommend', 'submitted_at')
-    list_filter = ('conference', 'occupation', 'recommend', 'submitted_at')
-    search_fields = ('full_name', 'email', 'conference__title')
+    list_display = ('full_name', 'email', 'location', 'occupation', 'recommend', 'submitted_at')
+    list_filter = ('location', 'occupation', 'recommend', 'submitted_at')
+    search_fields = ('full_name', 'email', 'location')
     ordering = ('-submitted_at',)
     readonly_fields = ('submitted_at',)
 

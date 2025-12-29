@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from openpyxl import Workbook
@@ -982,20 +982,51 @@ def feedback_survey(request):
     )
 
 
+def _dedupe_locations(*iterables):
+    seen = set()
+    locations = []
+    for iterable in iterables:
+        for raw_location in iterable:
+            if not raw_location:
+                continue
+            cleaned = raw_location.strip()
+            if not cleaned:
+                continue
+            key = cleaned.casefold()
+            if key in seen:
+                continue
+            seen.add(key)
+            locations.append(cleaned)
+    return sorted(locations, key=str.casefold)
+
+
+def _get_location_suggestions():
+    response_locations = (
+        ReflectionSurveyResponse.objects.exclude(location__isnull=True)
+        .exclude(location__exact="")
+        .values_list("location", flat=True)
+    )
+    conference_locations = (
+        Conference.objects.exclude(location__isnull=True)
+        .exclude(location__exact="")
+        .values_list("location", flat=True)
+    )
+    return _dedupe_locations(response_locations, conference_locations)
+
+
 def reflection_survey(request):
-    conferences = Conference.objects.filter(is_published=True)
+    locations = _get_location_suggestions()
+    entered_location = ""
 
-    selected_conference = None
     if request.method == "POST":
-        selected_id = request.POST.get("conference_id")
-        if selected_id:
-            selected_conference = Conference.objects.get(conference_id=selected_id)
-
-        if "full_name" in request.POST:
+        entered_location = (request.POST.get("location") or "").strip()
+        if not entered_location:
+            messages.error(request, "Please provide a location.")
+        else:
             user = request.user if request.user.is_authenticated else None
             ReflectionSurveyResponse.objects.create(
                 user=user,
-                conference=selected_conference,
+                location=entered_location,
                 full_name=request.POST.get("full_name"),
                 email=request.POST.get("email"),
                 occupation=request.POST.get("occupation"),
@@ -1025,7 +1056,7 @@ def reflection_survey(request):
     return render(
         request,
         "forms/reflection_survey.html",
-        {"conferences": conferences, "selected_conference": selected_conference},
+        {"locations": locations, "entered_location": entered_location},
     )
 
 
@@ -1146,13 +1177,12 @@ def feedback_dashboard(request):
 
 
 def reflection_dashboard(request):
-
-    conferences = Conference.objects.filter(is_published=True).order_by("title")
-    selected_conference_id = request.GET.get("conference_id")
+    locations = _get_location_suggestions()
+    selected_location = (request.GET.get("location") or "").strip()
 
     responses = ReflectionSurveyResponse.objects.all().order_by("-submitted_at")
-    if selected_conference_id:
-        responses = responses.filter(conference_id=selected_conference_id)
+    if selected_location:
+        responses = responses.filter(location__iexact=selected_location)
     total = responses.count()
 
     chart_fields = {
@@ -1208,8 +1238,8 @@ def reflection_dashboard(request):
             "responses": responses,
             "total_responses": total,
             "charts_data": charts_data,
-            "conferences": conferences,
-            "selected_conference_id": selected_conference_id or "",
+            "locations": locations,
+            "selected_location": selected_location,
         },
     )
 
@@ -1340,9 +1370,9 @@ def download_reflection_survey(request, conference_id):
         return redirect("dashboard")
 
     conference = get_object_or_404(Conference, conference_id=conference_id)
-    responses = ReflectionSurveyResponse.objects.filter(conference=conference).order_by(
-        "-submitted_at"
-    )
+    responses = ReflectionSurveyResponse.objects.filter(
+        Q(conference=conference) | Q(location__iexact=conference.location)
+    ).order_by("-submitted_at")
 
     # Create workbook
     wb = Workbook()
@@ -1354,6 +1384,7 @@ def download_reflection_survey(request, conference_id):
         "Submission Date",
         "Full Name",
         "Email",
+        "Location",
         "Occupation",
         "Occupation Other",
         "Connected with New People",
@@ -1392,26 +1423,27 @@ def download_reflection_survey(request, conference_id):
         ws.cell(row=row_num, column=1, value=r.submitted_at.strftime("%Y-%m-%d %H:%M"))
         ws.cell(row=row_num, column=2, value=r.full_name)
         ws.cell(row=row_num, column=3, value=r.email)
-        ws.cell(row=row_num, column=4, value=r.occupation or "")
-        ws.cell(row=row_num, column=5, value=r.occupation_other or "")
-        ws.cell(row=row_num, column=6, value=r.connect_new or "")
-        ws.cell(row=row_num, column=7, value=r.stayed_in_touch or "")
-        ws.cell(row=row_num, column=8, value=r.opportunities_found or "")
-        ws.cell(row=row_num, column=9, value=r.motivated_to_volunteer or "")
-        ws.cell(row=row_num, column=10, value=r.participated_due_to_conf or "")
-        ws.cell(row=row_num, column=11, value=r.engaged_in_theme or "")
-        ws.cell(row=row_num, column=12, value=r.improved_knowledge or "")
-        ws.cell(row=row_num, column=13, value=r.philosophy_applied or "")
-        ws.cell(row=row_num, column=14, value=r.more_informed or "")
-        ws.cell(row=row_num, column=15, value=r.leadership_enhanced or "")
-        ws.cell(row=row_num, column=16, value=r.more_socially_engaged or "")
-        ws.cell(row=row_num, column=17, value=r.more_socially_sensitive or "")
-        ws.cell(row=row_num, column=18, value=r.making_impact or "")
-        ws.cell(row=row_num, column=19, value=r.key_takeaway or "")
-        ws.cell(row=row_num, column=20, value="Yes" if r.recommend else "No")
-        ws.cell(row=row_num, column=21, value="Yes" if r.stay_involved else "No")
+        ws.cell(row=row_num, column=4, value=r.location or "")
+        ws.cell(row=row_num, column=5, value=r.occupation or "")
+        ws.cell(row=row_num, column=6, value=r.occupation_other or "")
+        ws.cell(row=row_num, column=7, value=r.connect_new or "")
+        ws.cell(row=row_num, column=8, value=r.stayed_in_touch or "")
+        ws.cell(row=row_num, column=9, value=r.opportunities_found or "")
+        ws.cell(row=row_num, column=10, value=r.motivated_to_volunteer or "")
+        ws.cell(row=row_num, column=11, value=r.participated_due_to_conf or "")
+        ws.cell(row=row_num, column=12, value=r.engaged_in_theme or "")
+        ws.cell(row=row_num, column=13, value=r.improved_knowledge or "")
+        ws.cell(row=row_num, column=14, value=r.philosophy_applied or "")
+        ws.cell(row=row_num, column=15, value=r.more_informed or "")
+        ws.cell(row=row_num, column=16, value=r.leadership_enhanced or "")
+        ws.cell(row=row_num, column=17, value=r.more_socially_engaged or "")
+        ws.cell(row=row_num, column=18, value=r.more_socially_sensitive or "")
+        ws.cell(row=row_num, column=19, value=r.making_impact or "")
+        ws.cell(row=row_num, column=20, value=r.key_takeaway or "")
+        ws.cell(row=row_num, column=21, value="Yes" if r.recommend else "No")
+        ws.cell(row=row_num, column=22, value="Yes" if r.stay_involved else "No")
         ws.cell(
-            row=row_num, column=22, value="Yes" if r.org_willing_to_partner else "No"
+            row=row_num, column=23, value="Yes" if r.org_willing_to_partner else "No"
         )
 
     # Adjust column widths safely

@@ -20,26 +20,26 @@
         <strong>* All fields are mandatory unless specified otherwise</strong>
     </p>
 
-    <form method="POST">
-        {% csrf_token %}
-        <!-- Conference Selection -->
-        <div class="form-group mb-4">
-            <label for="conference_id"><strong>Q0.</strong> Select the Conference You Attended: <span class="text-danger">*</span></label>
-            <select name="conference_id" id="conference_id" class="form-control" required onchange="this.form.submit();">
-                <option value="">-- Choose a conference --</option>
-                {% for conf in conferences %}
-                    <option value="{{ conf.conference_id }}" {% if selected_conference and conf == selected_conference %}selected{% endif %}>
-                        {{ conf.title }} ({{ conf.start_date }})
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-    </form>
-
-    {% if selected_conference %}
     <form method="POST" class="feedback-form" id="surveyForm" novalidate>
         {% csrf_token %}
-        <input type="hidden" name="conference_id" value="{{ selected_conference.conference_id }}">
+        <div class="form-group mb-4">
+            <label for="location">Conference Location Attended: <span class="text-danger">*</span></label>
+            <input
+                type="text"
+                class="form-control"
+                name="location"
+                id="location"
+                list="locationOptions"
+                value="{{ entered_location }}"
+                required
+            >
+            <datalist id="locationOptions">
+                {% for location in locations %}
+                    <option value="{{ location }}"></option>
+                {% endfor %}
+            </datalist>
+            <div class="invalid-feedback">Please provide the conference location.</div>
+        </div>
 
         <!-- Participant Information Section -->
         <div class="form-card mb-4">
@@ -348,7 +348,6 @@
             <button type="submit" class="btn btn-primary btn-lg">Submit Survey</button>
         </div>
     </form>
-    {% endif %}
 </div>
 
 <style>
