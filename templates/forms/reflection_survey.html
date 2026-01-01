@@ -34,7 +34,7 @@
                 required
             >
             <datalist id="locationOptions">
-                {% for location in locations %}
+                {% for location in locations|slice:":4" %}
                     <option value="{{ location }}"></option>
                 {% endfor %}
             </datalist>
