@@ -3,68 +3,141 @@
 
 {% block content %}
 
-    {% include 'partials/nav.html' %}
+{% include 'partials/nav.html' %}
 
-    <div class="container row m-auto py-3">
-        <div class="col-12 fs-6 fw-bold text-center mb-3">
-            Completed Conferences
-        </div>
-        <div class="">
-            <table class="table table-hover">
-                <tbody>
-                {% for conf in conferences %}
-                    <tr>
-                        <td class="row p-1">
-                            <div class="col-12 mt-3">
-                                <small class="mb-3">Conference #{{ forloop.counter }}</small>
-                            </div>
-                            <div class="col-12">
-                                <h5 class="card-title text-wrap">{{ conf.title }}</h5>
-                                <a class="btn btn-sm btn-warning float-end"
-                                   href="{% url 'admin_manage_conference' conf.pk %}">
-                                    <i class="fa-regular fa-circle-check"></i>
-                                    Manage
-                                </a>
-                                <hr/>
-                            </div>
-                            <div class="col-sm-12 col-md-4 fs-6 mb-3">
-                                Location: {{ conf.location }}
-                            </div>
-                            <div class="col-sm-12 col-md-4 fs-6 mb-3">
-                                Venue: {{ conf.venue }}
-                            </div>
-                            <div class="col-sm-12 col-md-4 fs-6 fst-italic mb-3">
-                                From {{ conf.start_date }} to {{ conf.end_date }}
-                            </div> 
-                            <div class="col-12 fs-6 mb-3">
-                                <i class="fa-solid fa-user-large"></i> Contact People: <br/>
-                                <div class="row mt-2">
-                                    <div class="col-sm-12 col-md-4">
-                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer1 }} <br/>
-                                        <i class="fa-solid fa-phone"></i> {{ conf.mobile1 }}
-                                    </div>
-                                    <div class="col-sm-12 col-md-4">
-                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer2 }} <br/>
-                                        <i class="fa-solid fa-phone"></i> {{ conf.mobile2 }}
-                                    </div>
-                                    <div class="col-sm-12 col-md-4">
-                                        <i class="fa-regular fa-envelope"></i> {{ conf.organizer3 }} <br/>
-                                        <i class="fa-solid fa-phone"></i> {{ conf.mobile3 }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 mb-3">
-                                <small class="text-body-secondary float-end">
-                                    Created {{ conf.created_at|timesince }} ago
-                                </small>
-                            </div>
-                        </td>
-                    </tr>
+<div class="container row m-auto py-3">
+    <div class="col-12 fs-6 fw-bold text-center mb-3">
+        Completed Conferences
+    </div>
+
+    {% if years %}
+    <div class="col-12 text-center mb-3">
+        <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+            <div class="btn-group" role="group" aria-label="Year Selection">
+                {% for y in years %}
+                <a href="?year={{ y }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                    class="btn btn-sm {% if y == selected_year %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    {{ y }}
+                </a>
                 {% endfor %}
-                </tbody>
-            </table>
+            </div>
+            {% if selected_year %}
+            <a href="{% url 'download_year_details' selected_year %}" class="btn btn-sm btn-success">
+                <i class="fa-solid fa-file-zipper me-1"></i>Download {{ selected_year }} Report
+            </a>
+            {% endif %}
         </div>
     </div>
+    {% endif %}
+
+    <div class="col-12 mb-3">
+        <form method="get" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search by title or location"
+                value="{{ search_query }}">
+            {% if selected_year %}
+            <input type="hidden" name="year" value="{{ selected_year }}">
+            {% endif %}
+            <button type="submit" class="btn btn-outline-success">Search</button>
+            {% if search_query %}
+            <a href="?{% if selected_year %}year={{ selected_year }}{% endif %}"
+                class="btn btn-outline-secondary ms-2">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col" style="width: 5%;">#</th>
+                    <th scope="col" style="width: 25%;">Title</th>
+                    <th scope="col" style="width: 20%;">Location & Venue</th>
+                    <th scope="col" style="width: 15%;">Date</th>
+                    <th scope="col" style="width: 20%;">Organizers</th>
+                    <th scope="col" style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conf in conferences %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <div class="fw-bold">{{ conf.title }}</div>
+                        <small class="text-muted d-block mt-1">
+                            <i class="fa-regular fa-clock me-1"></i>Created {{ conf.created_at|timesince }} ago
+                        </small>
+                    </td>
+                    <td>
+                        <div class="mb-1"><i class="fa-solid fa-location-dot me-1 text-danger"></i>{{ conf.location }}
+                        </div>
+                        <small class="text-muted"><i class="fa-solid fa-building me-1"></i>{{ conf.venue }}</small>
+                    </td>
+                    <td>
+                        <div>From: {{ conf.start_date|date:"M d, Y" }}</div>
+                        <div>To: {{ conf.end_date|date:"M d, Y" }}</div>
+                    </td>
+                    <td>
+                        <li><i class="fa-regular fa-envelope me-1"></i>{{ conf.organizer1 }}</li>
+                        {% if conf.mobile1 %}
+                        <li><i class="fa-solid fa-phone me-1"></i>{{ conf.mobile1 }}</li>
+                        {% endif %}
+
+                        {% if conf.organizer2 %}
+                        <li class="mt-1 border-top pt-1"><i class="fa-regular fa-envelope me-1"></i>
+                            {{ conf.organizer2 }}
+                        </li>
+                        {% if conf.mobile2 %}
+                        <li><i class="fa-solid fa-phone me-1"></i>{{ conf.mobile2 }}</li>
+                        {% endif %}
+                        {% endif %}
+
+                        {% if conf.organizer3 %}
+                        <li class="mt-1 border-top pt-1">
+                            <i class="fa-regular fa-envelope me-1"></i>
+                            {{ conf.organizer3 }}
+                        </li>
+                        {% if conf.mobile3 %}
+                        <li><i class="fa-solid fa-phone me-1"></i>{{ conf.mobile3 }}</li>
+                        {% endif %}
+                        {% endif %}
+                        </ul>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="btn-group w-100">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-download me-1"></i>Export
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item"
+                                            href="{% url 'download_registration_details' conf.pk %}">Registration
+                                            Details</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{% url 'download_feedback_survey' conf.pk %}">Feedback Results</a>
+                                    </li>
+                                    <li><a class="dropdown-item"
+                                            href="{% url 'download_reflection_survey' conf.pk %}">Reflection Results</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a class="btn btn-sm btn-warning w-100" href="{% url 'admin_manage_conference' conf.pk %}">
+                                <i class="fa-regular fa-circle-check me-1"></i>Manage
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="text-muted">No completed conferences found matching your criteria.</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 {% endblock content %}

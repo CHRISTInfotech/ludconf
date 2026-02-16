@@ -7,7 +7,7 @@ from conference.views import (
     stafforganisingconferenes, stafforganisedconferene, deregisteredconference, conferencepass,
     staffupdateconference, download_registration_details, adminconferenceupdate, download_emails_for_newsletter,
     conference_details, one_time_participation, conference_toolkit, feedback_survey, reflection_survey,
-    feedback_dashboard, reflection_dashboard
+    feedback_dashboard, reflection_dashboard, download_year_details
 )
 
 urlpatterns = [
@@ -46,4 +46,5 @@ urlpatterns = [
 
     path('download-feedback-survey/<str:conference_id>/', download_feedback_survey, name='download_feedback_survey'),
     path('download-reflection-survey/<str:conference_id>/', download_reflection_survey, name='download_reflection_survey'),
+    path('download-year-report/<int:year>/', download_year_details, name='download_year_details'),
 ]

@@ -9,6 +9,8 @@ from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 from datetime import datetime
+import io
+import zipfile
 from django.utils import timezone
 from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
 from collections import Counter
@@ -324,14 +326,45 @@ def adminlistactiveconference(request):
 
 def adminlistcompletedconference(request):
     if request.user.is_authenticated and request.user.is_superuser:
-        conferences = Conference.objects.filter(is_published=False).order_by(
-            "-created_at"
-        )
+        base_qs = Conference.objects.filter(is_published=False)
+        
+        search_query = request.GET.get('search', '')
+        if search_query:
+            base_qs = base_qs.filter(
+                Q(title__icontains=search_query) | 
+                Q(location__icontains=search_query)
+            )
+
+        years_qs = base_qs.dates('start_date', 'year', order='DESC')
+        years = [d.year for d in years_qs]
+
+        selected_year = request.GET.get('year')
+        if selected_year:
+            try:
+                selected_year = int(selected_year)
+            except ValueError:
+                selected_year = years[0] if years else None
+        elif years:
+            selected_year = years[0]
+
+        if selected_year:
+            conferences = base_qs.filter(start_date__year=selected_year).order_by("-created_at")
+        else:
+            conferences = base_qs.order_by("-created_at")
+
         return render(
             request,
             "siteadmin/listconferences.html",
-            context={"conferences": conferences},
+            context={
+                "conferences": conferences,
+                "years": years,
+                "selected_year": selected_year,
+                "search_query": search_query,
+            },
         )
+    else:
+        messages.error(request, "You are not logged in")
+        return redirect("home")
 
 
 def adminmanageconference(request, conference_id):
@@ -1465,4 +1498,246 @@ def download_reflection_survey(request, conference_id):
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     wb.save(response)
+    return response
+
+
+def download_year_details(request, year):
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to download this report.")
+        return redirect("dashboard")
+
+    try:
+        year = int(year)
+    except ValueError:
+        messages.error(request, "Invalid Year")
+        return redirect("admin_list_completed")
+
+    # Get completed conferences for the year
+    conferences = Conference.objects.filter(start_date__year=year, is_published=False)
+    
+    if not conferences.exists():
+        messages.error(request, f"No completed conferences found for year {year}")
+        return redirect("admin_list_completed")
+
+    # Create an in-memory zip file
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        
+        # --- 1. Registration Details ---
+        reg_wb = Workbook()
+        reg_ws = reg_wb.active
+        reg_ws.title = "Registrations"
+        
+        reg_headers = [
+            'Conference', 'Registration Date', 'Participat Interest', 'First Name', 'Last Name', 
+            'Email', 'Mobile Number', 'Gender', 'City/Location', 'Designation', 'Organization'
+        ]
+        
+        # Style headers
+        header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF")
+        
+        for col_num, header in enumerate(reg_headers, 1):
+            cell = reg_ws.cell(row=1, column=col_num, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+
+        registrations = ConferenceRegistration.objects.filter(conference__in=conferences).select_related('conference', 'user', 'user__userdetails')
+        
+        for row_num, reg in enumerate(registrations, 2):
+            reg_ws.cell(row=row_num, column=1, value=reg.conference.title)
+            reg_ws.cell(row=row_num, column=2, value=reg.registration_date.replace(tzinfo=None) if reg.registration_date else "")
+            reg_ws.cell(row=row_num, column=3, value=reg.interest)
+            reg_ws.cell(row=row_num, column=4, value=reg.user.first_name)
+            reg_ws.cell(row=row_num, column=5, value=reg.user.last_name)
+            reg_ws.cell(row=row_num, column=6, value=reg.user.email)
+            
+            try:
+                details = reg.user.userdetails
+                reg_ws.cell(row=row_num, column=7, value=details.mobile)
+                reg_ws.cell(row=row_num, column=8, value=details.gender)
+                reg_ws.cell(row=row_num, column=9, value=details.city_location)
+                reg_ws.cell(row=row_num, column=10, value=details.designation)
+                reg_ws.cell(row=row_num, column=11, value=details.organization)
+            except:
+                pass
+        
+        # Auto-adjust columns
+        for column in reg_ws.columns:
+            max_length = 0
+            col_letter = column[0].column_letter
+            for cell in column:
+                if cell.value:
+                    try:
+                        cell_len = len(str(cell.value))
+                        if cell_len > max_length:
+                            max_length = cell_len
+                    except:
+                        pass
+            reg_ws.column_dimensions[col_letter].width = min(max_length + 2, 50)
+
+        reg_io = io.BytesIO()
+        reg_wb.save(reg_io)
+        zip_file.writestr(f"Registrations_{year}.xlsx", reg_io.getvalue())
+
+        # --- 2. Feedback Survey ---
+        fb_wb = Workbook()
+        fb_ws = fb_wb.active
+        fb_ws.title = "Feedback"
+
+        fb_headers = [
+            "Conference", "Submission Date", "Full Name", "Email", "Phone", "Age", "Gender", 
+            "Occupation", "Occupation Other", "Location Type", "First Time",
+            "Q9.1", "Q9.2", "Q9.3", "Q9.4", "Q9.5", 
+            "Q10.1", "Q10.2", "Q10.3", "Q10.4", "Q10.5",
+            "Q11.1", "Q11.2", "Q11.3", "Q11.4",
+            "Q12.1", "Q12.2", "Q12.3", "Q12.4", "Q12.5",
+            "Follow-up", "Satisfaction", "Engaging Activity", "Takeaways", "Suggestions", "Team Interest"
+        ]
+
+        for col_num, header in enumerate(fb_headers, 1):
+            cell = fb_ws.cell(row=1, column=col_num, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+
+        feedbacks = FeedbackSurveyResponse.objects.filter(conference__in=conferences).select_related('conference')
+
+        for row_num, r in enumerate(feedbacks, 2):
+            fb_ws.cell(row=row_num, column=1, value=r.conference.title)
+            fb_ws.cell(row=row_num, column=2, value=r.submitted_at.strftime("%Y-%m-%d %H:%M"))
+            fb_ws.cell(row=row_num, column=3, value=r.full_name)
+            fb_ws.cell(row=row_num, column=4, value=r.email)
+            fb_ws.cell(row=row_num, column=5, value=r.phone or "")
+            fb_ws.cell(row=row_num, column=6, value=r.age or "")
+            fb_ws.cell(row=row_num, column=7, value=r.gender or "")
+            fb_ws.cell(row=row_num, column=8, value=r.occupation or "")
+            fb_ws.cell(row=row_num, column=9, value=r.occupation_other or "")
+            fb_ws.cell(row=row_num, column=10, value=r.location_type or "")
+            fb_ws.cell(row=row_num, column=11, value="Yes" if r.first_time else "No")
+            
+            fb_ws.cell(row=row_num, column=12, value=r.q9_1)
+            fb_ws.cell(row=row_num, column=13, value=r.q9_2)
+            fb_ws.cell(row=row_num, column=14, value=r.q9_3)
+            fb_ws.cell(row=row_num, column=15, value=r.q9_4)
+            fb_ws.cell(row=row_num, column=16, value=r.q9_5)
+            fb_ws.cell(row=row_num, column=17, value=r.q10_1)
+            fb_ws.cell(row=row_num, column=18, value=r.q10_2)
+            fb_ws.cell(row=row_num, column=19, value=r.q10_3)
+            fb_ws.cell(row=row_num, column=20, value=r.q10_4)
+            fb_ws.cell(row=row_num, column=21, value=r.q10_5)
+            fb_ws.cell(row=row_num, column=22, value=r.q11_1)
+            fb_ws.cell(row=row_num, column=23, value=r.q11_2)
+            fb_ws.cell(row=row_num, column=24, value=r.q11_3)
+            fb_ws.cell(row=row_num, column=25, value=r.q11_4)
+            fb_ws.cell(row=row_num, column=26, value=r.q12_1)
+            fb_ws.cell(row=row_num, column=27, value=r.q12_2)
+            fb_ws.cell(row=row_num, column=28, value=r.q12_3)
+            fb_ws.cell(row=row_num, column=29, value=r.q12_4)
+            fb_ws.cell(row=row_num, column=30, value=r.q12_5)
+            
+            fb_ws.cell(row=row_num, column=31, value="Yes" if r.followup_study else "No")
+            fb_ws.cell(row=row_num, column=32, value=r.satisfaction)
+            fb_ws.cell(row=row_num, column=33, value=r.engaging_activity or "")
+            fb_ws.cell(row=row_num, column=34, value=r.takeaways or "")
+            fb_ws.cell(row=row_num, column=35, value=r.suggestions or "")
+            fb_ws.cell(row=row_num, column=36, value="Yes" if r.team_interest else "No")
+
+        # Auto-adjust columns
+        for column in fb_ws.columns:
+            max_length = 0
+            col_letter = column[0].column_letter
+            for cell in column:
+                if cell.value:
+                    try:
+                        cell_len = len(str(cell.value))
+                        if cell_len > max_length:
+                            max_length = cell_len
+                    except:
+                        pass
+            fb_ws.column_dimensions[col_letter].width = min(max_length + 2, 50)
+
+        fb_io = io.BytesIO()
+        fb_wb.save(fb_io)
+        zip_file.writestr(f"Feedback_{year}.xlsx", fb_io.getvalue())
+
+        # --- 3. Reflection Survey ---
+        ref_wb = Workbook()
+        ref_ws = ref_wb.active
+        ref_ws.title = "Reflection"
+
+        ref_headers = [
+            "Conference", "Submission Date", "Full Name", "Email", "Location", "Occupation", "Occupation Other",
+            "Connect New", "Stayed in touch", "Opportunities Found", "Motivated to Volunteer",
+            "Participated", "Engaged Theme", "Improved Knowledge", "Philosophy Applied",
+            "More Informed", "Leadership Enhanced", "Socially Engaged", "Socially Sensitive", "Making Impact",
+            "Key Takeaway", "Would Recommend", "Stay Involved", "Willing to Partner"
+        ]
+
+        for col_num, header in enumerate(ref_headers, 1):
+            cell = ref_ws.cell(row=1, column=col_num, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            
+        # Build query for reflections across all conferences or matching locations
+        q_obj = Q()
+        for conf in conferences:
+            q_obj |= Q(conference=conf) | Q(location__iexact=conf.location)
+            
+        reflections = ReflectionSurveyResponse.objects.filter(q_obj).order_by("-submitted_at")
+        
+        for row_num, r in enumerate(reflections, 2):
+            conf_title = ""
+            if r.conference:
+                conf_title = r.conference.title
+            else:
+                match = next((c for c in conferences if c.location.lower() == (r.location or "").lower()), None)
+                if match:
+                    conf_title = match.title + " (Matched by Location)"
+            
+            ref_ws.cell(row=row_num, column=1, value=conf_title)
+            ref_ws.cell(row=row_num, column=2, value=r.submitted_at.strftime("%Y-%m-%d %H:%M"))
+            ref_ws.cell(row=row_num, column=3, value=r.full_name)
+            ref_ws.cell(row=row_num, column=4, value=r.email)
+            ref_ws.cell(row=row_num, column=5, value=r.location or "")
+            ref_ws.cell(row=row_num, column=6, value=r.occupation or "")
+            ref_ws.cell(row=row_num, column=7, value=r.occupation_other or "")
+            ref_ws.cell(row=row_num, column=8, value=r.connect_new)
+            ref_ws.cell(row=row_num, column=9, value=r.stayed_in_touch)
+            ref_ws.cell(row=row_num, column=10, value=r.opportunities_found)
+            ref_ws.cell(row=row_num, column=11, value=r.motivated_to_volunteer)
+            ref_ws.cell(row=row_num, column=12, value=r.participated_due_to_conf)
+            ref_ws.cell(row=row_num, column=13, value=r.engaged_in_theme)
+            ref_ws.cell(row=row_num, column=14, value=r.improved_knowledge)
+            ref_ws.cell(row=row_num, column=15, value=r.philosophy_applied)
+            ref_ws.cell(row=row_num, column=16, value=r.more_informed)
+            ref_ws.cell(row=row_num, column=17, value=r.leadership_enhanced)
+            ref_ws.cell(row=row_num, column=18, value=r.more_socially_engaged)
+            ref_ws.cell(row=row_num, column=19, value=r.more_socially_sensitive)
+            ref_ws.cell(row=row_num, column=20, value=r.making_impact)
+            ref_ws.cell(row=row_num, column=21, value=r.key_takeaway)
+            ref_ws.cell(row=row_num, column=22, value="Yes" if r.recommend else "No")
+            ref_ws.cell(row=row_num, column=23, value="Yes" if r.stay_involved else "No")
+            ref_ws.cell(row=row_num, column=24, value="Yes" if r.org_willing_to_partner else "No")
+
+        # Auto-adjust columns
+        for column in ref_ws.columns:
+            max_length = 0
+            col_letter = column[0].column_letter
+            for cell in column:
+                if cell.value:
+                    try:
+                        cell_len = len(str(cell.value))
+                        if cell_len > max_length:
+                            max_length = cell_len
+                    except:
+                        pass
+            ref_ws.column_dimensions[col_letter].width = min(max_length + 2, 50)
+
+        ref_io = io.BytesIO()
+        ref_wb.save(ref_io)
+        zip_file.writestr(f"Reflections_{year}.xlsx", ref_io.getvalue())
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename=Conference_Data_{year}.zip'
     return response
