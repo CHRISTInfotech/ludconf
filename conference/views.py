@@ -200,16 +200,27 @@ def dashboard(request):
         }
         return render(request, "siteadmin/dashboard.html", context=context)
     if request.user.is_authenticated and request.user.is_staff:
+        organising_conference_ids = list(
+            ConferenceOrganisers.objects.filter(mails=request.user.email).values_list(
+                "conference_id", flat=True
+            )
+        )
         registeredconference = ConferenceRegistration.objects.filter(
             user=request.user
         ).values("conference_id")
         conferences = Conference.objects.exclude(
             conference_id__in=registeredconference
-        ).exclude(is_published=False)
+        ).exclude(is_published=False).annotate(
+            registration_count=Count("conferenceregistration")
+        )
         conferenceDetails = ConferenceDetails.objects.filter(
             conference_id__in=conferences
         )
-        context = {"conferences": conferences, "conference_details": conferenceDetails}
+        context = {
+            "conferences": conferences,
+            "conference_details": conferenceDetails,
+            "organising_conference_ids": organising_conference_ids,
+        }
         return render(request, "organiser/dashboard.html", context=context)
     if request.user.is_authenticated:
         registeredconference = ConferenceRegistration.objects.filter(
@@ -684,7 +695,7 @@ def stafforganisingconferenes(request):
         ).values("conference_id")
         conferences = Conference.objects.filter(
             is_published=True, conference_id__in=organisingConference
-        ).order_by("-created_at")
+        ).annotate(registration_count=Count("conferenceregistration")).order_by("-created_at")
         return render(
             request,
             "organiser/newconference.html",
@@ -782,6 +793,40 @@ def staffupdateconference(request, conference_id):
     else:
         messages.error(request, "You are not logged in")
         return redirect("home")
+
+
+def staff_registration_statistics(request, conference_id):
+    if request.user.is_authenticated and request.user.is_staff:
+        conference = get_object_or_404(Conference, pk=conference_id)
+
+        is_organiser = ConferenceOrganisers.objects.filter(
+            mails=request.user.email, conference_id=conference_id
+        ).exists()
+        if not is_organiser and not request.user.is_superuser:
+            messages.error(request, "You are not authorized to view this conference")
+            return redirect("staff_organizing_conference")
+
+        registrations = ConferenceRegistration.objects.filter(
+            conference_id=conference.conference_id
+        ).select_related("user").order_by("-registration_date")
+
+        registration_count = registrations.count()
+        interest_stats = (
+            registrations.values("interest")
+            .annotate(total=Count("reg_id"))
+            .order_by("-total")
+        )
+
+        context = {
+            "conference": conference,
+            "registrations": registrations,
+            "registration_count": registration_count,
+            "interest_stats": interest_stats,
+        }
+        return render(request, "organiser/registration_statistics.html", context)
+
+    messages.error(request, "You are not logged in")
+    return redirect("home")
 
 
 def download_registration_details(request, conference_id):

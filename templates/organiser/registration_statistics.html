@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    {% include 'partials/nav.html' %}
+
+    <div class="container py-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <div class="fw-bolder fs-4">Registration Statistics</div>
+                <div class="text-muted small">{{ conference.title }} | {{ conference.location }}</div>
+            </div>
+            <div>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'staff_organizing_conference' %}">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+                </a>
+                <a class="btn btn-sm btn-success" href="{% url 'download_registration_details' conference.conference_id %}">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                    Download Registration
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">Total Registrations</div>
+                        <div class="fs-2 fw-bold">{{ registration_count }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-8">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="fw-semibold mb-2">Interest Distribution</div>
+                        {% if interest_stats %}
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered mb-0">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>Interest</th>
+                                        <th>Count</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in interest_stats %}
+                                        <tr>
+                                            <td>{{ item.interest|default:"-" }}</td>
+                                            <td>{{ item.total }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-muted small">No statistics available yet.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="fw-semibold mb-2">Registration List</div>
+                {% if registrations %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Interest</th>
+                                <th>Registered On</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for reg in registrations %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ reg.user.first_name }} {{ reg.user.last_name }}</td>
+                                    <td>{{ reg.user.email }}</td>
+                                    <td>{{ reg.user.userdetails.mobile|default:"-" }}</td>
+                                    <td>{{ reg.interest|default:"-" }}</td>
+                                    <td>{{ reg.registration_date|date:"Y-m-d H:i" }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-muted small">No registrations yet for this conference.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

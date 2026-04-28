@@ -7,18 +7,18 @@
     <div class="col-12">
 
         <div class="row">
-            <div class="col-12 col-md-4 mb-3 p-0">
+            <div class="col-12 col-md-2 mb-3 p-0">
                 {% if conference_details.conference_banner %}
                 <img src="{{ conference_details.conference_banner.url }}" class="w-100 h-100 d-block object-fit-cover" alt="...">
                 {% endif %}
             </div>
-            <div class="col-12 col-md-8">
+            <div class="col-12 col-md-10">
                 <div class="mb-3 fw-bolder fs-2">
                     {{ conference.title }}
                 </div>
                 <div class="mb-3 fs-3">
                     {% if conference_details.conference_theme %}
-                    {{ conference_details.conference_theme }}
+                    {{ conference_details.conference_theme|safe }}
                     {% endif %}
                 </div>
                 <div class="mb-3">
@@ -34,16 +34,16 @@
                 </div>
                 <div class="mb-3">
                     <i class="fa-solid fa-user-large"></i> Contact People: <br />
-                    <div class="row mt-2">
-                        <div class="col-sm-12 col-md-4">
+                    <div class="row mt-2 g-2">
+                        <div class="col-12">
                             <i class="fa-regular fa-envelope"></i> {{ conference.organizer1 }} <br />
                             <i class="fa-solid fa-phone"></i> {{ conference.mobile1 }}
                         </div>
-                        <div class="col-sm-12 col-md-4">
+                        <div class="col-12">
                             <i class="fa-regular fa-envelope"></i> {{ conference.organizer2 }} <br />
                             <i class="fa-solid fa-phone"></i> {{ conference.mobile2 }}
                         </div>
-                        <div class="col-sm-12 col-md-4">
+                        <div class="col-12">
                             <i class="fa-regular fa-envelope"></i> {{ conference.organizer3 }} <br />
                             <i class="fa-solid fa-phone"></i> {{ conference.mobile3 }}
                         </div>
