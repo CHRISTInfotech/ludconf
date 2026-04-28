@@ -800,9 +800,17 @@ def download_registration_details(request, conference_id):
             "user__email",
             "user__userdetails__mobile",
             "user__userdetails__gender",
+            "user__userdetails__age_group",
             "user__userdetails__city_location",
+            "user__userdetails__country",
+            "user__userdetails__organisation_type",
+            "user__userdetails__attendee_category",
             "user__userdetails__designation",
             "user__userdetails__organization",
+            "user__userdetails__organization_address",
+            "user__userdetails__embassy_letter",
+            "user__userdetails__emergency_contact_name",
+            "user__userdetails__emergency_contact_number",
         )
         # print(queryset)
         response = export_to_excel(queryset)
@@ -833,13 +841,36 @@ def one_time_participation(request, conference_id):
         conference = Conference.objects.get(pk=conference_id)
         if request.method == "POST":
             email = request.POST["email"]
-            first_name = request.POST["firstname"]
-            last_name = request.POST["lastname"]
+            full_name = request.POST["fullname"].strip()
+            name_parts = full_name.split(' ', 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else ''
             gender = request.POST["gender"]
+            age_group = request.POST["age_group"]
+            country_code = request.POST.get("country_code", "").strip()
+            mobile_number = request.POST.get("mobile_number", "").strip()
+            mobile = f"{country_code}{mobile_number}"
             city_location = request.POST["city_location"]
-            designation = request.POST["designation"]
-            orgnization = request.POST["organization"]
-            mobile = request.POST["mobile"]
+            country = request.POST["country"]
+
+            organisation_type = request.POST["organisation_type"]
+            if organisation_type == "Others":
+                organisation_type_other = request.POST.get("organisation_type_other", "").strip()
+                if organisation_type_other:
+                    organisation_type = f"Others: {organisation_type_other}"
+
+            attendee_category = request.POST["attendee_category"]
+            if attendee_category == "Others":
+                attendee_category_other = request.POST.get("attendee_category_other", "").strip()
+                if attendee_category_other:
+                    attendee_category = f"Others: {attendee_category_other}"
+
+            designation = request.POST.get("designation", "").strip()
+            organization = request.POST.get("organization_name", "").strip()
+            organization_address = request.POST.get("organization_address", "").strip()
+            embassy_letter = request.POST.get("embassy_letter", "").strip()
+            emergency_contact_name = request.POST.get("emergency_contact_name", "").strip()
+            emergency_contact_number = request.POST.get("emergency_contact_number", "").strip()
             newsletter = False
 
             user = request.user
@@ -859,10 +890,18 @@ def one_time_participation(request, conference_id):
                 userdetails = UserDetails(
                     user=user,
                     gender=gender,
+                    age_group=age_group,
                     city_location=city_location,
+                    country=country,
+                    organisation_type=organisation_type,
+                    attendee_category=attendee_category,
                     designation=designation,
-                    organization=orgnization,
+                    organization=organization,
+                    organization_address=organization_address,
                     mobile=mobile,
+                    embassy_letter=embassy_letter,
+                    emergency_contact_name=emergency_contact_name,
+                    emergency_contact_number=emergency_contact_number,
                     opt_newsletter=newsletter,
                 )
                 userdetails.save()

@@ -3,7 +3,7 @@
 
 <div class="container my-5 p-3">
     <div class="row">
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-12 col-md-4">
             <div class="col-12">
                 {% if conference_details.conference_banner %}
                 <img src="{{ conference_details.conference_banner.url }}" class="img-fluid" alt="...">
@@ -23,7 +23,8 @@
                 </div>
             </div>
         </div>
-        <form method="POST" class="col-sm-12 col-md-6">
+
+        <form method="POST" class="col-sm-12 col-md-8">
             {% csrf_token %}
             <div class="col-12 text-center mb-4 fs-5 mt-4">
                 Register to LUD Conference
@@ -33,71 +34,203 @@
                 <div class="fst-italic">
                     {{ conference.start_date }} - {{ conference.end_date }}
                 </div>
-                <small>
-                     #{{ conference.pk }}
-                </small>
             </div>
+
+            <!-- Email -->
             <div class="col-12 mb-3">
                 <div class="form-floating">
                     <input type="email" class="form-control" id="email" name="email" required>
-                    <label for="email">Email address</label>
+                    <label for="email">Email address <span class="text-danger">*</span></label>
                 </div>
             </div>
+
+            <!-- Full Name -->
             <div class="col-12 mb-3">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder="First Name"
-                        required>
-                    <label for="firstname">First Name</label>
+                    <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Full Name" required>
+                    <label for="fullname">Full Name <span class="text-danger">*</span></label>
                 </div>
             </div>
-            <div class="col-sm-12 mb-3">
+
+            <!-- Gender -->
+            <div class="col-12 mb-3">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Last Name"
-                        required>
-                    <label for="lastname">Last Name</label>
-                </div>
-            </div>
-            <div class="col-sm-12 mb-3">
-                <div class="form-floating">
-                    <select class="form-select" id="gender" name="gender" aria-label="Gender" required>
-                        <option value="" selected>--select--</option>
+                    <select class="form-select" id="gender" name="gender" required>
+                        <option value="" selected>-- Select --</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Others">Others</option>
                     </select>
-                    <label for="gender">Gender</label>
+                    <label for="gender">Gender <span class="text-danger">*</span></label>
                 </div>
             </div>
-            <div class="col-sm-12 mb-3">
+
+            <!-- Age Group -->
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Age Group <span class="text-danger">*</span></label>
+                <div class="radio-options">
+                    <input type="radio" id="age_under21" name="age_group" value="Under 21" required>
+                    <label for="age_under21">Under 21</label>
+                    <input type="radio" id="age_22_35" name="age_group" value="22–35">
+                    <label for="age_22_35">22–35</label>
+                    <input type="radio" id="age_36_50" name="age_group" value="36–50">
+                    <label for="age_36_50">36–50</label>
+                    <input type="radio" id="age_50plus" name="age_group" value="50+">
+                    <label for="age_50plus">50+</label>
+                </div>
+            </div>
+
+            <!-- WhatsApp / Phone -->
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">WhatsApp / Phone Number <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="country_code" name="country_code"
+                        placeholder="Country code" style="max-width: 120px;" required>
+                    <input type="text" class="form-control" id="mobile_number" name="mobile_number"
+                        placeholder="Phone number" required>
+                </div>
+                <div class="form-text">Enter country code (e.g. +91) followed by your number.</div>
+            </div>
+
+            <!-- City -->
+            <div class="col-12 mb-3">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="city_location" name="city_location" placeholder="Your City/Location" required>
-                    <label for="city_location">Your City/Location</label>
+                    <input type="text" class="form-control" id="city_location" name="city_location"
+                        placeholder="City" required>
+                    <label for="city_location">City <span class="text-danger">*</span></label>
                 </div>
             </div>
-            <div class="col-sm-12 mb-3">
+
+            <!-- Country -->
+            <div class="col-12 mb-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="country" name="country"
+                        placeholder="Country" required>
+                    <label for="country">Country <span class="text-danger">*</span></label>
+                </div>
+            </div>
+
+            <!-- Organisation Type -->
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Organisation <span class="text-danger">*</span></label>
+                <div class="radio-options">
+                    <input type="radio" id="org_university" name="organisation_type" value="University" required>
+                    <label for="org_university">University</label>
+                    <input type="radio" id="org_school" name="organisation_type" value="School">
+                    <label for="org_school">School</label>
+                    <input type="radio" id="org_nonprofit" name="organisation_type" value="Non Profit">
+                    <label for="org_nonprofit">Non Profit</label>
+                    <input type="radio" id="org_csr" name="organisation_type" value="CSR Entities">
+                    <label for="org_csr">CSR Entities</label>
+                    <input type="radio" id="org_industry" name="organisation_type" value="Industry">
+                    <label for="org_industry">Industry</label>
+                    <input type="radio" id="org_corporate" name="organisation_type" value="Corporate">
+                    <label for="org_corporate">Corporate</label>
+                    <input type="radio" id="org_others" name="organisation_type" value="Others"
+                        onchange="toggleOther('org_other_input', this)">
+                    <label for="org_others">Others</label>
+                </div>
+                <div class="mt-2" id="org_other_input" style="display:none;">
+                    <input type="text" class="form-control" name="organisation_type_other" placeholder="Please specify">
+                </div>
+            </div>
+
+            <!-- Attendee Category -->
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Attendee Category <span class="text-danger">*</span></label>
+                <div class="radio-options">
+                    <input type="radio" id="cat_student" name="attendee_category" value="Student" required>
+                    <label for="cat_student">Student</label>
+                    <input type="radio" id="cat_research" name="attendee_category" value="Research Scholar">
+                    <label for="cat_research">Research Scholar</label>
+                    <input type="radio" id="cat_faculty" name="attendee_category" value="Faculty/Teacher">
+                    <label for="cat_faculty">Faculty / Teacher</label>
+                    <input type="radio" id="cat_socialworker" name="attendee_category" value="Social Worker/NGO Staff">
+                    <label for="cat_socialworker">Social Worker / NGO Staff</label>
+                    <input type="radio" id="cat_medical" name="attendee_category" value="Medical Professional">
+                    <label for="cat_medical">Medical Professional</label>
+                    <input type="radio" id="cat_govt" name="attendee_category" value="Government Official">
+                    <label for="cat_govt">Government Official</label>
+                    <input type="radio" id="cat_community" name="attendee_category" value="Community Leader">
+                    <label for="cat_community">Community Leader</label>
+                    <input type="radio" id="cat_corporate" name="attendee_category" value="Corporate Personnel">
+                    <label for="cat_corporate">Corporate Personnel</label>
+                    <input type="radio" id="cat_others" name="attendee_category" value="Others"
+                        onchange="toggleOther('cat_other_input', this)">
+                    <label for="cat_others">Others</label>
+                </div>
+                <div class="mt-2" id="cat_other_input" style="display:none;">
+                    <input type="text" class="form-control" name="attendee_category_other" placeholder="Please specify">
+                </div>
+            </div>
+
+            <hr class="my-4">
+            <div class="text-muted small mb-3">The following fields are optional.</div>
+
+            <!-- Designation -->
+            <div class="col-12 mb-3">
                 <div class="form-floating">
                     <input type="text" class="form-control" id="designation" name="designation"
-                        placeholder="Designation" required>
-                    <label for="designation">Designation</label>
+                        placeholder="Designation / Title / Position">
+                    <label for="designation">Designation / Title / Position</label>
                 </div>
             </div>
-            <div class="col-sm-12 mb-3">
+
+            <!-- Organization Name -->
+            <div class="col-12 mb-3">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="organization" name="organization"
-                        placeholder="Organization" required>
-                    <label for="organization">Organization</label>
+                    <input type="text" class="form-control" id="organization_name" name="organization_name"
+                        placeholder="Organization Name">
+                    <label for="organization_name">Organization Name</label>
                 </div>
             </div>
-            <div class="col-sm-12 mb-3">
+
+            <!-- Organization Address -->
+            <div class="col-12 mb-3">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="mobile" name="mobile" placeholder="WhatsApp Number"
-                        required>
-                    <label for="mobile">WhatsApp / Phone Number</label>
+                    <textarea class="form-control" id="organization_address" name="organization_address"
+                        placeholder="Organization Address" style="height: 80px;"></textarea>
+                    <label for="organization_address">Organization Address</label>
                 </div>
             </div>
-            <div class="col-sm-12 mb-3">
+
+            <!-- Embassy / Invitation Letter -->
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Embassy / Invitation Letter Requirement
+                    <span class="text-muted small">(International Attendees only)</span>
+                </label>
+                <div class="radio-options">
+                    <input type="radio" id="embassy_yes" name="embassy_letter" value="Yes">
+                    <label for="embassy_yes">Yes</label>
+                    <input type="radio" id="embassy_no" name="embassy_letter" value="No">
+                    <label for="embassy_no">No</label>
+                </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="col-12 mb-3">
+                <label class="form-label fw-semibold">Emergency Contact</label>
+                <div class="row g-2">
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="emergency_contact_name"
+                                name="emergency_contact_name" placeholder="Name">
+                            <label for="emergency_contact_name">Name</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="emergency_contact_number"
+                                name="emergency_contact_number" placeholder="Contact Number">
+                            <label for="emergency_contact_number">Contact Number</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-3 mt-3">
                 <div class="d-flex justify-content-center">
-                    <button class="btn btn btn-success" type="submit">
+                    <button class="btn btn-success" type="submit">
                         <i class="fa-regular fa-floppy-disk"></i>
                         Register
                     </button>
@@ -105,8 +238,28 @@
             </div>
         </form>
     </div>
-
 </div>
 
+<script>
+    function toggleOther(inputId, radio) {
+        document.getElementById(inputId).style.display = radio.checked ? 'block' : 'none';
+    }
+
+    // Hide "others" text boxes when a different option is picked in the same group
+    document.querySelectorAll('input[name="organisation_type"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            if (this.value !== 'Others') {
+                document.getElementById('org_other_input').style.display = 'none';
+            }
+        });
+    });
+    document.querySelectorAll('input[name="attendee_category"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            if (this.value !== 'Others') {
+                document.getElementById('cat_other_input').style.display = 'none';
+            }
+        });
+    });
+</script>
 
 {% endblock content %}

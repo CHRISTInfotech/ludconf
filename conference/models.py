@@ -38,10 +38,18 @@ class OTPRequest(models.Model):
 class UserDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     gender = models.CharField(max_length=10)
+    age_group = models.CharField(max_length=20, blank=True, null=True)
     city_location = models.CharField(max_length=255, blank=True, null=True)
-    designation = models.CharField(max_length=255)
-    organization = models.CharField(max_length=255)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    organisation_type = models.CharField(max_length=255, blank=True, null=True)
+    attendee_category = models.CharField(max_length=255, blank=True, null=True)
+    designation = models.CharField(max_length=255, blank=True, null=True)
+    organization = models.CharField(max_length=255, blank=True, null=True)
+    organization_address = models.TextField(blank=True, null=True)
     mobile = models.CharField(max_length=255)
+    embassy_letter = models.CharField(max_length=10, blank=True, null=True)
+    emergency_contact_name = models.CharField(max_length=255, blank=True, null=True)
+    emergency_contact_number = models.CharField(max_length=100, blank=True, null=True)
     opt_newsletter = models.BooleanField(default=True)
 
     def __str__(self):
