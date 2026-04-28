@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static conference_dates %}
 
 {% block content %}
 
@@ -41,12 +41,8 @@
                     </tr>
                 {% endif %}
                 <tr>
-                    <th scope="row">Conference Start Date</th>
-                    <td>{{ conference.start_date }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Conference End Date</th>
-                    <td>{{ conference.end_date }}</td>
+                    <th scope="row">Conference Dates</th>
+                    <td>{% conference_date_range conference.start_date conference.end_date %}</td>
                 </tr>
                 <tr>
                     <th scope="row">Conference Organisers</th>

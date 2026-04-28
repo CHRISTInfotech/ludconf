@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static conference_dates %}
 {% block content %}
 
 <nav aria-label="breadcrumb" class="bg-light py-2">
@@ -31,7 +31,7 @@
         <option value="">-- Choose a conference --</option>
         {% for conf in conferences %}
           <option value="{{ conf.conference_id }}" {% if selected_conference and conf == selected_conference %}selected{% endif %}>
-            {{ conf.title }} ({{ conf.start_date }})
+            {{ conf.title }} ({% conference_date_range conf.start_date conf.end_date %})
           </option>
         {% endfor %}
       </select>

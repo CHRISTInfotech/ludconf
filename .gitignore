@@ -11,3 +11,4 @@ conference/migrations/
 
 #env variables
 ludconf/env.py
+media/

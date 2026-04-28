@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static conference_dates %}
 
 {% block content %}
 
@@ -47,7 +47,7 @@
                     {% endif %}
                     <div class="fst-italic mb-3">
                         {{ conference.location }}, {{ conference.venue }};
-                        From {{ conference.start_date }} to {{ conference.end_date }}
+                        {% conference_date_range conference.start_date conference.end_date %}
                     </div>
                     <div class="mb-3">
                         <i class="fa-solid fa-user-large"></i> Contact People: <br/>

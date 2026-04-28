@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static conference_dates %}
 
 {% block content %}
 
@@ -48,7 +48,7 @@
                 </div>
             {% endif %}
             <div class="fst-italic mb-3">
-                {{ conference.location }} | {{ conference.venue }}; From {{ conference.start_date }} to {{ conference.end_date }}
+                {{ conference.location }} | {{ conference.venue }}; {% conference_date_range conference.start_date conference.end_date %}
                 {% if conference.google_maps_link %}
                     <br/>
                     <a href="{{ conference.google_maps_link }}" target="_blank" class="text-decoration-none">

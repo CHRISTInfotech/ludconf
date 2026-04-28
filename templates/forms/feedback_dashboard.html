@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load conference_dates %}
 
 {% block content %}
 
@@ -22,7 +23,7 @@
                             <option value="">All Conferences</option>
                             {% for conf in conferences %}
                                 <option value="{{ conf.conference_id }}" {% if selected_conference_id == conf.conference_id|stringformat:'s' %}selected{% endif %}>
-                                    {{ conf.title }} ({{ conf.start_date }})
+                                    {{ conf.title }} ({% conference_date_range conf.start_date conf.end_date %})
                                 </option>
                             {% endfor %}
                         </select>

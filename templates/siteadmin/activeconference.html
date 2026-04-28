@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static conference_dates %}
 
 {% block content %}
 
@@ -33,7 +33,7 @@
                                 Venue: {{ conf.venue }}
                             </div>
                             <div class="col-sm-12 col-md-4 fs-6 fst-italic mb-3">
-                                From {{ conf.start_date }} to {{ conf.end_date }}
+                                {% conference_date_range conf.start_date conf.end_date %}
                             </div>
                             <div class="col-12 fs-6 mb-3">
                                 <i class="fa-solid fa-user-large"></i> Contact People: <br/>

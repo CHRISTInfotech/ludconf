@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static conference_dates %}
 
 {% block content %}
 
@@ -49,7 +49,7 @@
                                 <p class="card-text">
                                     {{ conf.location }} | {{ conf.venue }} <br/>
                                     <span class="fst-italic">
-                                    {{ conf.start_date }} | {{ conf.end_date }}
+                                    {% conference_date_range conf.start_date conf.end_date %}
                                 </span>
                                 </p>
                                 <p class="card-text">

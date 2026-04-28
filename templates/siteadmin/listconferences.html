@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static conference_dates %}
 
 {% block content %}
 
@@ -72,10 +72,7 @@
                         </div>
                         <small class="text-muted"><i class="fa-solid fa-building me-1"></i>{{ conf.venue }}</small>
                     </td>
-                    <td>
-                        <div>From: {{ conf.start_date|date:"M d, Y" }}</div>
-                        <div>To: {{ conf.end_date|date:"M d, Y" }}</div>
-                    </td>
+                    <td>{% conference_date_range conf.start_date conf.end_date %}</td>
                     <td>
                         <li><i class="fa-regular fa-envelope me-1"></i>{{ conf.organizer1 }}</li>
                         {% if conf.mobile1 %}
