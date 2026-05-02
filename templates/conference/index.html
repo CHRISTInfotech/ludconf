@@ -30,24 +30,31 @@
                         <div class="col-md-8 d-flex flex-column">
                             <div class="card-body flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h3 class="card-title text-wrap fw-bold mb-0">{{ conf.location }} <br/> {% conference_date_range conf.start_date conf.end_date %}</h3>
-                                    <div class="ms-2 flex-shrink-0">
-                                        <a class="btn btn-sm btn-warning" href="{% url 'one_time_registration' conf.pk %}">
-                                            <i class="fa-regular fa-circle-check"></i> Participate
-                                        </a>
-                                        <a class="btn btn-sm btn-success" href="{% url 'conference_details' conf.pk %}">
-                                            <i class="fa-solid fa-eye"></i> View More
-                                        </a>
-                                    </div>
-                                </div>
-                                <h4>{{ conf.venue }}</h4>
-                                <h5 class="fst-italic mt-3">
-                                    {% for confdetail in conference_details %}
+                                    <h3 class="card-title text-wrap fw-bold mb-0">
+                                        Register to the 
+                                        {% for confdetail in conference_details %}
                                     {% if conf.pk == confdetail.conference_id %}
                                     {{ confdetail.conference_theme|safe }}
                                     {% endif %}
                                     {% endfor %}
+                                    </h3>                            
+                                </div>
+                                <h4>
+                                     {{ conf.location }} <br/> {% conference_date_range conf.start_date conf.end_date %}
+                                </h4>
+                                <h5 class="fst-italic mt-3">
+                                    {{ conf.venue }}
                                 </h5>
+                                <div class="py-3 m-0">
+                                    <div class="ms-2 flex-shrink-0">
+                                        <a class="btn btn-sm btn-success" href="{% url 'one_time_registration' conf.pk %}">
+                                            <i class="fa-regular fa-circle-check"></i> Register
+                                        </a>
+                                        <!-- <a class="btn btn-sm btn-success" href="{% url 'conference_details' conf.pk %}">
+                                            <i class="fa-solid fa-eye"></i> View More
+                                        </a> -->
+                                    </div>
+                                </div>
                                 <p class="card-text">
                                     {% for confdetail in conference_details %}
                                     {% if conf.pk == confdetail.conference_id %}

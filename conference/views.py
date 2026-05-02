@@ -915,7 +915,13 @@ def one_time_participation(request, conference_id):
             organization_address = request.POST.get("organization_address", "").strip()
             embassy_letter = request.POST.get("embassy_letter", "").strip()
             emergency_contact_name = request.POST.get("emergency_contact_name", "").strip()
-            emergency_contact_number = request.POST.get("emergency_contact_number", "").strip()
+            emergency_contact_country_code = request.POST.get("emergency_contact_country_code", "").strip()
+            emergency_contact_number_value = request.POST.get("emergency_contact_number", "").strip()
+            emergency_contact_number = (
+                f"{emergency_contact_country_code}{emergency_contact_number_value}"
+                if emergency_contact_number_value
+                else ""
+            )
             newsletter = False
 
             user = request.user

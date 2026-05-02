@@ -28,7 +28,7 @@
         <form method="POST" class="col-sm-12 col-md-8">
             {% csrf_token %}
             <div class="col-12 text-center mb-4 fs-5 mt-4">
-                Register to LUD Conference
+                Register to the Let Us Dream {{ conference.title }}
                 <div class="fw-bold">
                     {{ conference.location }} | {{ conference.venue }}
                 </div>
@@ -220,11 +220,13 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
-                        <div class="form-floating">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="emergency_contact_country_code"
+                                name="emergency_contact_country_code" placeholder="Code" style="max-width: 100px;">
                             <input type="text" class="form-control" id="emergency_contact_number"
                                 name="emergency_contact_number" placeholder="Contact Number">
-                            <label for="emergency_contact_number">Contact Number</label>
                         </div>
+                        <div class="form-text">Enter country code (e.g. +91) followed by the emergency number.</div>
                     </div>
                 </div>
             </div>
