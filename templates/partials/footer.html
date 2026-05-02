@@ -1,5 +1,13 @@
-<nav class="bg-body-tertiary">
-  <div class=" text-center p-4 fs-6 border-top">
+<footer class="navbar footer">
+  <div class="text-center fs-6 w-100">
     &copy; Designed and Developed by CHRIST Infotech
+    {% if not request.user.is_authenticated %}
+    <div class="mb-2">
+      <a class="text-light text-decoration-none" href="{% url 'ludlogin' %}">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        Login as Conference Admin
+      </a>
+    </div>
+    {% endif %}
   </div>
-</nav>
+</footer>
