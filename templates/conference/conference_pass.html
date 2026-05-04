@@ -156,6 +156,10 @@
                                 <th>Preference</th>
                                 <td>{{ conferenceRegistration.interest }}</td>
                             </tr>
+                            <tr>
+                                <th>Participation Days</th>
+                                <td>{{ conferenceRegistration.participation_days|default:"-" }}</td>
+                            </tr>
                         </table>
                         <div class="text-center text-muted fst-italic">
                             You have registered for the conference on {{ conferenceRegistration.registration_date }}

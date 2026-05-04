@@ -120,18 +120,48 @@
         </div>
         <div class="col-12 mt-3">
             <hr/>
-            <form method="POST" class="d-flex align-items-center justify-content-center">
+            <form method="POST" class="row g-3 align-items-end justify-content-center">
                 {% csrf_token %}
-                <div class="form-floating" style="max-width: 500px">
+                <div class="col-12" style="max-width: 760px">
+                    <label class="form-label fw-semibold">Select days of participation <span class="text-danger">*</span></label>
+                    <div class="border rounded p-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="participation_day_1"
+                                   name="participation_days"
+                                   value="Day 1 - Education: Rethinking Learning Ecosystems - A GLocal Multigenerational Approach">
+                            <label class="form-check-label" for="participation_day_1">
+                                Day 1 - Education: Rethinking Learning Ecosystems - A GLocal Multigenerational Approach
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="participation_day_2"
+                                   name="participation_days"
+                                   value="Day 2 - Health: Building  Holistic Health - Local Wisdom meets Digital Reality">
+                            <label class="form-check-label" for="participation_day_2">
+                                Day 2 - Health: Building  Holistic Health - Local Wisdom meets Digital Reality
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="participation_day_3"
+                                   name="participation_days"
+                                   value="Day 3 - Social: Bridging Heritage and Equity - Indigenous Knowledge for Resilient Futures">
+                            <label class="form-check-label" for="participation_day_3">
+                                Day 3 - Social: Bridging Heritage and Equity - Indigenous Knowledge for Resilient Futures
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <div class="form-floating" style="min-width: 280px">
                     <select class="form-select" id="participation" name="participation" aria-label="">
                         <option value="Attend" selected>Attend the Conference</option>
                         <option value="Organising">Attend & Being part of Organizing Committee</option>
                         <option value="Sponsor">Attend & Being a Sponsor/Partner</option>
                     </select>
                     <label for="participation">Select your Preference</label>
+                    </div>
                 </div>
-                <div class="p-2"></div>
-                <div class="">
+                <div class="col-12 col-md-auto">
                     <button type="submit" class="btn btn-success p-3">
                         Register
                     </button>

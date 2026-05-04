@@ -32,6 +32,18 @@ from conference.utils import (
     str_to_int,
 )
 
+PARTICIPATION_DAY_OPTIONS = [
+    "Day 1 - Education: Rethinking Learning Ecosystems - A GLocal Multigenerational Approach",
+    "Day 2 - Health: Building  Holistic Health - Local Wisdom meets Digital Reality",
+    "Day 3 - Social: Bridging Heritage and Equity - Indigenous Knowledge for Resilient Futures",
+]
+
+
+def get_participation_days(request):
+    selected_days = request.POST.getlist("participation_days")
+    valid_days = [day for day in selected_days if day in PARTICIPATION_DAY_OPTIONS]
+    return ", ".join(valid_days)
+
 
 # Create your views here.
 def home(request):
@@ -622,6 +634,10 @@ def participateconference(request, conference_id):
         conference = Conference.objects.get(pk=conference_id)
         if request.method.lower() == "post":
             interest = request.POST.get("participation")
+            participation_days = get_participation_days(request)
+            if not participation_days:
+                messages.error(request, "Please select at least one day of participation")
+                return redirect("participate_conference", conference_id)
             if ConferenceRegistration.objects.filter(
                 conference_id=conference_id, user=request.user
             ).exists():
@@ -629,10 +645,12 @@ def participateconference(request, conference_id):
                     user=request.user, conference_id=conference_id
                 )
                 conference_reg.interest = interest
+                conference_reg.participation_days = participation_days
                 conference_reg.save()
             else:
                 conferenceReg = ConferenceRegistration(
                     interest=interest,
+                    participation_days=participation_days,
                     conference_id=conference.conference_id,
                     user=request.user,
                 )
@@ -840,6 +858,7 @@ def download_registration_details(request, conference_id):
         ).values(
             "registration_date",
             "interest",
+            "participation_days",
             "user__first_name",
             "user__last_name",
             "user__email",
@@ -886,6 +905,10 @@ def one_time_participation(request, conference_id):
         conference = Conference.objects.get(pk=conference_id)
         if request.method == "POST":
             email = request.POST["email"]
+            participation_days = get_participation_days(request)
+            if not participation_days:
+                messages.error(request, "Please select at least one day of participation")
+                return redirect("one_time_registration", conference_id)
             full_name = request.POST["fullname"].strip()
             name_parts = full_name.split(' ', 1)
             first_name = name_parts[0]
@@ -964,10 +987,12 @@ def one_time_participation(request, conference_id):
                     user=user, conference_id=conference_id
                 )
                 conference_reg.interest = "Attend-Onetime"
+                conference_reg.participation_days = participation_days
                 conference_reg.save()
             else:
                 conferenceReg = ConferenceRegistration(
                     interest="Attend-Onetime",
+                    participation_days=participation_days,
                     conference_id=conference.conference_id,
                     user=user,
                 )
@@ -1619,7 +1644,7 @@ def download_year_details(request, year):
         reg_ws.title = "Registrations"
         
         reg_headers = [
-            'Conference', 'Registration Date', 'Participat Interest', 'First Name', 'Last Name', 
+            'Conference', 'Registration Date', 'Participant Interest', 'Participation Days', 'First Name', 'Last Name', 
             'Email', 'Mobile Number', 'Gender', 'City/Location', 'Designation', 'Organization'
         ]
         
@@ -1638,17 +1663,18 @@ def download_year_details(request, year):
             reg_ws.cell(row=row_num, column=1, value=reg.conference.title)
             reg_ws.cell(row=row_num, column=2, value=reg.registration_date.replace(tzinfo=None) if reg.registration_date else "")
             reg_ws.cell(row=row_num, column=3, value=reg.interest)
-            reg_ws.cell(row=row_num, column=4, value=reg.user.first_name)
-            reg_ws.cell(row=row_num, column=5, value=reg.user.last_name)
-            reg_ws.cell(row=row_num, column=6, value=reg.user.email)
+            reg_ws.cell(row=row_num, column=4, value=reg.participation_days)
+            reg_ws.cell(row=row_num, column=5, value=reg.user.first_name)
+            reg_ws.cell(row=row_num, column=6, value=reg.user.last_name)
+            reg_ws.cell(row=row_num, column=7, value=reg.user.email)
             
             try:
                 details = reg.user.userdetails
-                reg_ws.cell(row=row_num, column=7, value=details.mobile)
-                reg_ws.cell(row=row_num, column=8, value=details.gender)
-                reg_ws.cell(row=row_num, column=9, value=details.city_location)
-                reg_ws.cell(row=row_num, column=10, value=details.designation)
-                reg_ws.cell(row=row_num, column=11, value=details.organization)
+                reg_ws.cell(row=row_num, column=8, value=details.mobile)
+                reg_ws.cell(row=row_num, column=9, value=details.gender)
+                reg_ws.cell(row=row_num, column=10, value=details.city_location)
+                reg_ws.cell(row=row_num, column=11, value=details.designation)
+                reg_ws.cell(row=row_num, column=12, value=details.organization)
             except:
                 pass
         

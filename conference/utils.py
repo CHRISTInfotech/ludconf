@@ -15,6 +15,7 @@ def export_to_excel(queryset):
     worksheet = workbook.active
     columns = ['registration_date',
                'interest',
+               'participation_days',
                'user__first_name',
                'user__last_name',
                'user__email',
@@ -24,7 +25,7 @@ def export_to_excel(queryset):
                'user__userdetails__designation',
                'user__userdetails__organization']
 
-    columns_to_excel = ['Registration Date', 'Participat Interest', 'First Name', 'Last Name', 'Email', 'Mobile Number',
+    columns_to_excel = ['Registration Date', 'Participant Interest', 'Participation Days', 'First Name', 'Last Name', 'Email', 'Mobile Number',
                         'Gender', 'City/Location', 'Designation', 'Organization']
 
     # Header row (optional styling for bold)

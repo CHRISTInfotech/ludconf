@@ -61,6 +61,7 @@ class ConferenceRegistration(models.Model):
     conference = models.ForeignKey(Conference, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     interest = models.CharField(max_length=255)
+    participation_days = models.TextField(blank=True, null=True)
     registration_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
