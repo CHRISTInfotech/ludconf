@@ -40,21 +40,9 @@
 
     <div class="form-card mb-4">
       <label for="conference_location"><strong>Conference Location: <span class="text-danger">*</span></strong></label>
-      <select name="conference_location" id="conference_location" class="form-control" required>
-        <option value="">-- Choose a location --</option>
-        <option value="Chennai, India">Chennai, India</option>
-        <option value="Texas, USA">Texas, USA</option>
-        <option value="NewYork, USA">New York, USA</option>
-        <option value="Pune, India">Pune, India</option>
-        <option value="Hyderabad, India">Hyderabad, India</option>
-        <option value="Bengaluru, India">Bengaluru, India</option>
-        <option value="Louisiana, USA">Louisiana, USA</option>
-        <option value="Delhi, India">Delhi, India</option>
-        <option value="Kolkata, India">Kolkata, India</option>
-        <option value="TVM, Kerala">TVM, Kerala</option>
-        <option value="Virginia, USA">Virginia, USA</option>
-      </select>
-      <div class="invalid-feedback">Please select a conference location.</div>
+      <input type="text" name="conference_location" id="conference_location" class="form-control" readonly
+             placeholder="Select a conference above to auto-fill" required>
+      <div class="invalid-feedback">Please select a conference first.</div>
     </div>
 
     <div class="form-card mb-4">
@@ -629,6 +617,17 @@
 </style>
 
 <script>
+// Conference id → location map built from server data
+const conferenceLocations = {
+  {% for conf in conferences %}"{{ conf.conference_id }}": "{{ conf.location }}"{% if not forloop.last %},{% endif %}
+  {% endfor %}
+};
+
+document.getElementById('conference_id').addEventListener('change', function () {
+  const locationInput = document.getElementById('conference_location');
+  locationInput.value = conferenceLocations[this.value] || '';
+});
+
 // Show/hide "other" profession field
 document.querySelector('select[name="profession"]').addEventListener('change', function() {
   const otherField = document.querySelector('input[name="profession_other"]');
