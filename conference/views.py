@@ -16,7 +16,7 @@ from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
 from collections import Counter
 from conference.functions import generate_otp
 
-from conference.mails import send_otp_email, send_registration_confirmation_email
+from conference.mails import send_otp_email, send_registration_confirmation_email, send_certificate_email
 from conference.models import (
     Conference,
     OTPRequest,
@@ -1123,7 +1123,10 @@ def feedback_survey(request):
                 engaging_activity=engaging_activities_str,
             )
 
-            messages.success(request, "Thank you for your feedback!")
+            full_name = request.POST.get("full_name")
+            email = request.POST.get("email")
+            send_certificate_email(email, full_name, selected_conference)
+            messages.success(request, "Thank you for your feedback! Your certificate of participation has been sent to your email.")
             return redirect("ludlogin")
 
         else:

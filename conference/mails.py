@@ -2,6 +2,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 from ludconf import settings
+from conference.certificates import generate_certificate_pdf
 
 
 def send_registration_confirmation_email(receiver_email, user, conference, conference_reg):
@@ -40,6 +41,40 @@ def send_registration_confirmation_email(receiver_email, user, conference, confe
         return True
     except Exception as e:
         print(f"Error sending registration confirmation email: {e}")
+        return False
+
+
+def send_certificate_email(receiver_email, full_name, conference):
+    subject = f"Your Certificate of Participation – {conference.title}"
+    text_body = (
+        f"Dear {full_name},\n\n"
+        f"Thank you for participating in {conference.title} and for submitting your feedback.\n\n"
+        "Please find your Certificate of Participation attached to this email.\n\n"
+        "LUD Conference Management Team"
+    )
+    html_body = render_to_string(
+        "emails/certificate_email.html",
+        {
+            "full_name": full_name,
+            "conference": conference,
+        },
+    )
+    pdf_bytes = generate_certificate_pdf(full_name, conference)
+
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_body,
+        from_email=settings.EMAIL_HOST_USER,
+        to=[receiver_email],
+    )
+    email.attach_alternative(html_body, "text/html")
+    email.attach("Certificate_of_Participation.pdf", pdf_bytes, "application/pdf")
+
+    try:
+        email.send()
+        return True
+    except Exception as e:
+        print(f"Error sending certificate email: {e}")
         return False
 
 
