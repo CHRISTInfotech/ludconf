@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registration Confirmed</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4efe7; font-family:'Trebuchet MS', 'Segoe UI', sans-serif; color:#1f1c17;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4efe7; padding:24px 12px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 16px 36px rgba(31,28,23,0.15);">
+
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding:28px 28px 20px; background-color:#eef6f3; border-bottom:1px solid #e2ece8;">
+                            <div style="font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:#1b6b6b; font-weight:700;">
+                                LUD CMT
+                            </div>
+                            <h1 style="margin:8px 0 4px; font-size:26px; font-family:'Georgia','Times New Roman',serif; color:#1f1c17;">
+                                Registration Confirmed
+                            </h1>
+                            <p style="margin:0; color:#5c5146; font-size:14px;">
+                                You're all set for <strong>{{ conference.title }}</strong>.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Greeting -->
+                    <tr>
+                        <td style="padding:24px 28px 0;">
+                            <p style="margin:0; font-size:15px; color:#1f1c17;">
+                                Dear <strong>{{ user.first_name }}{% if user.last_name %} {{ user.last_name }}{% endif %}</strong>,
+                            </p>
+                            <p style="margin:12px 0 0; font-size:14px; color:#5c5146; line-height:1.6;">
+                                Thank you for registering. We're excited to have you join us. Here's a summary of your registration details.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Conference Details Card -->
+                    <tr>
+                        <td style="padding:20px 28px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f4ef; border:1px solid #e8ddd4; border-radius:12px; overflow:hidden;">
+                                <tr>
+                                    <td style="padding:16px 20px; border-bottom:1px solid #e8ddd4; background-color:#f0ebe4;">
+                                        <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:#8a7063; font-weight:700;">Conference</div>
+                                        <div style="font-size:17px; font-family:'Georgia','Times New Roman',serif; color:#1f1c17; margin-top:4px; font-weight:600;">{{ conference.title }}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:16px 20px;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="6">
+                                            <tr>
+                                                <td style="width:110px; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#8a7063; padding:5px 0; vertical-align:top;">Dates</td>
+                                                <td style="font-size:14px; color:#1f1c17; padding:5px 0; vertical-align:top;">{{ conference.start_date|date:"F j, Y" }} – {{ conference.end_date|date:"F j, Y" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:110px; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#8a7063; padding:5px 0; vertical-align:top;">Venue</td>
+                                                <td style="font-size:14px; color:#1f1c17; padding:5px 0; vertical-align:top;">{{ conference.venue }}, {{ conference.location }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:110px; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#8a7063; padding:5px 0; vertical-align:top;">Attending</td>
+                                                <td style="font-size:14px; color:#1f1c17; padding:5px 0; vertical-align:top;">
+                                                    {% if days_list %}
+                                                        {% for day in days_list %}
+                                                            <span style="display:inline-block; background-color:#d8ede8; color:#1b6b6b; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; margin:2px 3px 2px 0;">{{ day }}</span>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        All days
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:110px; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#8a7063; padding:5px 0; vertical-align:top;">Reg. Date</td>
+                                                <td style="font-size:14px; color:#1f1c17; padding:5px 0; vertical-align:top;">{{ conference_reg.registration_date|date:"F j, Y" }}</td>
+                                            </tr>
+                                            {% if conference.google_maps_link %}
+                                            <tr>
+                                                <td style="width:110px; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#8a7063; padding:5px 0; vertical-align:top;">Map</td>
+                                                <td style="font-size:14px; padding:5px 0; vertical-align:top;">
+                                                    <a href="{{ conference.google_maps_link }}" style="color:#1b6b6b; text-decoration:underline;">View on Google Maps</a>
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Contact Info -->
+                    <tr>
+                        <td style="padding:0 28px 24px;">
+                            <p style="margin:0 0 8px; font-size:13px; color:#6c6055;">For any queries, reach out to the organising team:</p>
+                            <div style="font-size:13px; color:#1f1c17;">
+                                {{ conference.organizer1 }}{% if conference.mobile1 %} &nbsp;·&nbsp; {{ conference.mobile1 }}{% endif %}
+                            </div>
+                            {% if conference.organizer2 %}
+                            <div style="font-size:13px; color:#1f1c17; margin-top:4px;">
+                                {{ conference.organizer2 }}{% if conference.mobile2 %} &nbsp;·&nbsp; {{ conference.mobile2 }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding:20px 28px 28px; border-top:1px solid #f0e6da; background-color:#fffaf4;">
+                            <div style="font-size:12px; color:#8a7f73;">
+                                This confirmation was sent to {{ user.email }}.
+                            </div>
+                            <div style="margin-top:6px; font-size:11px; color:#a19387;">
+                                Need help? Reply to this email and our team will assist you.
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

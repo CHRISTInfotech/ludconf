@@ -16,7 +16,7 @@ from .models import Conference, FeedbackSurveyResponse, ReflectionSurveyResponse
 from collections import Counter
 from conference.functions import generate_otp
 
-from conference.mails import send_otp_email
+from conference.mails import send_otp_email, send_registration_confirmation_email
 from conference.models import (
     Conference,
     OTPRequest,
@@ -641,20 +641,24 @@ def participateconference(request, conference_id):
             if ConferenceRegistration.objects.filter(
                 conference_id=conference_id, user=request.user
             ).exists():
-                conference_reg = ConferenceRegistration.objects.get(
+                existing_reg = ConferenceRegistration.objects.get(
                     user=request.user, conference_id=conference_id
                 )
-                conference_reg.interest = interest
-                conference_reg.participation_days = participation_days
-                conference_reg.save()
-            else:
-                conferenceReg = ConferenceRegistration(
-                    interest=interest,
-                    participation_days=participation_days,
-                    conference_id=conference.conference_id,
-                    user=request.user,
+                send_registration_confirmation_email(
+                    request.user.email, request.user, conference, existing_reg
                 )
-                conferenceReg.save()
+                messages.info(request, "You have already registered for this conference. Your registration details have been sent to your email.")
+                return redirect("registered_conference")
+            conferenceReg = ConferenceRegistration(
+                interest=interest,
+                participation_days=participation_days,
+                conference_id=conference.conference_id,
+                user=request.user,
+            )
+            conferenceReg.save()
+            send_registration_confirmation_email(
+                request.user.email, request.user, conference, conferenceReg
+            )
             messages.success(request, "You have registered for the conference")
             return redirect("registered_conference")
         try:
@@ -909,6 +913,17 @@ def one_time_participation(request, conference_id):
             if not participation_days:
                 messages.error(request, "Please select at least one day of participation")
                 return redirect("one_time_registration", conference_id)
+            if User.objects.filter(email=email).exists():
+                existing_user = User.objects.get(email=email)
+                if ConferenceRegistration.objects.filter(
+                    conference_id=conference_id, user=existing_user
+                ).exists():
+                    existing_reg = ConferenceRegistration.objects.get(
+                        user=existing_user, conference_id=conference_id
+                    )
+                    send_registration_confirmation_email(email, existing_user, conference, existing_reg)
+                    messages.info(request, "You have already registered for this conference. Your registration details have been sent to your email.")
+                    return redirect("conference_details", conference_id)
             full_name = request.POST["fullname"].strip()
             name_parts = full_name.split(' ', 1)
             first_name = name_parts[0]
@@ -980,23 +995,14 @@ def one_time_participation(request, conference_id):
                 )
                 userdetails.save()
 
-            if ConferenceRegistration.objects.filter(
-                conference_id=conference_id, user=user.pk
-            ).exists():
-                conference_reg = ConferenceRegistration.objects.get(
-                    user=user, conference_id=conference_id
-                )
-                conference_reg.interest = "Attend-Onetime"
-                conference_reg.participation_days = participation_days
-                conference_reg.save()
-            else:
-                conferenceReg = ConferenceRegistration(
-                    interest="Attend-Onetime",
-                    participation_days=participation_days,
-                    conference_id=conference.conference_id,
-                    user=user,
-                )
-                conferenceReg.save()
+            conferenceReg = ConferenceRegistration(
+                interest="Attend-Onetime",
+                participation_days=participation_days,
+                conference_id=conference.conference_id,
+                user=user,
+            )
+            conferenceReg.save()
+            send_registration_confirmation_email(email, user, conference, conferenceReg)
 
             messages.success(request, "You have registered for the conference")
             return redirect("conference_details", conference_id)
